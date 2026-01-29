@@ -1,0 +1,260 @@
+/* Custom Styles for EDA Dashboard */
+
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #0dcaf0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Headers */
+.section-header {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-top: 2rem;
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    border-left: 5px solid var(--primary-color);
+}
+
+/* Metric Cards */
+.metric-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.metric-card h2,
+.metric-card h3,
+.metric-card h5,
+.metric-card h6 {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.metric-card p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Interpretation Box */
+.interpretation-box {
+    background-color: #e8f4f8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.interpretation-box strong {
+    color: #2c3e50;
+}
+
+/* Recommendation Box */
+.recommendation-box {
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid;
+    margin: 1rem 0;
+}
+
+.recommendation-box h5 {
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.recommendation-box p {
+    margin-bottom: 0.5rem;
+}
+
+/* Hover Card Effect */
+.hover-card {
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.hover-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+
+/* Feature List */
+.feature-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.feature-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.feature-list li:last-child {
+    border-bottom: none;
+}
+
+/* Code Block */
+.code-block {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    padding: 1.5rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    max-height: 600px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Tables */
+.table {
+    font-size: 0.9rem;
+}
+
+.table thead {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0,0,0,.02);
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 5px;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: bold;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Loading Spinner */
+.spinner-border {
+    border-width: 0.3rem;
+}
+
+/* Responsive Images */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Utility Classes */
+.shadow-sm {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08) !important;
+}
+
+.shadow {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .section-header {
+        font-size: 1.5rem;
+    }
+    
+    .metric-card {
+        padding: 1rem;
+    }
+    
+    .interpretation-box {
+        padding: 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .code-block {
+        font-size: 0.75rem;
+        padding: 1rem;
+    }
+}

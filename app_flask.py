@@ -167,43 +167,27 @@ class DataAnalyzer:
         }
     
     def generate_recommendations(self):
-        """Generate actionable recommendations"""
+        """Generate actionable recommendations (simplified, no remove recommendations)"""
         recommendations = []
         
         missing = self.get_missing_values()
         for idx, row in missing.iterrows():
-            if row['Missing %'] > 50:
-                recommendations.append({
-                    'category': 'Column Removal',
-                    'priority': 'High',
-                    'action': f"Remove column '{row['Column']}'",
-                    'reason': f"Contains {row['Missing %']:.1f}% missing values"
-                })
-            elif row['Missing %'] > 5:
+            if row['Missing %'] > 5:
                 recommendations.append({
                     'category': 'Data Imputation',
-                    'priority': 'Medium',
+                    'priority': 'High' if row['Missing %'] > 30 else 'Medium',
                     'action': f"Handle missing values in '{row['Column']}'",
-                    'reason': f"Contains {row['Missing %']:.1f}% missing values"
+                    'reason': f"{row['Missing %']:.1f}% missing"
                 })
         
         outliers = self.detect_outliers()
         for col, info in outliers.items():
-            if info['percentage'] > 10:
+            if info['percentage'] > 5:
                 recommendations.append({
-                    'category': 'Outlier Treatment',
+                    'category': 'Outlier Analysis',
                     'priority': 'Medium',
-                    'action': f"Investigate outliers in '{col}'",
-                    'reason': f"{info['count']} outliers ({info['percentage']:.1f}%)"
-                })
-        
-        for col in self.numeric_cols:
-            if self.df[col].nunique() == 1:
-                recommendations.append({
-                    'category': 'Column Removal',
-                    'priority': 'High',
-                    'action': f"Remove constant column '{col}'",
-                    'reason': "Only one unique value"
+                    'action': f"Analyze outliers in '{col}'",
+                    'reason': f"{info['percentage']:.1f}% outliers"
                 })
         
         stats = self.get_statistics()
@@ -212,10 +196,10 @@ class DataAnalyzer:
                 skew = stats.loc[col, 'skewness'] if col in stats.index else 0
                 if abs(skew) > 2:
                     recommendations.append({
-                        'category': 'Transformation',
+                        'category': 'Data Transformation',
                         'priority': 'Medium',
                         'action': f"Apply transformation to '{col}'",
-                        'reason': f"High skewness ({skew:.2f})"
+                        'reason': f"High skewness"
                     })
         
         if len(self.numeric_cols) > 1:
@@ -224,9 +208,9 @@ class DataAnalyzer:
                 for j in range(i+1, len(corr_matrix.columns)):
                     if abs(corr_matrix.iloc[i, j]) > 0.9:
                         recommendations.append({
-                            'category': 'Feature Redundancy',
+                            'category': 'Multicollinearity',
                             'priority': 'Medium',
-                            'action': f"Consider removing '{corr_matrix.columns[i]}' or '{corr_matrix.columns[j]}'",
+                            'action': f"Review '{corr_matrix.columns[i]}' and '{corr_matrix.columns[j]}'",
                             'reason': f"High correlation ({corr_matrix.iloc[i, j]:.2f})"
                         })
                         break
@@ -237,8 +221,8 @@ class DataAnalyzer:
                 recommendations.append({
                     'category': 'Feature Scaling',
                     'priority': 'High',
-                    'action': "Apply feature scaling",
-                    'reason': "Features have vastly different scales"
+                    'action': "Apply standardization/normalization",
+                    'reason': "Features have different scales"
                 })
         
         return recommendations
@@ -321,27 +305,39 @@ def upload_file():
     """Handle file upload"""
     global current_analyzer, current_filename
     
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
-    
-    df = load_data(file)
-    if df is None:
-        return jsonify({'error': 'Failed to load file'}), 400
-    
-    current_analyzer = DataAnalyzer(df)
-    current_filename = secure_filename(file.filename)
-    
-    return jsonify({'success': True, 'filename': current_filename})
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Validate file extension
+        allowed_extensions = {'.csv', '.xlsx', '.xls', '.xlsm', '.xlsb', '.txt'}
+        file_ext = os.path.splitext(file.filename.lower())[1]
+        if file_ext not in allowed_extensions:
+            return jsonify({'error': f'Invalid file type. Allowed: {', '.join(allowed_extensions)}'}), 400
+        
+        df = load_data(file)
+        if df is None or len(df) == 0:
+            return jsonify({'error': 'Failed to load file. Please ensure it is a valid CSV or Excel file with data.'}), 400
+        
+        current_analyzer = DataAnalyzer(df)
+        current_filename = secure_filename(file.filename)
+        
+        return jsonify({'success': True, 'filename': current_filename})
+    except Exception as e:
+        print(f"Upload error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Upload failed: {str(e)}'}), 500
 
 @app.route('/visualizations')
 def visualizations():
     """Visualizations page"""
     if current_analyzer is None:
-        return render_template('error.html', message='No data loaded. Please upload a file.')
+        return render_template('error.html', message='No data loaded. Please upload a file first from the home page.')
     
     return render_template('visualizations.html', filename=current_filename)
 
@@ -352,16 +348,25 @@ def code_page():
         with open('eda_analysis.py', 'r', encoding='utf-8') as f:
             code_content = f.read()
         return render_template('code.html', code=code_content)
-    except:
-        return render_template('error.html', message='Could not load code file.')
+    except Exception as e:
+        print(f"Code page error: {str(e)}")
+        return render_template('error.html', message='Could not load code file. Please ensure eda_analysis.py exists.')
 
 @app.route('/recommendations')
 def recommendations():
     """Recommendations page"""
     if current_analyzer is None:
-        return render_template('error.html', message='No data loaded. Please upload a file.')
+        return render_template('error.html', message='No data loaded. Please upload a file first from the home page.')
     
     return render_template('recommendations.html', filename=current_filename)
+
+@app.route('/reports')
+def reports():
+    """Reports page with detailed analysis"""
+    if current_analyzer is None:
+        return render_template('error.html', message='No data loaded. Please upload a file.')
+    
+    return render_template('reports.html', filename=current_filename)
 
 @app.route('/api/overview')
 def api_overview():

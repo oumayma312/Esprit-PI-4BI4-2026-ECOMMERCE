@@ -206,21 +206,13 @@ $(document).ready(function() {
                         <strong>Impact assessment:</strong>
                         <ul class="mt-2 mb-0">
                             ${data.data.some(row => row['Missing %'] > 50) ? 
-                                `<li>🔴 <strong>Critical:</strong> Some columns have >50% missing - strongly consider removal</li>` : ''}
+                                `<li>🔴 <strong>Critical:</strong> Some columns have >50% missing - strongly consider handling carefully</li>` : ''}
                             ${data.data.some(row => row['Missing %'] > 20 && row['Missing %'] <= 50) ?
                                 `<li>⚠️ <strong>High:</strong> Columns with 20-50% missing may bias results - use imputation carefully</li>` : ''}
                             ${data.data.some(row => row['Missing %'] > 5 && row['Missing %'] <= 20) ?
                                 `<li>⚡ <strong>Moderate:</strong> 5-20% missing - multiple imputation or row removal recommended</li>` : ''}
                             ${data.data.some(row => row['Missing %'] <= 5) ?
                                 `<li>✓ <strong>Low:</strong> <5% missing - safe to drop rows or use simple imputation</li>` : ''}
-                        </ul>
-                        <br><strong>Recommended actions:</strong>
-                        <ul class="mt-2 mb-0">
-                            <li><strong>Understand the cause:</strong> Random missing (MAR), systematic patterns, or data collection issues?</li>
-                            <li><strong>Numeric data:</strong> Use mean/median (symmetric), median (skewed), or predictive imputation (complex)</li>
-                            <li><strong>Categorical data:</strong> Use mode, "Unknown" category, or predictive models</li>
-                            <li><strong>High missingness:</strong> Remove column if >70% missing or not critical to analysis</li>
-                            <li><strong>Document decisions:</strong> Track what was imputed/removed for reproducibility</li>
                         </ul>
                     </div>
                 `;

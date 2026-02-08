@@ -24,6 +24,13 @@ import json
 from werkzeug.utils import secure_filename
 import warnings
 warnings.filterwarnings('ignore')
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak, KeepTogether
+from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -685,6 +692,526 @@ def api_recommendations():
 def download_code():
     """Download Python code"""
     return send_file('eda_analysis.py', as_attachment=True, download_name='eda_analysis.py')
+
+@app.route('/download/report-pdf')
+def download_report_pdf():
+    """Generate and download comprehensive PDF report"""
+    if current_analyzer is None:
+        return jsonify({'error': 'No data loaded'}), 400
+    
+    try:
+        # Create PDF in memory
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4,
+                              rightMargin=50, leftMargin=50,
+                              topMargin=50, bottomMargin=50)
+        
+        # Container for PDF elements
+        elements = []
+        
+        # Styles
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            textColor=colors.HexColor('#1a237e'),
+            spaceAfter=30,
+            alignment=TA_CENTER
+        )
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading2'],
+            fontSize=16,
+            textColor=colors.HexColor('#1976d2'),
+            spaceAfter=12,
+            spaceBefore=12
+        )
+        subheading_style = ParagraphStyle(
+            'CustomSubHeading',
+            parent=styles['Heading3'],
+            fontSize=12,
+            textColor=colors.HexColor('#424242'),
+            spaceAfter=8
+        )
+        normal_style = ParagraphStyle(
+            'CustomNormal',
+            parent=styles['Normal'],
+            fontSize=10,
+            alignment=TA_JUSTIFY,
+            spaceAfter=6
+        )
+        code_style = ParagraphStyle(
+            'Code',
+            parent=styles['Code'],
+            fontSize=8,
+            leftIndent=20,
+            rightIndent=20,
+            spaceAfter=10,
+            spaceBefore=10,
+            backColor=colors.HexColor('#f5f5f5'),
+            borderColor=colors.HexColor('#e0e0e0'),
+            borderWidth=1,
+            borderPadding=10
+        )
+        
+        # Title Page
+        elements.append(Spacer(1, 1*inch))
+        elements.append(Paragraph("Exploratory Data Analysis", title_style))
+        elements.append(Paragraph("Comprehensive Report", title_style))
+        elements.append(Spacer(1, 0.5*inch))
+        elements.append(Paragraph(f"Dataset: {current_filename}", styles['Normal']))
+        elements.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y at %H:%M')}", styles['Normal']))
+        elements.append(PageBreak())
+        
+        # ========== SECTION 1: MISSING VALUES ==========
+        elements.append(Paragraph("1. Missing Values Analysis", heading_style))
+        elements.append(Spacer(1, 12))
+        
+        # Purpose and explanation
+        elements.append(Paragraph("<b>Purpose</b>", subheading_style))
+        elements.append(Paragraph(
+            "Missing values in datasets can significantly impact model performance and statistical analysis. "
+            "This section identifies columns with missing data and provides comprehensive strategies for handling them effectively.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Missing values data
+        missing = current_analyzer.get_missing_values()
+        if len(missing) > 0:
+            elements.append(Paragraph("<b>Missing Values in Your Dataset</b>", subheading_style))
+            
+            # Create table
+            missing_data = [['Column', 'Missing Count', 'Missing %']]
+            for idx, row in missing.iterrows():
+                missing_data.append([
+                    str(row['Column']),
+                    str(int(row['Missing Count'])),
+                    f"{row['Missing %']:.2f}%"
+                ])
+            
+            missing_table = Table(missing_data, colWidths=[3*inch, 1.5*inch, 1.5*inch])
+            missing_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            elements.append(missing_table)
+            elements.append(Spacer(1, 12))
+        else:
+            elements.append(Paragraph("No missing values detected in the dataset.", normal_style))
+            elements.append(Spacer(1, 12))
+        
+        # Solutions
+        elements.append(Paragraph("<b>Proposed Solutions</b>", subheading_style))
+        elements.append(Paragraph(
+            "<b>Solution 1: Statistical Imputation</b> - Replace missing values with mean, median, or mode. "
+            "Best for numeric features with 5-30% missing values.",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>Solution 2: Advanced Imputation</b> - Use KNN or regression-based imputation for better accuracy.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Code snippet
+        elements.append(Paragraph("<b>Implementation Code</b>", subheading_style))
+        code_text = """# Statistical imputation
+df['column'].fillna(df['column'].mean(), inplace=True)  # Mean
+df['column'].fillna(df['column'].median(), inplace=True)  # Median
+
+# Advanced imputation
+from sklearn.impute import KNNImputer
+imputer = KNNImputer(n_neighbors=5)
+df_imputed = imputer.fit_transform(df[numeric_cols])"""
+        elements.append(Paragraph(code_text.replace('\n', '<br/>').replace(' ', '&nbsp;'), code_style))
+        elements.append(PageBreak())
+        
+        # ========== SECTION 2: OUTLIER ANALYSIS ==========
+        elements.append(Paragraph("2. Outlier Analysis", heading_style))
+        elements.append(Spacer(1, 12))
+        
+        elements.append(Paragraph("<b>Purpose</b>", subheading_style))
+        elements.append(Paragraph(
+            "Outliers are data points that significantly deviate from other observations. "
+            "They can indicate errors, anomalies, or valuable insights depending on the context.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Outlier detection
+        outliers = current_analyzer.detect_outliers()
+        if len(outliers) > 0:
+            elements.append(Paragraph("<b>Outliers Detected in Your Dataset</b>", subheading_style))
+            
+            outlier_data = [['Column', 'Outlier Count', 'Percentage', 'Lower Bound', 'Upper Bound']]
+            for col, info in outliers.items():
+                outlier_data.append([
+                    str(col),
+                    str(info['count']),
+                    f"{info['percentage']:.2f}%",
+                    f"{info['lower_bound']:.2f}",
+                    f"{info['upper_bound']:.2f}"
+                ])
+            
+            outlier_table = Table(outlier_data, colWidths=[1.8*inch, 1.2*inch, 1*inch, 1.2*inch, 1.2*inch])
+            outlier_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            elements.append(outlier_table)
+            elements.append(Spacer(1, 12))
+            
+            # Add boxplot visualizations
+            elements.append(Paragraph("<b>Visualizations</b>", subheading_style))
+            for col in list(outliers.keys())[:3]:  # Limit to first 3 columns
+                try:
+                    fig, ax = plt.subplots(figsize=(6, 3))
+                    ax.boxplot(current_analyzer.df[col].dropna())
+                    ax.set_ylabel(col)
+                    ax.set_title(f'Box Plot: {col}')
+                    ax.grid(alpha=0.3)
+                    
+                    img_buffer = io.BytesIO()
+                    plt.savefig(img_buffer, format='png', bbox_inches='tight', dpi=150)
+                    img_buffer.seek(0)
+                    plt.close(fig)
+                    
+                    img = Image(img_buffer, width=4*inch, height=2*inch)
+                    elements.append(img)
+                    elements.append(Spacer(1, 6))
+                except:
+                    pass
+        else:
+            elements.append(Paragraph("No significant outliers detected in the dataset.", normal_style))
+        
+        elements.append(Spacer(1, 12))
+        
+        # Solutions
+        elements.append(Paragraph("<b>Proposed Solutions</b>", subheading_style))
+        elements.append(Paragraph(
+            "<b>Solution 1: Investigation</b> - Analyze outliers to determine if they're legitimate or errors.",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>Solution 2: Transformation</b> - Apply log or Box-Cox transformations to compress outliers.",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>Solution 3: Capping/Winsorization</b> - Replace extreme values with percentile values.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Code snippet
+        elements.append(Paragraph("<b>Implementation Code</b>", subheading_style))
+        code_text = """# IQR method for outlier detection
+Q1 = df['column'].quantile(0.25)
+Q3 = df['column'].quantile(0.75)
+IQR = Q3 - Q1
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+outliers = df[(df['column'] < lower_bound) | (df['column'] > upper_bound)]
+
+# Capping method (Winsorization)
+from scipy.stats.mstats import winsorize
+df['column_winsorized'] = winsorize(df['column'], limits=[0.05, 0.05])"""
+        elements.append(Paragraph(code_text.replace('\n', '<br/>').replace(' ', '&nbsp;'), code_style))
+        elements.append(PageBreak())
+        
+        # ========== SECTION 3: DATA TRANSFORMATION ==========
+        elements.append(Paragraph("3. Data Transformation", heading_style))
+        elements.append(Spacer(1, 12))
+        
+        elements.append(Paragraph("<b>Purpose</b>", subheading_style))
+        elements.append(Paragraph(
+            "Data transformation adjusts variable distributions to improve model performance, "
+            "satisfy statistical assumptions, and enhance the interpretability of results.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Skewness analysis
+        stats_df = current_analyzer.get_statistics()
+        if stats_df is not None and 'skewness' in stats_df.columns:
+            elements.append(Paragraph("<b>Skewness Analysis</b>", subheading_style))
+            elements.append(Paragraph(
+                "Features with high skewness (>2 or <-2) may benefit from transformation:",
+                normal_style
+            ))
+            elements.append(Spacer(1, 6))
+            
+            skew_data = [['Feature', 'Skewness', 'Recommendation']]
+            for idx, row in stats_df.iterrows():
+                skew = row['skewness']
+                if abs(skew) > 0.5:  # Show features with any skewness
+                    recommendation = "Transform" if abs(skew) > 2 else "Monitor"
+                    skew_data.append([
+                        str(idx),
+                        f"{skew:.2f}",
+                        recommendation
+                    ])
+            
+            if len(skew_data) > 1:
+                skew_table = Table(skew_data, colWidths=[2.5*inch, 1.5*inch, 2*inch])
+                skew_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, 0), 10),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                ]))
+                elements.append(skew_table)
+                elements.append(Spacer(1, 12))
+        
+        # Methods and code
+        elements.append(Paragraph("<b>Transformation Methods</b>", subheading_style))
+        elements.append(Paragraph(
+            "<b>Log Transformation:</b> Best for right-skewed data (income, prices, population).",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>Square Root:</b> For moderately skewed count data.",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>Box-Cox:</b> Automatically finds optimal transformation parameter.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Code snippet
+        elements.append(Paragraph("<b>Implementation Code</b>", subheading_style))
+        code_text = """# Log transformation
+df['column_log'] = np.log1p(df['column'])  # log1p handles zeros
+
+# Square root transformation
+df['column_sqrt'] = np.sqrt(df['column'])
+
+# Box-Cox transformation
+from scipy.stats import boxcox
+df['column_boxcox'], lambda_param = boxcox(df['column'])
+print(f'Optimal lambda: {lambda_param}')"""
+        elements.append(Paragraph(code_text.replace('\n', '<br/>').replace(' ', '&nbsp;'), code_style))
+        elements.append(PageBreak())
+        
+        # ========== SECTION 4: MULTICOLLINEARITY ==========
+        elements.append(Paragraph("4. Multicollinearity Analysis", heading_style))
+        elements.append(Spacer(1, 12))
+        
+        elements.append(Paragraph("<b>Purpose</b>", subheading_style))
+        elements.append(Paragraph(
+            "Multicollinearity occurs when independent variables are highly correlated. "
+            "This analysis identifies these relationships and provides strategies to address redundancy.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Correlation analysis
+        if len(current_analyzer.numeric_cols) >= 2:
+            elements.append(Paragraph("<b>Correlation Analysis</b>", subheading_style))
+            
+            # Generate correlation matrix visualization
+            try:
+                corr_matrix = current_analyzer.df[current_analyzer.numeric_cols].corr()
+                
+                # Find high correlations
+                high_corr_pairs = []
+                for i in range(len(corr_matrix.columns)):
+                    for j in range(i+1, len(corr_matrix.columns)):
+                        if abs(corr_matrix.iloc[i, j]) > 0.7:
+                            high_corr_pairs.append([
+                                corr_matrix.columns[i],
+                                corr_matrix.columns[j],
+                                f"{corr_matrix.iloc[i, j]:.3f}"
+                            ])
+                
+                if high_corr_pairs:
+                    elements.append(Paragraph("High correlation pairs detected (|r| > 0.7):", normal_style))
+                    elements.append(Spacer(1, 6))
+                    
+                    corr_data = [['Feature 1', 'Feature 2', 'Correlation']]
+                    corr_data.extend(high_corr_pairs)
+                    
+                    corr_table = Table(corr_data, colWidths=[2*inch, 2*inch, 1.5*inch])
+                    corr_table.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('FONTSIZE', (0, 0), (-1, 0), 10),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                    ]))
+                    elements.append(corr_table)
+                    elements.append(Spacer(1, 12))
+                    
+                    # Add correlation heatmap
+                    fig, ax = plt.subplots(figsize=(6, 5))
+                    sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='coolwarm',
+                              center=0, square=True, linewidths=1, cbar_kws={"shrink": 0.8},
+                              ax=ax)
+                    ax.set_title('Correlation Matrix')
+                    
+                    img_buffer = io.BytesIO()
+                    plt.savefig(img_buffer, format='png', bbox_inches='tight', dpi=150)
+                    img_buffer.seek(0)
+                    plt.close(fig)
+                    
+                    img = Image(img_buffer, width=5*inch, height=4*inch)
+                    elements.append(img)
+                    elements.append(Spacer(1, 12))
+                else:
+                    elements.append(Paragraph("No high correlation pairs detected (all |r| < 0.7).", normal_style))
+                    elements.append(Spacer(1, 12))
+            except:
+                pass
+        
+        # Solutions
+        elements.append(Paragraph("<b>Proposed Solutions</b>", subheading_style))
+        elements.append(Paragraph(
+            "<b>Solution 1: Feature Selection</b> - Remove one feature from highly correlated pairs.",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>Solution 2: PCA</b> - Transform correlated features into uncorrelated components.",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>Solution 3: Regularization</b> - Use Ridge or Lasso regression for robustness.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Code snippet
+        elements.append(Paragraph("<b>Implementation Code</b>", subheading_style))
+        code_text = """# Correlation matrix analysis
+corr_matrix = df.corr()
+high_corr = (corr_matrix.abs() > 0.9) & (corr_matrix.abs() < 1.0)
+
+# VIF calculation
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+vif_data = pd.DataFrame()
+vif_data['Variable'] = X.columns
+vif_data['VIF'] = [variance_inflation_factor(X.values, i) 
+                   for i in range(X.shape[1])]"""
+        elements.append(Paragraph(code_text.replace('\n', '<br/>').replace(' ', '&nbsp;'), code_style))
+        elements.append(PageBreak())
+        
+        # ========== SECTION 5: FEATURE SCALING ==========
+        elements.append(Paragraph("5. Feature Scaling", heading_style))
+        elements.append(Spacer(1, 12))
+        
+        elements.append(Paragraph("<b>Purpose</b>", subheading_style))
+        elements.append(Paragraph(
+            "Feature scaling ensures all features contribute equally to model training by normalizing their ranges. "
+            "This is crucial for distance-based algorithms and gradient descent optimization.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Scale analysis
+        if stats_df is not None and 'std' in stats_df.columns:
+            elements.append(Paragraph("<b>Scale Analysis</b>", subheading_style))
+            elements.append(Paragraph(
+                "Comparison of feature scales (standard deviation):",
+                normal_style
+            ))
+            elements.append(Spacer(1, 6))
+            
+            scale_data = [['Feature', 'Mean', 'Std Dev', 'Min', 'Max']]
+            for idx, row in stats_df.iterrows():
+                scale_data.append([
+                    str(idx)[:20],  # Truncate long names
+                    f"{row['mean']:.2f}",
+                    f"{row['std']:.2f}",
+                    f"{row['min']:.2f}",
+                    f"{row['max']:.2f}"
+                ])
+            
+            scale_table = Table(scale_data, colWidths=[1.8*inch, 1*inch, 1*inch, 1*inch, 1*inch])
+            scale_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1976d2')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('FONTSIZE', (0, 0), (-1, -1), 8)
+            ]))
+            elements.append(scale_table)
+            elements.append(Spacer(1, 12))
+        
+        # Methods
+        elements.append(Paragraph("<b>Scaling Methods</b>", subheading_style))
+        elements.append(Paragraph(
+            "<b>StandardScaler (Z-score):</b> Transforms to mean=0, std=1. Best for normally distributed data.",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>MinMaxScaler:</b> Scales to [0, 1] range. Best when you need bounded values.",
+            normal_style
+        ))
+        elements.append(Paragraph(
+            "<b>RobustScaler:</b> Uses median and IQR. Best when outliers are present.",
+            normal_style
+        ))
+        elements.append(Spacer(1, 12))
+        
+        # Code snippet
+        elements.append(Paragraph("<b>Implementation Code</b>", subheading_style))
+        code_text = """# StandardScaler (Z-score normalization)
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+df_scaled = scaler.fit_transform(df[numeric_cols])
+
+# MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+df_scaled = scaler.fit_transform(df[numeric_cols])
+
+# RobustScaler (robust to outliers)
+from sklearn.preprocessing import RobustScaler
+scaler = RobustScaler()
+df_scaled = scaler.fit_transform(df[numeric_cols])"""
+        elements.append(Paragraph(code_text.replace('\n', '<br/>').replace(' ', '&nbsp;'), code_style))
+        
+        # Build PDF
+        doc.build(elements)
+        buffer.seek(0)
+        
+        # Send file
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=f'EDA_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf',
+            mimetype='application/pdf'
+        )
+        
+    except Exception as e:
+        print(f"Error generating PDF: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Failed to generate PDF: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

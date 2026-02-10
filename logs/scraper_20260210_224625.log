@@ -1,0 +1,112 @@
+2026-02-10 22:46:25,548 [INFO] ====== WebDriver manager ======
+2026-02-10 22:46:26,975 [INFO] Get LATEST chromedriver version for google-chrome
+2026-02-10 22:46:26,980 [DEBUG] Starting new HTTPS connection (1): googlechromelabs.github.io:443
+2026-02-10 22:46:27,117 [DEBUG] https://googlechromelabs.github.io:443 "GET /chrome-for-testing/latest-patch-versions-per-build.json HTTP/1.1" 200 15239
+2026-02-10 22:46:27,134 [INFO] Get LATEST chromedriver version for google-chrome
+2026-02-10 22:46:27,135 [DEBUG] Starting new HTTPS connection (1): googlechromelabs.github.io:443
+2026-02-10 22:46:27,220 [DEBUG] https://googlechromelabs.github.io:443 "GET /chrome-for-testing/latest-patch-versions-per-build.json HTTP/1.1" 200 15239
+2026-02-10 22:46:27,229 [INFO] Driver [C:\Users\koudo\.wdm\drivers\chromedriver\win64\144.0.7559.133\chromedriver-win32/chromedriver.exe] found in cache
+2026-02-10 22:46:27,230 [DEBUG] Skipping Selenium Manager; path to chrome driver specified in Service class: C:\Users\koudo\.wdm\drivers\chromedriver\win64\144.0.7559.133\chromedriver-win32/chromedriver.exe
+2026-02-10 22:46:28,279 [DEBUG] Started executable: `C:\Users\koudo\.wdm\drivers\chromedriver\win64\144.0.7559.133\chromedriver-win32/chromedriver.exe` in a child process with pid: 2932 using 0 to output -3
+2026-02-10 22:46:28,792 [DEBUG] POST http://localhost:65043/session {'capabilities': {'firstMatch': [{}], 'alwaysMatch': {'browserName': 'chrome', 'pageLoadStrategy': <PageLoadStrategy.normal: 'normal'>, 'goog:chromeOptions': {'excludeSwitches': ['enable-automation'], 'useAutomationExtension': False, 'extensions': [], 'args': ['--disable-blink-features=AutomationControlled', '--no-sandbox', '--disable-dev-shm-usage', '--start-maximized', '--disable-gpu', 'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36']}}}}
+2026-02-10 22:46:28,793 [DEBUG] Starting new HTTP connection (1): localhost:65043
+2026-02-10 22:46:29,708 [DEBUG] http://localhost:65043 "POST /session HTTP/1.1" 200 0
+2026-02-10 22:46:29,709 [DEBUG] Remote response: status=200 | data={"value":{"capabilities":{"acceptInsecureCerts":false,"browserName":"chrome","browserVersion":"144.0.7559.133","chrome":{"chromedriverVersion":"144.0.7559.133 (7da823b1d594d1b49797911900e003ec96a8c0e7-refs/branch-heads/7559@{#4253})","userDataDir":"C:\\Users\\koudo\\AppData\\Local\\Temp\\scoped_dir2932_874544784"},"fedcm:accounts":true,"goog:chromeOptions":{"debuggerAddress":"localhost:65046"},"goog:processID":25280,"networkConnectionEnabled":false,"pageLoadStrategy":"normal","platformName":"windows","proxy":{},"setWindowRect":true,"strictFileInteractability":false,"timeouts":{"implicit":0,"pageLoad":300000,"script":30000},"unhandledPromptBehavior":"dismiss and notify","webauthn:extension:credBlob":true,"webauthn:extension:largeBlob":true,"webauthn:extension:minPinLength":true,"webauthn:extension:prf":true,"webauthn:virtualAuthenticators":true},"sessionId":"67db8a711b44ff03f94febdefb1aa6d6"}} | headers=HTTPHeaderDict({'Content-Length': '905', 'Content-Type': 'application/json; charset=utf-8', 'cache-control': 'no-cache'})
+2026-02-10 22:46:29,709 [DEBUG] Finished Request
+2026-02-10 22:46:29,709 [DEBUG] POST http://localhost:65043/session/67db8a711b44ff03f94febdefb1aa6d6/execute/sync {'script': "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})", 'args': []}
+2026-02-10 22:46:29,720 [DEBUG] http://localhost:65043 "POST /session/67db8a711b44ff03f94febdefb1aa6d6/execute/sync HTTP/1.1" 200 0
+2026-02-10 22:46:29,720 [DEBUG] Remote response: status=200 | data={"value":null} | headers=HTTPHeaderDict({'Content-Length': '14', 'Content-Type': 'application/json; charset=utf-8', 'cache-control': 'no-cache'})
+2026-02-10 22:46:29,720 [DEBUG] Finished Request
+2026-02-10 22:46:29,720 [INFO] ✓ Chrome driver initialized
+2026-02-10 22:46:29,725 [INFO] ✓ Created clean CSV: ileycom_products_clean.csv
+2026-02-10 22:46:29,726 [INFO] ============================================================
+2026-02-10 22:46:29,726 [INFO] 🚀 Starting multi-category scrape: 6 categories
+2026-02-10 22:46:29,726 [INFO] ============================================================
+2026-02-10 22:46:29,726 [INFO] 
+2026-02-10 22:46:29,727 [INFO] 🔹==========================================================🔹
+2026-02-10 22:46:29,727 [INFO] 📂 CATEGORY 1/6: https://ileycom.com/en/product-category/gifts-ideas/
+2026-02-10 22:46:29,727 [INFO] 🔹==========================================================🔹
+2026-02-10 22:46:29,727 [INFO] 📄 Scraping: https://ileycom.com/en/product-category/gifts-ideas/ (Attempt 1/3)
+2026-02-10 22:46:29,727 [DEBUG] POST http://localhost:65043/session/67db8a711b44ff03f94febdefb1aa6d6/url {'url': 'https://ileycom.com/en/product-category/gifts-ideas/'}
+2026-02-10 22:46:34,500 [DEBUG] http://localhost:65043 "POST /session/67db8a711b44ff03f94febdefb1aa6d6/url HTTP/1.1" 500 0
+2026-02-10 22:46:34,500 [DEBUG] Remote response: status=500 | data={"value":{"error":"unknown error","message":"unknown error: cannot determine loading status\nfrom unknown error: cannot determine loading status\nfrom target frame detached\n  (Session info: chrome=144.0.7559.133)","stacktrace":"Symbols not available. Dumping unresolved backtrace:\n\t0x705093\n\t0x7050d4\n\t0x4fb2ce\n\t0x4eb423\n\t0x4e96a8\n\t0x4e9ef6\n\t0x50db3e\n\t0x503f7b\n\t0x503e82\n\t0x4f7b11\n\t0x4f75d7\n\t0x508a6e\n\t0x50e4b6\n\t0x4ea57c\n\t0x508389\n\t0x58565a\n\t0x567f56\n\t0x5396c9\n\t0x53a484\n\t0x957e34\n\t0x9530c9\n\t0x970add\n\t0x71db38\n\t0x7258ad\n\t0x70d848\n\t0x70da12\n\t0x6f75fa\n\t0x77745d49\n\t0x77a1d83b\n\t0x77a1d7c1\n"}} | headers=HTTPHeaderDict({'Content-Length': '652', 'Content-Type': 'application/json; charset=utf-8', 'cache-control': 'no-cache'})
+2026-02-10 22:46:34,501 [DEBUG] Finished Request
+2026-02-10 22:46:34,501 [ERROR] ❌ Error: Message: unknown error: cannot determine loading status
+from unknown error: cannot determine loading status
+from target frame detached
+  (Session info: chrome=144.0.7559.133)
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x705093
+	0x7050d4
+	0x4fb2ce
+	0x4eb423
+	0x4e96a8
+	0x4e9ef6
+	0x50db3e
+	0x503f7b
+	0x503e82
+	0x4f7b11
+	0x4f75d7
+	0x508a6e
+	0x50e4b6
+	0x4ea57c
+	0x508389
+	0x58565a
+	0x567f56
+	0x5396c9
+	0x53a484
+	0x957e34
+	0x9530c9
+	0x970add
+	0x71db38
+	0x7258ad
+	0x70d848
+	0x70da12
+	0x6f75fa
+	0x77745d49
+	0x77a1d83b
+	0x77a1d7c1
+
+2026-02-10 22:46:39,503 [INFO] 📄 Scraping: https://ileycom.com/en/product-category/gifts-ideas/ (Attempt 2/3)
+2026-02-10 22:46:39,503 [DEBUG] POST http://localhost:65043/session/67db8a711b44ff03f94febdefb1aa6d6/url {'url': 'https://ileycom.com/en/product-category/gifts-ideas/'}
+2026-02-10 22:46:39,505 [DEBUG] http://localhost:65043 "POST /session/67db8a711b44ff03f94febdefb1aa6d6/url HTTP/1.1" 404 0
+2026-02-10 22:46:39,505 [DEBUG] Remote response: status=404 | data={"value":{"error":"invalid session id","message":"invalid session id: session deleted as the browser has closed the connection\nfrom disconnected: not connected to DevTools\n  (Session info: chrome=144.0.7559.133)","stacktrace":"Symbols not available. Dumping unresolved backtrace:\n\t0x705093\n\t0x7050d4\n\t0x4fb490\n\t0x4ea43e\n\t0x508ef3\n\t0x56f00c\n\t0x584df9\n\t0x567f56\n\t0x5396c9\n\t0x53a484\n\t0x957e34\n\t0x9530c9\n\t0x970add\n\t0x71db38\n\t0x7258ad\n\t0x70d848\n\t0x70da12\n\t0x6f75fa\n\t0x77745d49\n\t0x77a1d83b\n\t0x77a1d7c1\n"}} | headers=HTTPHeaderDict({'Content-Length': '544', 'Content-Type': 'application/json; charset=utf-8', 'cache-control': 'no-cache'})
+2026-02-10 22:46:39,505 [DEBUG] Finished Request
+2026-02-10 22:46:39,505 [ERROR] ❌ Error: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=144.0.7559.133); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#invalidsessionidexception
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x705093
+	0x7050d4
+	0x4fb490
+	0x4ea43e
+	0x508ef3
+	0x56f00c
+	0x584df9
+	0x567f56
+	0x5396c9
+	0x53a484
+	0x957e34
+	0x9530c9
+	0x970add
+	0x71db38
+	0x7258ad
+	0x70d848
+	0x70da12
+	0x6f75fa
+	0x77745d49
+	0x77a1d83b
+	0x77a1d7c1
+
+2026-02-10 22:46:41,975 [WARNING] 
+⚠ Interrupted by user
+2026-02-10 22:46:41,975 [INFO] Partial results: 0 products
+2026-02-10 22:46:41,976 [DEBUG] DELETE http://localhost:65043/session/67db8a711b44ff03f94febdefb1aa6d6 {}
+2026-02-10 22:46:41,995 [DEBUG] Incremented Retry for (url='/session/67db8a711b44ff03f94febdefb1aa6d6'): Retry(total=2, connect=None, read=None, redirect=None, status=None)
+2026-02-10 22:46:41,995 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ConnectionResetError(10054, 'Une connexion existante a dû être fermée par l’hôte distant', None, 10054, None)': /session/67db8a711b44ff03f94febdefb1aa6d6
+2026-02-10 22:46:41,996 [DEBUG] Starting new HTTP connection (2): localhost:65043
+2026-02-10 22:46:46,073 [DEBUG] Incremented Retry for (url='/session/67db8a711b44ff03f94febdefb1aa6d6'): Retry(total=1, connect=None, read=None, redirect=None, status=None)
+2026-02-10 22:46:46,073 [WARNING] Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError("HTTPConnection(host='localhost', port=65043): Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée")': /session/67db8a711b44ff03f94febdefb1aa6d6
+2026-02-10 22:46:46,073 [DEBUG] Starting new HTTP connection (3): localhost:65043

@@ -1,0 +1,351 @@
+{
+  "name": "PDF OCR + LLM to CSV (Windows Ready)",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        208,
+        48
+      ],
+      "id": "9163d96c-69b0-4cd4-b0e2-eb4cf18b6b3a"
+    },
+    {
+      "parameters": {
+        "command": "powershell -Command \"Get-ChildItem 'D:\\4BI4\\PI\\E-commerce\\E-commerce\\artisanat\\archive_facture\\Achat\\baticonfort' -Filter *.pdf | ForEach-Object { $path = $_.FullName -replace '\\\\\\\\','/'; Write-Output ('{\\\"filePath\\\":\\\"' + $path + '\\\",\\\"fileName\\\":\\\"' + $_.Name + '\\\"}') }\"\n"
+      },
+      "name": "List PDFs",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        432,
+        48
+      ],
+      "id": "e9d9052f-795a-4707-a011-e31c6722e770"
+    },
+    {
+      "parameters": {
+        "functionCode": "const lines = $json['stdout'].split('\\n').filter(l => l.trim() !== '');\nreturn lines.map(line => {\n  // replace backslashes with forward slashes before parsing\n  const fixedLine = line.replace(/\\\\/g, '/');\n  return { json: JSON.parse(fixedLine) };\n});\n"
+      },
+      "name": "Parse PDF List",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        656,
+        48
+      ],
+      "id": "b0dbe862-81aa-45cd-af67-88341bc119af"
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=\"C:/poppler/Library/bin/pdftoppm.exe\" \"{{$json.filePath}}\" \"D:/4BI4/PI/E-commerce/E-commerce/artisanat/archive_facture/Achat/baticonfort/tmp/{{$json.fileName.replace('.pdf','')}}\" -png\n"
+      },
+      "name": "Convert PDF to PNG",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        208,
+        384
+      ],
+      "id": "9d20509f-0754-4685-89c5-1b310727d0d7"
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = $input.all();\n\nreturn items.map(item => {\n  return {\n    json: JSON.parse(item.json.stdout)\n  };\n});\n"
+      },
+      "name": "List PNGs",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        656,
+        384
+      ],
+      "id": "125ff597-b0f7-4a2e-8d39-b50abbd7ed39"
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=\"C:/Program Files/Tesseract-OCR/tesseract.exe\" \"{{$json.filePath.replace(/\\\\/g,'/')}}\" stdout"
+      },
+      "name": "OCR PNG",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        880,
+        384
+      ],
+      "id": "77e735b1-f3d2-4c6d-94ff-d3dc8a81377c"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a data extraction assistant.\n\nReturn ONLY valid JSON.\nReturn ONLY an array of objects.\nDo NOT add any text, explanation, or formatting.\n\nFields to extract:\n- societe\n- num_facture\n- adresse\n- date\n- reference\n- designation\n- quantite\n- pu\n- tva\n- timbre\n- montant_ttc\n\nRules:\n- societe MUST be \"Baticonfort Mestiri\"\n- adresse MUST be \"Sousse\"\n- Date format must be YYYY-MM-DD\n- Normalize numeric values (keep decimal format)\n- If a field is missing, use null\n\nText to extract from:\n\"\"\"\n{{ $json.text }}\n\"\"\"\n\nReturn EXACTLY this structure:\n[\n  {\n    \"societe\": \"Baticonfort Mestiri\",\n    \"num_facture\": \"<invoice number or null>\",\n    \"adresse\": \"Sousse\",\n    \"date\": \"<YYYY-MM-DD or null>\",\n    \"reference\": \"<reference number or null>\",\n    \"designation\": \"<item description or null>\",\n    \"quantite\": \"<quantity or null>\",\n    \"pu\": \"<unit price without tax or null>\",\n    \"tva\": \"<tax value or null>\",\n    \"timbre\": \"<stamp fee or null>\",\n    \"montant_ttc\": \"<total including tax or null>\"\n  }\n]\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1328,
+        48
+      ],
+      "id": "123e82c0-4efe-4169-a6bd-40bb10a76683",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=powershell -Command \"Get-ChildItem 'D:/4BI4/PI/E-commerce/E-commerce/artisanat/archive_facture/Achat/baticonfort/tmp' -Filter '*{{$('Parse PDF List').item.json.fileName.replace('.pdf','')}}*.png' | ForEach-Object { $fullPath = $_.FullName -replace '\\\\','/'; $json = @{ filePath = $fullPath; fileName = $_.Name } | ConvertTo-Json -Compress; Write-Output $json }\"\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        432,
+        384
+      ],
+      "id": "c7aa22f9-0f15-45e7-b4fa-37ef4c678512",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items\nlet ocrData = $input.all();\n\n// Concatenate all stdout values with a clear separator\nlet combinedText = ocrData\n    .map((entry, index) => `--- transfer Entry ${index + 1} ---\\n${entry.json.stdout}`)\n    .join(\"\\n\\n\");\n\n// Return as a single item to pass to the LLM\nreturn [\n    { json: { text: combinedText } }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        48
+      ],
+      "id": "6c0d3aaa-f1a4-409d-8cab-2eee6819f45b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data =$input.first().json.output\nconst headers = Object.keys(data[0]);\nconst csvString = [\n  headers.join(\",\"), // header\n  ...data.map(row => headers.map(h => `\"${row[h] !== null ? row[h] : ''}\"`).join(\",\"))\n].join(\"\\n\");\n\nreturn [\n  {\n    json: {}, // empty JSON is fine\n    binary: {\n      data: {\n        data: Buffer.from(csvString, \"utf8\")\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        48
+      ],
+      "id": "81178b51-2a16-4bd9-a97a-7522a64bc850",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=D:/4BI4/PI/E-commerce/E-commerce/artisanat/archive_facture/Achat/baticonfort/bati.csv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        48
+      ],
+      "id": "aa348c68-e032-44ec-9bf7-43a834350bab",
+      "name": "Read/Write Files from Disk",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n    \"societe\": \"Baticonfort Mestiri\",\n    \"num_facture\": \"25002591/2025\",\n    \"adresse\": \"Sousse\",\n    \"date\": \"2025-07-18\",\n    \"reference\": \"40084956954726\",\n    \"designation\": \"PILE 1.5V BP 2 AAA ALKALINE VARTA\",\n    \"quantite\": \"1\",\n    \"pu\": \"3.888\",\n    \"tva\": \"19%\",\n    \"timbre\": \"1,000\",\n    \"montant_ttc\": \"29,649\"\n  }\n]\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1472,
+        272
+      ],
+      "id": "0a7fc679-4a66-4d8f-86b2-464d65bda975",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        272
+      ],
+      "id": "b05cd317-8bb0-4828-a6f8-7972085f8c61",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "53UKOyHLW8UdC5yK",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=\"C:/poppler/Library/bin/pdftotext.exe\" \"{{ $json.filePath }}\" -"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        848,
+        -32
+      ],
+      "id": "76b12c91-d74e-49e8-9893-76b655b5c950",
+      "name": "Execute Command1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "List PDFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List PDFs": {
+      "main": [
+        [
+          {
+            "node": "Parse PDF List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse PDF List": {
+      "main": [
+        [
+          {
+            "node": "Convert PDF to PNG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert PDF to PNG": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List PNGs": {
+      "main": [
+        [
+          {
+            "node": "OCR PNG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR PNG": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "List PNGs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "4f609fb8-77c0-468e-b473-b05abb26ce1e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d62488ce445c9e19fe99a645ab14d34fd844d04897c3310eeabf1e69d797db24"
+  },
+  "id": "pNBd4EsyW1oc5yv9",
+  "tags": []
+}

@@ -763,10 +763,57 @@ $(document).ready(function() {
             processData: false,
             contentType: false,
             success: function(response) {
-                messageDiv.html('<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>File uploaded successfully! Redirecting to visualizations...</div>');
-                setTimeout(function() {
-                    window.location.href = '/visualizations';
-                }, 1500);
+                if (response.sheets && response.sheets.length > 1) {
+                    // Multiple sheets detected - show sheet selector
+                    var sheetOptions = response.sheets.map(function(sheet) {
+                        return '<button class="btn btn-outline-primary btn-lg m-2 sheet-select-btn" data-sheet="' + sheet + '">' +
+                               '<i class="fas fa-file-excel me-2"></i>' + sheet + '</button>';
+                    }).join('');
+                    
+                    messageDiv.html(
+                        '<div class="alert alert-success mb-4">' +
+                        '<i class="fas fa-check-circle me-2"></i>File uploaded successfully! ' +
+                        'Found <strong>' + response.sheets.length + ' sheets</strong>.' +
+                        '</div>' +
+                        '<div class="card border-primary">' +
+                        '<div class="card-header bg-primary text-white">' +
+                        '<h5 class="mb-0"><i class="fas fa-table me-2"></i>Select a Sheet to Analyze</h5>' +
+                        '</div>' +
+                        '<div class="card-body text-center p-4">' +
+                        sheetOptions +
+                        '</div>' +
+                        '</div>'
+                    );
+                    
+                    // Add click handlers for sheet selection
+                    $('.sheet-select-btn').on('click', function() {
+                        var selectedSheet = $(this).data('sheet');
+                        messageDiv.html('<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-2"></i>Loading sheet "' + selectedSheet + '"...</div>');
+                        
+                        $.ajax({
+                            url: '/switch_sheet',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ sheet_name: selectedSheet }),
+                            success: function(response) {
+                                messageDiv.html('<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>Sheet "' + selectedSheet + '" loaded successfully! Redirecting...</div>');
+                                setTimeout(function() {
+                                    window.location.href = '/visualizations';
+                                }, 1000);
+                            },
+                            error: function(xhr) {
+                                var error = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to switch sheet';
+                                messageDiv.html('<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>' + error + '</div>');
+                            }
+                        });
+                    });
+                } else {
+                    // Single sheet or CSV - proceed directly
+                    messageDiv.html('<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>File uploaded successfully! Redirecting to visualizations...</div>');
+                    setTimeout(function() {
+                        window.location.href = '/visualizations';
+                    }, 1500);
+                }
             },
             error: function(xhr) {
                 var error = xhr.responseJSON ? xhr.responseJSON.error : 'Upload failed';

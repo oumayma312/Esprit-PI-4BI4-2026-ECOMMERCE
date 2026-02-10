@@ -205,12 +205,10 @@ $(document).ready(function() {
                         The dataset contains missing values in ${data.data.length} column(s). Missing data can significantly impact analysis quality and must be addressed before modeling.<br><br>
                         <strong>Impact assessment:</strong>
                         <ul class="mt-2 mb-0">
-                            ${data.data.some(row => row['Missing %'] > 50) ? 
-                                `<li>🔴 <strong>Critical:</strong> Some columns have >50% missing - strongly consider handling carefully</li>` : ''}
-                            ${data.data.some(row => row['Missing %'] > 20 && row['Missing %'] <= 50) ?
-                                `<li>⚠️ <strong>High:</strong> Columns with 20-50% missing may bias results - use imputation carefully</li>` : ''}
-                            ${data.data.some(row => row['Missing %'] > 5 && row['Missing %'] <= 20) ?
-                                `<li>⚡ <strong>Moderate:</strong> 5-20% missing - multiple imputation or row removal recommended</li>` : ''}
+                            ${data.data.some(row => row['Missing %'] > 30) ? 
+                                `<li>🔴 <strong>Critical:</strong> Some columns have >30% missing - strongly consider handling carefully</li>` : ''}
+                            ${data.data.some(row => row['Missing %'] > 5 && row['Missing %'] <= 30) ?
+                                `<li>⚠️ <strong>High:</strong> Columns with 5-30% missing may bias results - use imputation carefully</li>` : ''}
                             ${data.data.some(row => row['Missing %'] <= 5) ?
                                 `<li>✓ <strong>Low:</strong> <5% missing - safe to drop rows or use simple imputation</li>` : ''}
                         </ul>
@@ -314,10 +312,75 @@ $(document).ready(function() {
         $.get('/api/boxplots', function(data) {
             var html = '';
             data.forEach(function(box) {
+                var percentage = parseFloat(box.outlier_percentage);
+                var recommendation = '';
+                var recColor = '';
+                var recIcon = '';
+                
+                // Determine recommendation based on outlier percentage
+                if (box.has_outliers) {
+                    if (percentage < 1) {
+                        recColor = 'success';
+                        recIcon = 'check-circle';
+                        recommendation = `
+                            <div class="alert alert-success border-success" style="border-left: 5px solid;">
+                                <h6 class="alert-heading"><i class="fas fa-${recIcon} me-2"></i>Recommended Action: Remove Outliers</h6>
+                                <p class="mb-2"><strong>Reason:</strong> Very low percentage (${box.outlier_percentage}%) - safe to remove</p>
+                                <p class="mb-2"><strong>Method:</strong> Use boolean indexing to filter out values</p>
+                                <p class="mb-0"><strong>Impact:</strong> Minimal impact on dataset size</p>
+                                <hr>
+                                <small><code>df = df[(df['${box.column}'] >= ${box.lower_bound}) & (df['${box.column}'] <= ${box.upper_bound})]</code></small>
+                            </div>
+                        `;
+                    } else if (percentage < 5) {
+                        recColor = 'warning';
+                        recIcon = 'exclamation-triangle';
+                        recommendation = `
+                            <div class="alert alert-warning border-warning" style="border-left: 5px solid;">
+                                <h6 class="alert-heading"><i class="fas fa-${recIcon} me-2"></i>Recommended Action: Winsorization (Capping)</h6>
+                                <p class="mb-2"><strong>Reason:</strong> Moderate percentage (${box.outlier_percentage}%) - transformation preferred</p>
+                                <p class="mb-2"><strong>Method:</strong> Replace extreme values with boundary values</p>
+                                <p class="mb-0"><strong>Impact:</strong> Preserves dataset size while reducing extreme values</p>
+                                <hr>
+                                <small><code>from scipy.stats.mstats import winsorize<br>
+                                df['${box.column}_win'] = winsorize(df['${box.column}'], limits=[0.05, 0.05])</code></small>
+                            </div>
+                        `;
+                    } else if (percentage < 10) {
+                        recColor = 'danger';
+                        recIcon = 'fire';
+                        recommendation = `
+                            <div class="alert alert-danger border-danger" style="border-left: 5px solid;">
+                                <h6 class="alert-heading"><i class="fas fa-${recIcon} me-2"></i>Recommended Action: Log Transformation</h6>
+                                <p class="mb-2"><strong>Reason:</strong> High percentage (${box.outlier_percentage}%) - transformation is safer</p>
+                                <p class="mb-2"><strong>Method:</strong> Apply logarithmic transformation to compress range</p>
+                                <p class="mb-0"><strong>Impact:</strong> Reduces impact while preserving all data</p>
+                                <hr>
+                                <small><code>df['${box.column}_log'] = np.log1p(df['${box.column}'])</code></small>
+                            </div>
+                        `;
+                    } else {
+                        recColor = 'dark';
+                        recIcon = 'search';
+                        recommendation = `
+                            <div class="alert alert-dark border-dark" style="border-left: 5px solid;">
+                                <h6 class="alert-heading"><i class="fas fa-${recIcon} me-2"></i>Recommended Action: Investigation Required</h6>
+                                <p class="mb-2"><strong>Reason:</strong> Very high percentage (${box.outlier_percentage}%) - may indicate distribution issues</p>
+                                <p class="mb-2"><strong>Method:</strong> Investigate if outliers are legitimate or errors</p>
+                                <p class="mb-0"><strong>Impact:</strong> Requires domain expertise and careful analysis</p>
+                                <hr>
+                                <small><code>from sklearn.preprocessing import RobustScaler<br>
+                                scaler = RobustScaler()<br>
+                                df['${box.column}_scaled'] = scaler.fit_transform(df[['${box.column}']])</code></small>
+                            </div>
+                        `;
+                    }
+                }
+                
                 html += `
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-light">
-                            <h5 class="mb-0">Boxplot of ${box.column}</h5>
+                            <h5 class="mb-0"><i class="fas fa-chart-box me-2"></i>Boxplot of ${box.column}</h5>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -326,11 +389,11 @@ $(document).ready(function() {
                                 </div>
                                 <div class="col-lg-4">
                                     ${box.has_outliers ? `
-                                        <div class="alert alert-warning">
-                                            <i class="fas fa-exclamation-triangle me-2"></i><strong>${box.outlier_count} Outliers</strong>
+                                        <div class="alert alert-${recColor === 'success' ? 'info' : recColor}">
+                                            <i class="fas fa-exclamation-triangle me-2"></i><strong>${box.outlier_count} Outliers Detected</strong>
                                         </div>
                                         <div class="metric-card mb-2">
-                                            <h6 class="text-warning">${box.outlier_percentage}%</h6>
+                                            <h6 class="text-${recColor}">${box.outlier_percentage}%</h6>
                                             <p class="text-muted mb-0">Outlier Percentage</p>
                                         </div>
                                         <div class="metric-card mb-2">
@@ -343,16 +406,22 @@ $(document).ready(function() {
                                         </div>
                                     ` : `
                                         <div class="alert alert-success">
-                                            <i class="fas fa-check-circle me-2"></i><strong>No Outliers</strong>
+                                            <i class="fas fa-check-circle me-2"></i><strong>No Outliers Detected</strong>
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <p class="mb-0"><small>All values fall within the expected range. Excellent data quality!</small></p>
                                         </div>
                                     `}
                                 </div>
                             </div>
+                            
+                           
+                            
                             <div class="interpretation-box mt-3">
                                 <strong>📊 Interpretation:</strong><br>
                                 ${box.has_outliers ? 
                                     `<strong>${box.column}</strong> contains <strong>${box.outlier_count} outliers</strong> (${box.outlier_percentage}% of data) outside the normal range of [${box.lower_bound}, ${box.upper_bound}].<br><br>
-                                    ${parseFloat(box.outlier_percentage) > 15 ? 
+                                    ${percentage > 15 ? 
                                         `⚠️ <strong>High outlier rate!</strong> With ${box.outlier_percentage}% outliers, this suggests either data quality issues, special cases, or a heavy-tailed distribution. Investigate these values individually:
                                         <ul class="mt-2 mb-0">
                                             <li>Check for data entry errors or measurement issues</li>
@@ -360,7 +429,7 @@ $(document).ready(function() {
                                             <li>Consider robust statistical methods or transformations</li>
                                             <li>Document outliers before deciding on removal strategy</li>
                                         </ul>` :
-                                        parseFloat(box.outlier_percentage) > 5 ?
+                                        percentage > 5 ?
                                             `<strong>Moderate outliers detected.</strong> These extreme values may be legitimate but warrant investigation. Consider:
                                             <ul class="mt-2 mb-0">
                                                 <li>Verify data accuracy for outlier values</li>
@@ -389,16 +458,20 @@ $(document).ready(function() {
     }
     
     function loadCorrelation() {
+        var html = '';
+        
+        // Load quantitative correlation
         $.get('/api/correlation', function(data) {
             if (data.chart) {
-                var html = `
+                html += `
+                    <h3 class="mb-3 text-primary"><i class="fas fa-calculator me-2"></i>Quantitative Variables Correlation</h3>
                     <div class="card shadow-sm mb-4">
                         <div class="card-body text-center">
-                            <img src="data:image/png;base64,${data.chart}" class="img-fluid" alt="Correlation Matrix">
+                            <img src="data:image/png;base64,${data.chart}" class="img-fluid" alt="Quantitative Correlation Matrix">
                         </div>
                     </div>
-                    <div class="interpretation-box">
-                        <strong>📊 Interpretation:</strong><br>
+                    <div class="interpretation-box mb-4">
+                        <strong>📊 Interpretation - Pearson Correlation:</strong><br>
                         The correlation matrix reveals relationships between numeric features. High positive correlations (close to +1.0) indicate features that increase together, while negative correlations (close to -1.0) show inverse relationships.<br><br>
                         <strong>Key insights:</strong>
                         <ul class="mt-2 mb-0">
@@ -406,14 +479,69 @@ $(document).ready(function() {
                             <li><strong>Strong correlation (|r| > 0.7):</strong> Significant linear relationship - consider removing one for feature reduction</li>
                             <li><strong>Moderate correlation (0.3 < |r| < 0.7):</strong> Noticeable relationship but variables provide unique information</li>
                             <li><strong>Weak correlation (|r| < 0.3):</strong> Little to no linear relationship - features are largely independent</li>
-                            <li><strong>Diagonal values (1.0):</strong> Each variable perfectly correlates with itself (expected)</li>
                         </ul>
-                        <br><strong>⚠️ Multicollinearity Warning:</strong> Highly correlated features can cause issues in regression models. Use VIF (Variance Inflation Factor) or PCA for dimensionality reduction if needed.
+                        <br><strong>⚠️ Multicollinearity Warning:</strong> Highly correlated features can cause issues in regression models.
                     </div>
                 `;
-                $('#correlation-content').html(html);
-                $('#corr-section').show();
             }
+            
+            // Load qualitative correlation
+            $.get('/api/correlation_qualitative', function(data2) {
+                if (data2.chart) {
+                    html += `
+                        <h3 class="mb-3 text-warning"><i class="fas fa-tags me-2"></i>Qualitative Variables Correlation</h3>
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${data2.chart}" class="img-fluid" alt="Qualitative Correlation Matrix">
+                            </div>
+                        </div>
+                        <div class="interpretation-box mb-4">
+                            <strong>📊 Interpretation - Cramér's V:</strong><br>
+                            Cramér's V measures the association between categorical variables using Chi-square test. Values range from 0 (no association) to 1 (perfect association).<br><br>
+                            <strong>Key insights:</strong>
+                            <ul class="mt-2 mb-0">
+                                <li><strong>V > 0.5:</strong> Strong association - categories are highly related</li>
+                                <li><strong>0.3 < V < 0.5:</strong> Moderate association - noticeable relationship</li>
+                                <li><strong>0.1 < V < 0.3:</strong> Weak association - limited relationship</li>
+                                <li><strong>V < 0.1:</strong> Negligible association - categories are independent</li>
+                            </ul>
+                            <br><strong>💡 Note:</strong> Unlike Pearson correlation, Cramér's V is always positive as it measures strength, not direction.
+                        </div>
+                    `;
+                }
+                
+                // Load mixed correlation
+                $.get('/api/correlation_mixed', function(data3) {
+                    if (data3.chart) {
+                        html += `
+                            <h3 class="mb-3 text-success"><i class="fas fa-exchange-alt me-2"></i>Quantitative vs Qualitative Correlation</h3>
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-body text-center">
+                                    <img src="data:image/png;base64,${data3.chart}" class="img-fluid" alt="Mixed Correlation Matrix">
+                                </div>
+                            </div>
+                            <div class="interpretation-box mb-4">
+                                <strong>📊 Interpretation - Correlation Ratio (η²):</strong><br>
+                                The correlation ratio measures how well a categorical variable explains the variance in a quantitative variable. η² ranges from 0 to 1.<br><br>
+                                <strong>Key insights:</strong>
+                                <ul class="mt-2 mb-0">
+                                    <li><strong>η² > 0.14:</strong> Strong effect - the categorical variable significantly explains the numeric variance</li>
+                                    <li><strong>0.06 < η² < 0.14:</strong> Moderate effect - noticeable influence on numeric values</li>
+                                    <li><strong>0.01 < η² < 0.06:</strong> Small effect - weak relationship</li>
+                                    <li><strong>η² < 0.01:</strong> Negligible effect - categorical groups have similar numeric distributions</li>
+                                </ul>
+                                <br><strong>💡 Use Case:</strong> High η² values suggest good categorical features for predicting numeric targets (useful for feature selection in regression).
+                            </div>
+                        `;
+                    }
+                    
+                    // Display all correlation content
+                    if (html !== '') {
+                        $('#correlation-content').html(html);
+                        $('#corr-section').show();
+                    }
+                });
+            });
         });
     }
     
@@ -557,20 +685,25 @@ $(document).ready(function() {
                     
                     <div class="card shadow-sm mb-4">
                         <div class="card-header bg-light">
-                            <h5 class="mb-0">Component Importance</h5>
+                            <h5 class="mb-0">Component Importance (All ${data.n_components} Components)</h5>
                         </div>
                         <div class="card-body">
+                            <div class="alert alert-info mb-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>PCA Analysis:</strong> ${data.n_components} principal components calculated from all numeric features. 
+                                ${data.n_components > 6 ? `Showing all ${data.n_components} components (scroll to see more cards).` : ''}
+                            </div>
                             <div class="row">
                                 ${data.explained_variance.map((variance, idx) => `
-                                    <div class="col-md-4 mb-3">
+                                    <div class="col-md-4 col-lg-3 mb-3">
                                         <div class="card border-primary">
                                             <div class="card-body text-center">
                                                 <h4 class="text-primary">PC${idx + 1}</h4>
                                                 <h2 class="text-success">${(variance * 100).toFixed(1)}%</h2>
-                                                <p class="text-muted mb-0">Individual Variance</p>
+                                                <p class="text-muted mb-0 small">Individual Variance</p>
                                                 <hr>
                                                 <h5 class="text-info">${(data.cumulative_variance[idx] * 100).toFixed(1)}%</h5>
-                                                <p class="text-muted mb-0">Cumulative Variance</p>
+                                                <p class="text-muted mb-0 small">Cumulative Variance</p>
                                             </div>
                                         </div>
                                     </div>
@@ -585,6 +718,41 @@ $(document).ready(function() {
                                         `⚠️ <strong>Complex data structure:</strong> ${data.n_components} components explain ${(data.cumulative_variance[data.cumulative_variance.length - 1] * 100).toFixed(1)}% - consider using more components or feature engineering.`
                                 }
                             </div>
+                            
+                            ${data.n_components > 3 ? `
+                                <div class="mt-4">
+                                    <h6 class="fw-bold mb-3">📋 Complete Components Table</h6>
+                                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                        <table class="table table-sm table-striped table-hover">
+                                            <thead class="sticky-top bg-primary text-white">
+                                                <tr>
+                                                    <th>Component</th>
+                                                    <th>Variance Explained (%)</th>
+                                                    <th>Cumulative Variance (%)</th>
+                                                    ${data.eigenvalues ? '<th>Eigenvalue</th>' : ''}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${data.explained_variance.map((variance, idx) => `
+                                                    <tr ${data.cumulative_variance[idx] >= 0.8 && (idx === 0 || data.cumulative_variance[idx-1] < 0.8) ? 'class="table-success"' : ''}>
+                                                        <td><strong>PC${idx + 1}</strong></td>
+                                                        <td>${(variance * 100).toFixed(2)}%</td>
+                                                        <td>${(data.cumulative_variance[idx] * 100).toFixed(2)}%</td>
+                                                        ${data.eigenvalues ? `<td>${data.eigenvalues[idx].toFixed(3)}</td>` : ''}
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="alert alert-light mt-2">
+                                        <small>
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            <strong>Note:</strong> Rows highlighted in green indicate where 80% cumulative variance is reached.
+                                            ${data.kaiser_components ? ` Kaiser criterion suggests retaining <strong>${data.kaiser_components}</strong> component${data.kaiser_components > 1 ? 's' : ''} (eigenvalue > 1).` : ''}
+                                        </small>
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -604,29 +772,173 @@ $(document).ready(function() {
                             This visualization projects your high-dimensional data onto the two most important principal components (PC1 and PC2), which together explain <strong>${((data.explained_variance[0] + data.explained_variance[1]) * 100).toFixed(1)}%</strong> of the total variance.<br><br>
                             <strong>What to look for:</strong>
                             <ul class="mt-2 mb-0">
-                                <li>🔍 <strong>Clusters:</strong> Groups of nearby points indicate similar samples. Look for natural groupings that might represent different categories or patterns in your data.</li>
-                                <li>🎯 <strong>Outliers:</strong> Points far from the main cluster may be anomalies, errors, or genuinely unique cases worth investigating.</li>
-                                <li>📏 <strong>Spread:</strong> 
-                                    <ul>
-                                        <li>Wide distribution → High diversity in data</li>
-                                        <li>Tight clustering → Samples are very similar</li>
-                                        <li>Elongated shape → Data varies more along one principal component</li>
-                                    </ul>
-                                </li>
-                                <li>📐 <strong>Patterns:</strong> Linear arrangements, curves, or distinct regions may reveal underlying data structures or relationships.</li>
-                                <li>🌈 <strong>Color gradient:</strong> Represents sample index - look for patterns related to data collection order or time sequence.</li>
-                            </ul>
-                            <br>
-                            <strong>Practical Applications:</strong>
-                            <ul class="mt-2 mb-0">
-                                <li>✓ Use for data visualization in reports and presentations</li>
-                                <li>✓ Identify data quality issues or collection biases</li>
-                                <li>✓ Discover natural groupings for clustering analysis</li>
-                                <li>✓ Detect anomalies or unusual patterns</li>
+                                <li>🔍 <strong>Clusters:</strong> Groups of nearby points indicate similar samples</li>
+                                <li>🎯 <strong>Outliers:</strong> Points far from the main cluster may be anomalies</li>
+                                <li>📏 <strong>Spread:</strong> Wide distribution → High diversity in data</li>
                             </ul>
                         </div>
                     `;
                 }
+                
+                // Biplot
+                if (data.charts.biplot) {
+                    html += `
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-project-diagram me-2"></i>PCA Biplot - Observations and Variables</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${data.charts.biplot}" class="img-fluid" alt="PCA Biplot">
+                            </div>
+                        </div>
+                        <div class="interpretation-box mb-4">
+                            <strong>📊 Biplot Interpretation:</strong><br>
+                            The biplot combines observations (dots) and original variables (red arrows) in the same plot.<br><br>
+                            <strong>How to read it:</strong>
+                            <ul class="mt-2 mb-0">
+                                <li>🔴 <strong>Red arrows:</strong> Original variables. Arrow direction shows positive correlation with PCs</li>
+                                <li>📏 <strong>Arrow length:</strong> Longer arrows = more influence on principal components</li>
+                                <li>↔️ <strong>Arrow angle:</strong> 
+                                    <ul>
+                                        <li>Small angle between arrows = variables are positively correlated</li>
+                                        <li>90° angle = variables are uncorrelated</li>
+                                        <li>180° angle = variables are negatively correlated</li>
+                                    </ul>
+                                </li>
+                                <li>🎯 <strong>Observations near an arrow:</strong> High values for that variable</li>
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                // Correlation Circle
+                if (data.charts.correlation_circle) {
+                    html += `
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-circle-notch me-2"></i>Correlation Circle</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${data.charts.correlation_circle}" class="img-fluid" alt="Correlation Circle">
+                            </div>
+                        </div>
+                        <div class="interpretation-box mb-4">
+                            <strong>📊 Correlation Circle Interpretation:</strong><br>
+                            Shows how well each original variable is represented by PC1 and PC2.<br><br>
+                            <strong>Key insights:</strong>
+                            <ul class="mt-2 mb-0">
+                                <li>⭕ <strong>Circle edge:</strong> Variables close to the circle are well-represented (high quality representation)</li>
+                                <li>📍 <strong>Center:</strong> Variables near center are poorly represented by these 2 PCs</li>
+                                <li>➡️ <strong>Horizontal arrows:</strong> Mainly explained by PC1</li>
+                                <li>⬆️ <strong>Vertical arrows:</strong> Mainly explained by PC2</li>
+                                <li>🔵 <strong>Grouped arrows:</strong> Correlated variables point in similar directions</li>
+                            </ul>
+                            <br>
+                            <strong>💡 Tip:</strong> Variables with arrows pointing in opposite directions are negatively correlated.
+                        </div>
+                    `;
+                }
+                
+                // Variable Contributions
+                if (data.charts.contributions) {
+                    html += `
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Variable Contributions to Principal Components</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${data.charts.contributions}" class="img-fluid" alt="Variable Contributions">
+                            </div>
+                        </div>
+                        <div class="interpretation-box mb-4">
+                            <strong>📊 Variable Contributions Interpretation:</strong><br>
+                            Shows which original variables contribute most to each principal component (in %).<br><br>
+                            <strong>Understanding:</strong>
+                            <ul class="mt-2 mb-0">
+                                <li>📊 <strong>High contribution (>10%):</strong> Variable strongly influences this PC</li>
+                                <li>📉 <strong>Low contribution (<5%):</strong> Variable has little impact on this PC</li>
+                                <li>🎯 <strong>Equal contributions:</strong> All variables equally important (rare)</li>
+                                <li>⚖️ <strong>Dominant variable:</strong> One variable controls the PC (suggests redundancy)</li>
+                            </ul>
+                            <br>
+                            <strong>💡 Use Case:</strong> Identify which variables define each principal component for better interpretation.
+                        </div>
+                    `;
+                }
+                
+                // Eigenvalues (Kaiser Criterion)
+                if (data.charts.eigenvalues) {
+                    html += `
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-ruler me-2"></i>Eigenvalues (Kaiser Criterion)</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${data.charts.eigenvalues}" class="img-fluid" alt="Eigenvalues">
+                            </div>
+                        </div>
+                        <div class="interpretation-box mb-4">
+                            <strong>📊 Kaiser Criterion Interpretation:</strong><br>
+                            The Kaiser rule suggests retaining components with eigenvalues > 1 (red dashed line).<br><br>
+                            <strong>Analysis:</strong>
+                            <ul class="mt-2 mb-0">
+                                <li>📈 <strong>Eigenvalue > 1:</strong> Component explains more variance than a single original variable</li>
+                                <li>📉 <strong>Eigenvalue < 1:</strong> Component explains less than one original variable</li>
+                                ${data.kaiser_components ? 
+                                    `<li>✅ <strong>Kaiser suggests ${data.kaiser_components} component${data.kaiser_components > 1 ? 's' : ''}:</strong> Based on eigenvalues > 1</li>` 
+                                    : 
+                                    `<li>⚠️ <strong>No components with eigenvalue > 1:</strong> Data may need more preprocessing</li>`
+                                }
+                            </ul>
+                            <br>
+                            <strong>⚖️ Note:</strong> Kaiser criterion is a guideline, not a strict rule. Consider cumulative variance too.
+                        </div>
+                    `;
+                }
+                
+                // Loadings Heatmap
+                if (data.charts.loadings) {
+                    html += `
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-th me-2"></i>Component Loadings Heatmap</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="data:image/png;base64,${data.charts.loadings}" class="img-fluid" alt="Loadings Heatmap">
+                            </div>
+                        </div>
+                        <div class="interpretation-box mb-4">
+                            <strong>📊 Loadings Heatmap Interpretation:</strong><br>
+                            Shows the eigenvectors (loadings) - how each original variable contributes to each PC.<br><br>
+                            <strong>Color coding:</strong>
+                            <ul class="mt-2 mb-0">
+                                <li>🔴 <strong>Red (positive):</strong> Variable increases as PC increases</li>
+                                <li>🔵 <strong>Blue (negative):</strong> Variable decreases as PC increases</li>
+                                <li>⚪ <strong>White (near zero):</strong> Variable doesn't contribute to this PC</li>
+                                <li>🎨 <strong>Intensity:</strong> Darker colors = stronger contribution</li>
+                            </ul>
+                            <br>
+                            <strong>💡 Tip:</strong> Variables with similar loading patterns are correlated.
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-lightbulb me-2"></i>PCA Summary & Recommendations</h5>
+                        <ul class="mb-0">
+                            <li><strong>Components analyzed:</strong> ${data.n_components}</li>
+                            ${data.kaiser_components ? `<li><strong>Kaiser criterion:</strong> Retain ${data.kaiser_components} component${data.kaiser_components > 1 ? 's' : ''} (eigenvalue > 1)</li>` : ''}
+                            <li><strong>Total variance captured:</strong> ${(data.cumulative_variance[data.cumulative_variance.length - 1] * 100).toFixed(1)}%</li>
+                            <li><strong>Best use:</strong> 
+                                ${data.explained_variance[0] > 0.7 ? 
+                                    'Excellent for dimensionality reduction - single component captures most information' :
+                                    'Use for visualization, feature extraction, and noise reduction'
+                                }
+                            </li>
+                        </ul>
+                    </div>
+                `;
                 
                 $('#pca-content').html(html);
             } else {

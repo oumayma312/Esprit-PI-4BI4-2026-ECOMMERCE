@@ -19,6 +19,10 @@ plotly==5.18.0
 scipy==1.16.3
 scikit-learn==1.7.2
 
+# Excel file support
+openpyxl==3.1.2
+xlrd==2.0.1
+
 
 
 

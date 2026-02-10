@@ -377,12 +377,102 @@ df['column_log1p'] = np.log1p(df['column'])  # For data with zeros</code></pre>
                                         <strong>Best for:</strong> Automatically finding optimal transformation parameter
                                     </p>
                                     <p class="text-muted small mb-2">
-                                        <strong>Use case:</strong> Unknown or complex skewness patterns
+                                        <strong>Use case:</strong> Unknown or complex skewness patterns (positive values only)
                                     </p>
                                     <pre class="code-block"><code>from scipy.stats import boxcox
 df['column_boxcox'], lambda_param = boxcox(df['column'])
 print(f'Optimal lambda: {lambda_param}')</code></pre>
                                 </div>
+                            </div>
+
+                            <div class="card bg-light border-0 mb-3">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-primary mb-2">Yeo-Johnson Transformation</h6>
+                                    <p class="text-muted small mb-2">
+                                        <strong>Best for:</strong> Data with negative values or zeros
+                                    </p>
+                                    <p class="text-muted small mb-2">
+                                        <strong>Use case:</strong> When Box-Cox fails due to non-positive values
+                                    </p>
+                                    <pre class="code-block"><code>from sklearn.preprocessing import PowerTransformer
+pt = PowerTransformer(method='yeo-johnson')
+df['column_transformed'] = pt.fit_transform(df[['column']])</code></pre>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h6 class="fw-bold mb-3">🎯 Which Transformation Should You Choose?</h6>
+                            
+                            <div class="alert alert-info" role="alert">
+                                <h6 class="alert-heading"><i class="fas fa-lightbulb me-2"></i>Decision Guide Based on Data Characteristics</h6>
+                                <p class="mb-0 small">Use the table below to select the most appropriate transformation method:</p>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th style="width: 25%;">Data Characteristic</th>
+                                            <th style="width: 30%;">Recommended Transformation</th>
+                                            <th style="width: 45%;">Reason / When to Use</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Skewness: 0.5 to 1.0</strong><br><span class="text-muted small">(Mild skew)</span></td>
+                                            <td><span class="badge bg-success">Square Root</span><br><code>np.sqrt(x)</code></td>
+                                            <td>✅ Gentle transformation<br>✅ Preserves variable relationships<br>✅ Good for count data</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Skewness: 1.0 to 2.0</strong><br><span class="text-muted small">(Moderate skew)</span></td>
+                                            <td><span class="badge bg-primary">Log Transformation</span><br><code>np.log1p(x)</code></td>
+                                            <td>✅ Most common choice<br>✅ Handles zeros with log1p<br>✅ Interpretable for percentages</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Skewness > 2.0</strong><br><span class="text-muted small">(High skew)</span></td>
+                                            <td><span class="badge bg-danger">Box-Cox</span><br><code>scipy.stats.boxcox(x)</code></td>
+                                            <td>✅ Automatically optimized<br>✅ Strongest correction<br>✅ Best for extreme skewness</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data contains zeros</strong></td>
+                                            <td><span class="badge bg-info">Log1p or Square Root</span><br><code>np.log1p(x)</code></td>
+                                            <td>✅ log(x+1) handles zeros safely<br>✅ sqrt also works with zeros<br>❌ Avoid log(x) - would fail</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Negative values present</strong></td>
+                                            <td><span class="badge bg-warning text-dark">Yeo-Johnson</span><br><code>PowerTransformer()</code></td>
+                                            <td>✅ Variant of Box-Cox<br>✅ Works with any real numbers<br>✅ Use sklearn PowerTransformer</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Count data</strong><br><span class="text-muted small">(Integer values: 0,1,2...)</span></td>
+                                            <td><span class="badge bg-success">Square Root or Log1p</span></td>
+                                            <td>✅ Natural for Poisson distributions<br>✅ Preserves count interpretation<br>✅ Stabilizes variance</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Financial/Price data</strong></td>
+                                            <td><span class="badge bg-primary">Log Transformation</span><br><code>np.log(x)</code></td>
+                                            <td>✅ Standard in finance<br>✅ Log-returns are interpretable<br>✅ Multiplicative → Additive</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Unknown distribution</strong><br><span class="text-muted small">(Exploratory phase)</span></td>
+                                            <td><span class="badge bg-danger">Try Box-Cox First</span></td>
+                                            <td>✅ Automated optimization<br>✅ Then validate results<br>✅ Compare with other methods</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="alert alert-warning mt-3" role="alert">
+                                <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Important Validation Steps</h6>
+                                <ul class="mb-0 small">
+                                    <li>📊 <strong>Visualize BEFORE and AFTER:</strong> Always plot distributions to verify improvement</li>
+                                    <li>📈 <strong>Check skewness reduction:</strong> Target is closer to 0 (between -0.5 and 0.5 is ideal)</li>
+                                    <li>🎯 <strong>Validate model improvement:</strong> Compare metrics (R², RMSE, MAE) before/after</li>
+                                    <li>🔄 <strong>Inverse transform predictions:</strong> Convert back to original scale for interpretation</li>
+                                    <li>⚙️ <strong>Apply consistently:</strong> Use same transformation on train, validation, and test sets</li>
+                                    <li>📝 <strong>Document parameters:</strong> Save lambda values from Box-Cox for production use</li>
+                                </ul>
                             </div>
 
                             <hr class="my-4">
@@ -469,10 +559,12 @@ vif_data['VIF'] = [variance_inflation_factor(X.values, i) for i in range(X.shape
 
                             <h6 class="fw-bold mb-3">Proposed Solutions</h6>
                             
+                            <h6 class="text-primary mt-4 mb-3"><i class="fas fa-calculator me-2"></i>For Quantitative Variables</h6>
+                            
                             <div class="recommendation-box border-success">
                                 <h6 class="fw-bold text-success"><i class="fas fa-filter me-2"></i>Solution 1: Feature Selection</h6>
                                 <p class="text-muted mb-0">
-                                    <strong>Approach:</strong> Select the most relevant feature from correlated pairs (keep the one with higher domain relevance or predictive power). The other can be excluded from the model while preserving the information.
+                                    <strong>Approach:</strong> Remove one feature from highly correlated pairs (|r| > 0.9). Keep the one with higher domain relevance or predictive power. The other can be excluded from the model while preserving the information.
                                 </p>
                             </div>
 
@@ -484,16 +576,62 @@ vif_data['VIF'] = [variance_inflation_factor(X.values, i) for i in range(X.shape
                             </div>
 
                             <div class="recommendation-box border-warning">
-                                <h6 class="fw-bold text-warning"><i class="fas fa-chart-pie me-2"></i>Solution 3: Dimensionality Reduction</h6>
+                                <h6 class="fw-bold text-warning"><i class="fas fa-chart-pie me-2"></i>Solution 3: Dimensionality Reduction (PCA)</h6>
                                 <p class="text-muted mb-0">
-                                    <strong>Approach:</strong> Use PCA or similar techniques to transform correlated features into uncorrelated principal components.
+                                    <strong>Approach:</strong> Use PCA to transform correlated features into uncorrelated principal components. Retains maximum variance while reducing dimensions.
                                 </p>
                             </div>
 
                             <div class="recommendation-box border-danger">
                                 <h6 class="fw-bold text-danger"><i class="fas fa-microchip me-2"></i>Solution 4: Regularization</h6>
                                 <p class="text-muted mb-0">
-                                    <strong>Approach:</strong> Use Ridge (L2) or Lasso (L1) regression which are more robust to multicollinearity.
+                                    <strong>Approach:</strong> Use Ridge (L2) or Lasso (L1) regression which are more robust to multicollinearity. Ridge shrinks coefficients, Lasso can set them to zero.
+                                </p>
+                            </div>
+
+                            <h6 class="text-warning mt-4 mb-3"><i class="fas fa-tags me-2"></i>For Qualitative Variables</h6>
+
+                            <div class="recommendation-box border-success">
+                                <h6 class="fw-bold text-success"><i class="fas fa-object-group me-2"></i>Solution 1: Merge Categories</h6>
+                                <p class="text-muted mb-0">
+                                    <strong>Approach:</strong> Combine highly associated categorical features (V > 0.7) into a single composite feature. This reduces redundancy while maintaining information.
+                                </p>
+                            </div>
+
+                            <div class="recommendation-box border-info">
+                                <h6 class="fw-bold text-info"><i class="fas fa-plus-circle me-2"></i>Solution 2: Feature Engineering</h6>
+                                <p class="text-muted mb-0">
+                                    <strong>Approach:</strong> Create interaction terms or hierarchical features from associated categories. For example, combine "City" and "State" into "Location".
+                                </p>
+                            </div>
+
+                            <div class="recommendation-box border-warning">
+                                <h6 class="fw-bold text-warning"><i class="fas fa-compress me-2"></i>Solution 3: Multiple Correspondence Analysis (MCA)</h6>
+                                <p class="text-muted mb-0">
+                                    <strong>Approach:</strong> MCA is like PCA for categorical data. Transforms correlated categorical features into uncorrelated dimensions.
+                                </p>
+                            </div>
+
+                            <h6 class="text-success mt-4 mb-3"><i class="fas fa-exchange-alt me-2"></i>For Mixed Variables (Quantitative & Qualitative)</h6>
+
+                            <div class="recommendation-box border-success">
+                                <h6 class="fw-bold text-success"><i class="fas fa-layer-group me-2"></i>Solution 1: Group-based Models</h6>
+                                <p class="text-muted mb-0">
+                                    <strong>Approach:</strong> Use categorical features with high η² for stratification. Train separate models for different groups or use group-specific features.
+                                </p>
+                            </div>
+
+                            <div class="recommendation-box border-info">
+                                <h6 class="fw-bold text-info"><i class="fas fa-link me-2"></i>Solution 2: Interaction Features</h6>
+                                <p class="text-muted mb-0">
+                                    <strong>Approach:</strong> Create numeric × categorical interaction terms. Multiply numeric features by one-hot encoded categorical features to capture group-specific effects.
+                                </p>
+                            </div>
+
+                            <div class="recommendation-box border-warning">
+                                <h6 class="fw-bold text-warning"><i class="fas fa-code me-2"></i>Solution 3: Target Encoding</h6>
+                                <p class="text-muted mb-0">
+                                    <strong>Approach:</strong> Encode categories based on numeric target statistics (mean, median). Useful when categorical variables strongly explain numeric variance.
                                 </p>
                             </div>
 
@@ -526,6 +664,87 @@ def select_features_by_vif(df, threshold=5):
         vif_data['VIF'] = [variance_inflation_factor(df_temp.values, i) for i in range(df_temp.shape[1])]
     
     return df[features_to_keep]</code></pre>
+                                </div>
+                            </div>
+
+                            <div class="card bg-light border-0 mb-3">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-warning mb-2">Qualitative Correlation (Cramér's V)</h6>
+                                    <pre class="code-block"><code># Calculate Cramér's V for categorical variables
+from scipy.stats import chi2_contingency
+import numpy as np
+
+def cramers_v(x, y):
+    """Calculate Cramér's V statistic for categorical association"""
+    confusion_matrix = pd.crosstab(x, y)
+    chi2 = chi2_contingency(confusion_matrix)[0]
+    n = confusion_matrix.sum().sum()
+    min_dim = min(confusion_matrix.shape[0] - 1, confusion_matrix.shape[1] - 1)
+    if min_dim == 0:
+        return 0
+    return np.sqrt(chi2 / (n * min_dim))
+
+# Calculate for all categorical pairs
+categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+cramers_matrix = pd.DataFrame(index=categorical_cols, columns=categorical_cols)
+
+for col1 in categorical_cols:
+    for col2 in categorical_cols:
+        cramers_matrix.loc[col1, col2] = cramers_v(df[col1], df[col2])
+
+# Find strong associations (V > 0.5)
+strong_assoc = cramers_matrix[(cramers_matrix > 0.5) & (cramers_matrix < 1.0)]
+print("Strong associations detected:", strong_assoc)</code></pre>
+                                </div>
+                            </div>
+
+                            <div class="card bg-light border-0 mb-3">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-success mb-2">Mixed Correlation - Correlation Ratio (η²)</h6>
+                                    <pre class="code-block"><code># Calculate correlation ratio (eta-squared) for mixed variables
+import numpy as np
+
+def correlation_ratio(categories, values):
+    """Calculate η² between categorical and numeric variables"""
+    categories = pd.Series(categories)
+    values = pd.Series(values)
+    
+    # Remove NaN values
+    mask = ~(categories.isna() | values.isna())
+    categories = categories[mask]
+    values = values[mask]
+    
+    # Calculate overall mean
+    overall_mean = values.mean()
+    
+    # Total sum of squares
+    ss_total = np.sum((values - overall_mean) ** 2)
+    if ss_total == 0:
+        return 0
+    
+    # Between-group sum of squares
+    groups = values.groupby(categories)
+    ss_between = sum(len(group) * (group.mean() - overall_mean) ** 2 
+                     for _, group in groups)
+    
+    # Correlation ratio
+    return ss_between / ss_total
+
+# Calculate for numeric vs categorical
+numeric_cols = df.select_dtypes(include=[np.number]).columns
+categorical_cols = df.select_dtypes(include=['object', 'category']).columns
+
+eta_matrix = pd.DataFrame(index=numeric_cols, columns=categorical_cols)
+
+for num_col in numeric_cols:
+    for cat_col in categorical_cols:
+        eta_matrix.loc[num_col, cat_col] = correlation_ratio(
+            df[cat_col], df[num_col]
+        )
+
+# Find strong effects (η² > 0.14)
+strong_effects = eta_matrix[eta_matrix > 0.14]
+print("Strong effects detected:", strong_effects)</code></pre>
                                 </div>
                             </div>
                             
@@ -766,14 +985,95 @@ $(document).ready(function() {
                 
                 data.forEach(function(item) {
                     if (item.has_outliers) {
-                        outliersHtml += '<div class="col-md-6 mb-3">' +
-                            '<div class="card border-warning">' +
-                            '<div class="card-header bg-warning text-dark"><strong>' + item.column + '</strong></div>' +
+                        // Parse outlier percentage
+                        let outlierPct = parseFloat(item.outlier_percentage);
+                        
+                        // Determine recommendation based on percentage
+                        let recommendationHtml = '';
+                        let cardBorderClass = 'border-warning';
+                        let cardHeaderClass = 'bg-warning text-dark';
+                        
+                        if (outlierPct < 1) {
+                            cardBorderClass = 'border-success';
+                            cardHeaderClass = 'bg-success text-white';
+                            recommendationHtml = '<div class="alert alert-success mt-3 mb-0">' +
+                                '<h6 class="fw-bold"><i class="fas fa-check-circle me-2"></i>Recommended Action: Consider Removal</h6>' +
+                                '<p class="mb-2 small">With less than 1% outliers, you can safely remove these extreme values without significantly impacting your dataset.</p>' +
+                                '<details><summary class="fw-bold" style="cursor: pointer;">View Code</summary>' +
+                                '<pre class="code-block mt-2 mb-0"><code># Remove outliers for ' + item.column + '\n' +
+                                'Q1 = df[\'' + item.column + '\'].quantile(0.25)\n' +
+                                'Q3 = df[\'' + item.column + '\'].quantile(0.75)\n' +
+                                'IQR = Q3 - Q1\n' +
+                                'lower_bound = Q1 - 1.5 * IQR\n' +
+                                'upper_bound = Q3 + 1.5 * IQR\n' +
+                                'df_clean = df[(df[\'' + item.column + '\'] >= lower_bound) & (df[\'' + item.column + '\'] <= upper_bound)]</code></pre>' +
+                                '</details></div>';
+                        } else if (outlierPct >= 1 && outlierPct <= 5) {
+                            cardBorderClass = 'border-warning';
+                            cardHeaderClass = 'bg-warning text-dark';
+                            recommendationHtml = '<div class="alert alert-warning mt-3 mb-0">' +
+                                '<h6 class="fw-bold"><i class="fas fa-cut me-2"></i>Recommended Action: Winsorization (Capping)</h6>' +
+                                '<p class="mb-2 small">With 1-5% outliers, winsorization caps extreme values at specified percentiles while preserving data structure.</p>' +
+                                '<details><summary class="fw-bold" style="cursor: pointer;">View Code</summary>' +
+                                '<pre class="code-block mt-2 mb-0"><code># Winsorization for ' + item.column + '\n' +
+                                'from scipy.stats.mstats import winsorize\n' +
+                                'df[\'' + item.column + '_winsorized\'] = winsorize(df[\'' + item.column + '\'], limits=[0.05, 0.05])\n\n' +
+                                '# OR manual capping\n' +
+                                'lower_percentile = df[\'' + item.column + '\'].quantile(0.05)\n' +
+                                'upper_percentile = df[\'' + item.column + '\'].quantile(0.95)\n' +
+                                'df[\'' + item.column + '_capped\'] = df[\'' + item.column + '\'].clip(lower_percentile, upper_percentile)</code></pre>' +
+                                '</details></div>';
+                        } else if (outlierPct > 5 && outlierPct <= 10) {
+                            cardBorderClass = 'border-danger';
+                            cardHeaderClass = 'bg-danger text-white';
+                            recommendationHtml = '<div class="alert alert-danger mt-3 mb-0">' +
+                                '<h6 class="fw-bold"><i class="fas fa-chart-line me-2"></i>Recommended Action: Log Transformation</h6>' +
+                                '<p class="mb-2 small">With 5-10% outliers, log transformation compresses extreme values while preserving relative relationships.</p>' +
+                                '<details><summary class="fw-bold" style="cursor: pointer;">View Code</summary>' +
+                                '<pre class="code-block mt-2 mb-0"><code># Log transformation for ' + item.column + '\n' +
+                                'import numpy as np\n' +
+                                'df[\'' + item.column + '_log\'] = np.log1p(df[\'' + item.column + '\'])  # log1p handles zeros\n\n' +
+                                '# OR Box-Cox transformation (auto-finds best lambda)\n' +
+                                'from scipy.stats import boxcox\n' +
+                                'df[\'' + item.column + '_boxcox\'], lambda_param = boxcox(df[\'' + item.column + '\'] + 1)  # +1 if zeros exist\n' +
+                                'print(f\'Optimal lambda: {lambda_param}\')</code></pre>' +
+                                '</details></div>';
+                        } else {
+                            cardBorderClass = 'border-dark';
+                            cardHeaderClass = 'bg-dark text-white';
+                            recommendationHtml = '<div class="alert alert-dark mt-3 mb-0">' +
+                                '<h6 class="fw-bold"><i class="fas fa-balance-scale me-2"></i>Recommended Action: Robust Scaling</h6>' +
+                                '<p class="mb-2 small">With >10% outliers, use robust scaling methods that are resistant to extreme values. Consider data quality review.</p>' +
+                                '<details><summary class="fw-bold" style="cursor: pointer;">View Code</summary>' +
+                                '<pre class="code-block mt-2 mb-0"><code># Robust scaling for ' + item.column + '\n' +
+                                'from sklearn.preprocessing import RobustScaler\n' +
+                                'scaler = RobustScaler()\n' +
+                                'df[\'' + item.column + '_scaled\'] = scaler.fit_transform(df[[\'' + item.column + '\']])\n\n' +
+                                '# OR flag outliers for separate analysis\n' +
+                                'Q1 = df[\'' + item.column + '\'].quantile(0.25)\n' +
+                                'Q3 = df[\'' + item.column + '\'].quantile(0.75)\n' +
+                                'IQR = Q3 - Q1\n' +
+                                'df[\'' + item.column + '_is_outlier\'] = ((df[\'' + item.column + '\'] < (Q1 - 1.5 * IQR)) | \n' +
+                                '                                           (df[\'' + item.column + '\'] > (Q3 + 1.5 * IQR)))</code></pre>' +
+                                '</details></div>';
+                        }
+                        
+                        outliersHtml += '<div class="col-md-12 mb-4">' +
+                            '<div class="card ' + cardBorderClass + '">' +
+                            '<div class="card-header ' + cardHeaderClass + '"><strong>' + item.column + '</strong></div>' +
                             '<div class="card-body">' +
+                            '<div class="row">' +
+                            '<div class="col-md-6">' +
                             '<img src="data:image/png;base64,' + item.chart + '" class="img-fluid mb-2">' +
-                            '<p class="mb-1"><strong>Outliers:</strong> ' + item.outlier_count + ' (' + item.outlier_percentage + '%)</p>' +
-                            '<p class="mb-1"><strong>Lower Bound:</strong> ' + item.lower_bound + '</p>' +
-                            '<p class="mb-0"><strong>Upper Bound:</strong> ' + item.upper_bound + '</p>' +
+                            '</div>' +
+                            '<div class="col-md-6">' +
+                            '<h6 class="fw-bold text-primary mb-3">Outlier Statistics</h6>' +
+                            '<p class="mb-2"><strong>Outliers Detected:</strong> ' + item.outlier_count + ' (' + item.outlier_percentage + '%)</p>' +
+                            '<p class="mb-2"><strong>Lower Bound:</strong> ' + item.lower_bound + '</p>' +
+                            '<p class="mb-2"><strong>Upper Bound:</strong> ' + item.upper_bound + '</p>' +
+                            recommendationHtml +
+                            '</div>' +
+                            '</div>' +
                             '</div></div></div>';
                     }
                 });
@@ -819,15 +1119,55 @@ $(document).ready(function() {
         url: '/api/correlation',
         type: 'GET',
         success: function(data) {
+            let corrHtml = '<div class="mb-5">';
+            
             if (data && data.chart) {
-                let corrHtml = '<h6 class="fw-bold mb-3 text-primary">Your Dataset: Correlation Matrix</h6>';
+                corrHtml += '<h6 class="fw-bold mb-3 text-primary"><i class="fas fa-calculator me-2"></i>Quantitative Variables Correlation (Pearson)</h6>';
+                corrHtml += '<p class="text-muted small">Measures linear relationships between numeric variables. Values range from -1 to +1.</p>';
                 corrHtml += '<img src="data:image/png;base64,' + data.chart + '" class="img-fluid shadow rounded mb-3">';
                 corrHtml += '<div class="alert alert-info"><i class="fas fa-info-circle me-2"></i>' +
-                    '<strong>Analysis:</strong> Look for dark red or blue cells (correlations &gt; 0.9). These indicate highly correlated features that may require attention.</div>';
-                $('#correlationData').html(corrHtml);
+                    '<strong>Analysis:</strong> Look for dark red (positive) or blue (negative) cells with |r| > 0.9. These indicate highly correlated features that may require attention.</div>';
             } else {
-                $('#correlationData').html('<div class="alert alert-warning">Insufficient numeric columns for correlation analysis.</div>');
+                corrHtml += '<div class="alert alert-warning">Insufficient numeric columns for correlation analysis.</div>';
             }
+            corrHtml += '</div>';
+            
+            // Load qualitative correlation
+            $.ajax({
+                url: '/api/correlation_qualitative',
+                type: 'GET',
+                success: function(data2) {
+                    if (data2 && data2.chart) {
+                        corrHtml += '<div class="mb-5">';
+                        corrHtml += '<h6 class="fw-bold mb-3 text-warning"><i class="fas fa-tags me-2"></i>Qualitative Variables Correlation (Cramér\'s V)</h6>';
+                        corrHtml += '<p class="text-muted small">Measures association between categorical variables using Chi-square test. Values range from 0 (no association) to 1 (perfect association).</p>';
+                        corrHtml += '<img src="data:image/png;base64,' + data2.chart + '" class="img-fluid shadow rounded mb-3">';
+                        corrHtml += '<div class="alert alert-warning"><i class="fas fa-info-circle me-2"></i>' +
+                            '<strong>Analysis:</strong> V > 0.5 indicates strong association. V > 0.7 suggests categories are highly related and may be redundant.</div>';
+                        corrHtml += '</div>';
+                    }
+                    
+                    // Load mixed correlation
+                    $.ajax({
+                        url: '/api/correlation_mixed',
+                        type: 'GET',
+                        success: function(data3) {
+                            if (data3 && data3.chart) {
+                                corrHtml += '<div class="mb-4">';
+                                corrHtml += '<h6 class="fw-bold mb-3 text-success"><i class="fas fa-exchange-alt me-2"></i>Quantitative vs Qualitative Correlation (η²)</h6>';
+                                corrHtml += '<p class="text-muted small">Correlation ratio measures how well categorical variables explain variance in numeric variables. Values range from 0 to 1.</p>';
+                                corrHtml += '<img src="data:image/png;base64,' + data3.chart + '" class="img-fluid shadow rounded mb-3">';
+                                corrHtml += '<div class="alert alert-success"><i class="fas fa-info-circle me-2"></i>' +
+                                    '<strong>Analysis:</strong> η² > 0.14 indicates strong effect (categorical variable significantly explains numeric variance). Useful for feature selection in regression.</div>';
+                                corrHtml += '</div>';
+                            }
+                            
+                            // Display all correlation content
+                            $('#correlationData').html(corrHtml);
+                        }
+                    });
+                }
+            });
         }
     });
 

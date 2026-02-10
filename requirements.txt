@@ -1,0 +1,28 @@
+# Requirements for EDA Flask Application
+# Generated on February 7, 2026
+# Python version compatibility: Python 3.8+
+
+# Web Framework
+Flask==3.1.2
+Werkzeug==3.1.5
+
+# Data Processing and Analysis
+pandas==2.3.3
+numpy==2.3.4
+
+# Data Visualization
+matplotlib==3.10.1
+seaborn==0.13.0
+plotly==5.18.0
+
+# Statistical Analysis and Machine Learning
+scipy==1.16.3
+scikit-learn==1.7.2
+
+# Excel file support
+openpyxl==3.1.2
+xlrd==2.0.1
+
+
+
+

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EDA Dashboard{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <style>
+        /* Animated Background Watermark */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{{ url_for('static', filename='logo.png') }}') no-repeat center center;
+            background-size: 50%;
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Modern Navbar Styling */
+        .navbar {
+            background: linear-gradient(135deg, 
+                rgba(13, 110, 253, 0.95) 0%, 
+                rgba(102, 16, 242, 0.90) 50%, 
+                rgba(13, 202, 240, 0.85) 100%) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            background-size: 200% 200%;
+            padding: 0.7rem 0;
+        }
+        
+        /* Scrolled State */
+        .navbar.scrolled {
+            background: linear-gradient(135deg, 
+                rgba(13, 110, 253, 0.98) 0%, 
+                rgba(102, 16, 242, 0.95) 50%, 
+                rgba(13, 202, 240, 0.92) 100%) !important;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+            padding-top: 0.2rem;
+            padding-bottom: 0.2rem;
+        }
+        
+        /* Logo Color Filter #323570 */
+        .navbar-logo,
+        .hero-logo-large {
+            filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(200%) contrast(100%);
+        }
+        
+        .navbar-logo {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+        
+        /* Brand Styling */
+        .navbar-brand {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+        }
+        
+        /* Navigation Links */
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1.2rem !important;
+            margin: 0 0.2rem;
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff !important;
+        }
+        
+        /* Active Link State */
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        /* Navbar Toggler */
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" id="mainNavbar">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="/">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="navbar-logo me-3" onerror="this.style.display='none'">
+                EDA Dashboard
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-2">
+                    <!-- Sheet Selector (appears when multiple sheets loaded) -->
+                    <li class="nav-item" id="sheetSelectorContainer" style="display: none;">
+                        <div class="d-flex align-items-center me-2">
+                            <span class="text-white me-2"><i class="fas fa-table me-1"></i>Sheet:</span>
+                            <select id="sheetSelector" class="form-select form-select-sm" style="max-width: 200px;">
+                                <option>Loading...</option>
+                            </select>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" role="button">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/visualizations" role="button">
+                            <i class="fas fa-chart-bar me-1"></i>Visualizations
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/code" role="button">
+                            <i class="fas fa-code me-1"></i>Python Code
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reports" role="button">
+                            <i class="fas fa-file-alt me-1"></i>Reports
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container-fluid mt-4 flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center py-3 mt-5 shadow-sm">
+        <p class="mb-0 text-muted">
+            <i class="fas fa-flask me-1"></i>Professional EDA Dashboard - Built with Flask &amp; Bootstrap
+        </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Sheet Selector Script -->
+    <script>
+        $(document).ready(function() {
+            // Load available sheets
+            function loadSheets() {
+                $.ajax({
+                    url: '/get_sheets',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.sheets && response.sheets.length > 1) {
+                            // Multiple sheets available
+                            $('#sheetSelectorContainer').show();
+                            var selector = $('#sheetSelector');
+                            selector.empty();
+                            
+                            response.sheets.forEach(function(sheet) {
+                                var selected = sheet === response.current_sheet ? 'selected' : '';
+                                selector.append('<option value="' + sheet + '" ' + selected + '>' + sheet + '</option>');
+                            });
+                            
+                            // Add change handler
+                            selector.off('change').on('change', function() {
+                                var selectedSheet = $(this).val();
+                                if (selectedSheet !== response.current_sheet) {
+                                    // Show loading indicator
+                                    $('body').append('<div id="loadingOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;"><div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+                                    
+                                    $.ajax({
+                                        url: '/switch_sheet',
+                                        type: 'POST',
+                                        contentType: 'application/json',
+                                        data: JSON.stringify({ sheet_name: selectedSheet }),
+                                        success: function(response) {
+                                            // Reload the current page to reflect new data
+                                            location.reload();
+                                        },
+                                        error: function(xhr) {
+                                            $('#loadingOverlay').remove();
+                                            alert('Failed to switch sheet: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            // Single sheet or no data
+                            $('#sheetSelectorContainer').hide();
+                        }
+                    },
+                    error: function() {
+                        $('#sheetSelectorContainer').hide();
+                    }
+                });
+            }
+            
+            // Load sheets on page load (except on home page)
+            if (window.location.pathname !== '/') {
+                loadSheets();
+            }
+        });
+    </script>
+    
+    <!-- Navbar Scroll Effect -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navbar = document.getElementById('mainNavbar');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // Add scroll effect to navbar
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Highlight active link based on current page
+            const currentPath = window.location.pathname;
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath === '/' && href === '/')) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

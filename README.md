@@ -7,31 +7,31 @@ This project was developed as part of the **PI – 4th Year Engineering Program*
 It delivers an end-to-end Business Intelligence workflow for an e-commerce context: data integration, data warehouse modeling, orchestration, and decision dashboards.
 
 ## Features
-- Integration of multiple data sources (sales, orders, payments, deliveries, etc.)
-- Data cleaning and normalization (types, duplicates, null values)
-- Data Warehouse implementation (dimensions, facts, surrogate keys, constraints)
-- SCD handling for historical tracking (where applicable)
-- Automated orchestration with Apache Airflow (master/sub-jobs, monitoring)
+- Integration of multiple data sources 
+- Data cleaning and normalization
+- Data Warehouse implementation
+- SCD handling for historical tracking 
+- Automated orchestration with Apache Airflow
 - KPI dashboards and reporting
 
 ## Tech Stack
 ### Frontend
-- Power BI (Dashboards & Reporting)
+- Angular 
 
 ### Backend
 - PostgreSQL (Data Warehouse)
 - Talend (ETL / Data Integration)
 - Apache Airflow (Orchestration)
 
+
 ## Architecture
 - **Staging Area (SA):** raw landing tables loaded from source files
-- **ODS (optional):** cleaned and normalized intermediate layer
-- **Data Warehouse (DW):** star/constellation schema (Facts + Dimensions)
+- **Data Warehouse (DW):** constellation schema (Facts + Dimensions)
 - **Orchestration:** Airflow DAGs triggering Talend jobs and SQL scripts
 - **Analytics:** Power BI dashboards connected to DW
 
 ## Contributors
-- [Your Name / GitHub Username]
+- Datoops Team 
 
 ## Academic Context
 Developed at **Esprit School of Engineering – Tunisia**  

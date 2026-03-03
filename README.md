@@ -37,13 +37,6 @@ It delivers an end-to-end Business Intelligence workflow for an e-commerce conte
 Developed at **Esprit School of Engineering – Tunisia**  
 PI – 4th Year Engineering Program | Academic Year 2025–2026
 
-## Getting Started
-1. Clone the repository
-2. Prepare the database (PostgreSQL) and run SQL scripts in `04-DataWarehouse/`
-3. Configure Talend connections and contexts, then run jobs in `03-ETL/`
-4. Configure Airflow connection variables and deploy DAGs from `06-Airflow/`
-5. Open Power BI dashboards from `05-Dashboards/` and refresh data
-
 ## Acknowledgments
 - Esprit School of Engineering
 - Course instructors and supervisors

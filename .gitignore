@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Excel/CSV
+*.xlsx
+*.csv
+
+# PDFs téléchargés
+invoices_pdf/
+mendeley_invoices/
+
+# Fichiers ZIP
+*.zip
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

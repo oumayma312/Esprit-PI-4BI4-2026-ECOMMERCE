@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <section class="pagehead">
+    <h1 class="title">{{ title }}</h1>
+    <div class="meta">
+      <div>{{ subtitle }}</div>
+      <div>Updated: {{ updated_at }}</div>
+      {% if last_run_id %}<div>Run: <span class="mono">{{ last_run_id }}</span></div>{% endif %}
+    </div>
+  </section>
+
+  {% if error %}o
+    <section class="alert">
+      <div class="alert-title">Error</div>
+      <div class="alert-body">{{ error }}</div>
+    </section>
+  {% elif dataframe is not none and dataframe.shape[0] > 0 %}
+    <section class="tablewrap">
+      {{ dataframe.to_html(index=False, classes='table', border=0) | safe }}
+    </section>
+  {% else %}
+    <section class="empty">
+      <div class="empty-title">No data yet</div>
+      <div class="empty-body">{{ empty_hint }}</div>
+    </section>
+  {% endif %}
+{% endblock %}

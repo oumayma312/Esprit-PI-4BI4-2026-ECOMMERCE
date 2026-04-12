@@ -1,0 +1,294 @@
+{
+  "version": 6,
+  "source_mtime": 1776019179.81753,
+  "generated_at": "2026-04-12T20:06:09Z",
+  "sections": {
+    "data_prep": {
+      "steps": [
+        {
+          "title": "Overview",
+          "markdown": [],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Required notebook order",
+          "markdown": [
+            "<h1>Best Time to Sell — Forecasting (PostgreSQL)</h1>\n<p><strong>Goal</strong>: prepare the data, engineer/select features, compare <strong>time-series forecasting</strong> models, then recommend the <strong>best time to sell in 2027</strong> with the <strong>expected revenue</strong>.</p>\n<p><strong>DW semantics</strong>: <code>startDate/endDate</code> are execution-history artifacts; the only valid sales date is <code>dateFK</code> (via <code>DimDate</code>).</p>\n<p><strong>Training window</strong> (history): July 2023 → end of 2025 (filter applied on the sales date).</p>\n<h2>Required notebook order</h2>\n<ol>\n<li><strong>Data Preparation &amp; Feature Engineering</strong></li>\n</ol>\n<ul>\n<li>\n<p>Data cleaning: missing values, outliers (kept), encoding, scaling</p>\n</li>\n<li>\n<p>Feature engineering &amp; selection (domain + filter/embedded approaches)</p>\n</li>\n</ul>\n<ol start=\"2\">\n<li><strong>Model Understanding</strong> (mandatory for all models used)</li>\n</ol>\n<ul>\n<li>\n<p>Intuition, key parameters, assumptions, limitations</p>\n</li>\n<li>\n<p>Justification of model choice for this problem</p>\n</li>\n</ul>\n<ol start=\"3\">\n<li><strong>Time Series / Forecasting</strong></li>\n</ol>\n<ul>\n<li>\n<p>Stationarity analysis (ADF/KPSS) + decomposition</p>\n</li>\n<li>\n<p>≥ 2 forecasting models + mandatory comparison (MAE/RMSE/MAPE)</p>\n</li>\n<li>\n<p>2027 recommendation: <strong>best month</strong> (and best day) + expected revenue</p>\n</li>\n</ul>"
+          ],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Data Preparation & Feature Engineering",
+          "markdown": [
+            "<hr>\n<h2>Data Preparation &amp; Feature Engineering</h2>\n<h3>Setup &amp; Imports</h3>"
+          ],
+          "html": [],
+          "text": [
+            "ERROR: Could not install packages due to an OSError: [Errno 2] No such file or directory: 'C:\\\\Users\\\\maysa\\\\AppData\\\\Local\\\\Packages\\\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\\\LocalCache\\\\local-packages\\\\Python313\\\\site-packages\\\\prophet\\\\stan_model\\\\cmdstan-2.37.0\\\\stan\\\\lib\\\\stan_math\\\\lib\\\\tbb_2020.3\\\\include\\\\tbb\\\\internal\\\\_deprecated_header_message_guard.h'\nHINT: This error might have occurred since this system does not have Windows Long Path support enabled. You can find information on how to enable this at https://pip.pypa.io/warnings/enable-long-paths\n\n\n[notice] A new release of pip is available: 25.3 -> 26.0.1\n[notice] To update, run: C:\\Users\\maysa\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe -m pip install --upgrade pip\n",
+            "✅ Imports loaded\n"
+          ],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Secure PostgreSQL connection",
+          "markdown": [
+            "<h3>Secure PostgreSQL connection</h3>\n<p>Supported variables: <code>PGHOST</code>, <code>PGPORT</code>, <code>PGDATABASE</code>, <code>PGUSER</code>, <code>PGPASSWORD</code>, <code>DW_SCHEMA</code>.</p>"
+          ],
+          "html": [],
+          "text": [
+            "✅ PostgreSQL connection OK\n"
+          ],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "DW Extraction & Daily Time Series Build",
+          "markdown": [
+            "<hr>\n<h3>DW Extraction &amp; Daily Time Series Build</h3>"
+          ],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Load DW tables (robust discovery)",
+          "markdown": [
+            "<h3>Load DW tables (robust discovery)</h3>\n<p>We load the sales fact table <code>FactVente(e)</code> from the DW schema, and (when available) <code>DimDate</code> and <code>DimChannel</code> for correct date and channel labels.</p>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>dateFK</th>\n      <th>saleDate_dim</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>20200101</td>\n      <td>20200101</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20200102</td>\n      <td>20200102</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>20200103</td>\n      <td>20200103</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>20200104</td>\n      <td>20200104</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>20200105</td>\n      <td>20200105</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>channelFK</th>\n      <th>channel_name</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1</td>\n      <td>vente direct</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2</td>\n      <td>foire sousse</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>3</td>\n      <td>popup store</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>4</td>\n      <td>site web</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>FactVentePK</th>\n      <th>dateFK</th>\n      <th>documentFK</th>\n      <th>channelFK</th>\n      <th>productFK</th>\n      <th>price</th>\n      <th>quantity</th>\n      <th>remise</th>\n      <th>tva</th>\n      <th>timbre</th>\n      <th>total_ht</th>\n      <th>total_ttc</th>\n      <th>documentcode</th>\n      <th>saleDate_dim</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>1</td>\n      <td>20260102</td>\n      <td>4405</td>\n      <td>4</td>\n      <td>13269</td>\n      <td>50</td>\n      <td>2</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>100</td>\n      <td>100</td>\n      <td>F-14148</td>\n      <td>20260102</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2</td>\n      <td>20251230</td>\n      <td>4406</td>\n      <td>4</td>\n      <td>13251</td>\n      <td>90</td>\n      <td>1</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>90</td>\n      <td>90</td>\n      <td>F-14146</td>\n      <td>20251230</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>3</td>\n      <td>20251229</td>\n      <td>4407</td>\n      <td>4</td>\n      <td>13101</td>\n      <td>65</td>\n      <td>1</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>153</td>\n      <td>153</td>\n      <td>F-14145</td>\n      <td>20251229</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>4</td>\n      <td>20251229</td>\n      <td>4407</td>\n      <td>4</td>\n      <td>13096</td>\n      <td>58</td>\n      <td>1</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>153</td>\n      <td>153</td>\n      <td>F-14145</td>\n      <td>20251229</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>5</td>\n      <td>20251229</td>\n      <td>4407</td>\n      <td>4</td>\n      <td>13192</td>\n      <td>30</td>\n      <td>1</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>153</td>\n      <td>153</td>\n      <td>F-14145</td>\n      <td>20251229</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "Sales table: datawarehouse.FactVentee\nColumns detected: 16\n",
+            "DimDate loaded: datawarehouse.dim_date (rows=22281)\n",
+            "     dateFK  saleDate_dim\n0  20200101      20200101\n1  20200102      20200102\n2  20200103      20200103\n3  20200104      20200104\n4  20200105      20200105",
+            "DimChannel loaded: datawarehouse.dim_channel (rows=4)\n",
+            "   channelFK  channel_name\n0          1  vente direct\n1          2  foire sousse\n2          3   popup store\n3          4      site web",
+            "Raw FactVente(e) shape: (2575, 14)\n",
+            "   FactVentePK    dateFK  documentFK  channelFK  productFK price quantity  \\\n0            1  20260102        4405          4      13269    50        2   \n1            2  20251230        4406          4      13251    90        1   \n2            3  20251229        4407          4      13101    65        1   \n3            4  20251229        4407          4      13096    58        1   \n4            5  20251229        4407          4      13192    30        1   \n\n  remise tva timbre total_ht total_ttc documentcode  saleDate_dim  \n0      0   0      0      100       100      F-14148      20260102  \n1      0   0      0       90        90      F-14146      20251230  \n2      0   0      0      153       153      F-14145      20251229  \n3      0   0      0      153       153      F-14145      20251229  \n4      0   0      0      153       153      F-14145      20251229  "
+          ],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Build the daily revenue time series",
+          "markdown": [
+            "<h3>Build the daily revenue time series</h3>\n<p>We derive the sales date strictly from <code>dateFK</code> (via <code>DimDate</code> when available), filter the period (Jul-2023 → Dec-2025), then build a <strong>daily</strong> revenue series <code>CA_TOTAL</code> used for forecasting.</p>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>date</th>\n      <th>channel</th>\n      <th>total_ht</th>\n      <th>total_ttc</th>\n      <th>revenue</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>1</th>\n      <td>2025-12-30</td>\n      <td>site web</td>\n      <td>90.0</td>\n      <td>90.0</td>\n      <td>90.0</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2025-12-29</td>\n      <td>site web</td>\n      <td>153.0</td>\n      <td>153.0</td>\n      <td>153.0</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>2025-12-29</td>\n      <td>site web</td>\n      <td>153.0</td>\n      <td>153.0</td>\n      <td>153.0</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>2025-12-29</td>\n      <td>site web</td>\n      <td>153.0</td>\n      <td>153.0</td>\n      <td>153.0</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>2025-12-29</td>\n      <td>site web</td>\n      <td>90.0</td>\n      <td>90.0</td>\n      <td>90.0</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "✅ Rows after date filter: 2038\nDate range: 2023-08-11 → 2025-12-30\n",
+            "        date   channel  total_ht  total_ttc  revenue\n1 2025-12-30  site web      90.0       90.0     90.0\n2 2025-12-29  site web     153.0      153.0    153.0\n3 2025-12-29  site web     153.0      153.0    153.0\n4 2025-12-29  site web     153.0      153.0    153.0\n5 2025-12-29  site web      90.0       90.0     90.0",
+            "✅ Using revenue = total_ttc for CA calculations\nDays in series: 873\nSeries range: 2023-08-11 → 2025-12-30\n",
+            "<Figure size 1320x550 with 1 Axes>"
+          ],
+          "images": [
+            "/static/notebook_assets/sell/data_prep_01.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "Data Cleaning (missing values, outliers)",
+          "markdown": [
+            "<h3>Data Cleaning (missing values, outliers)</h3>\n<p>We keep outliers (we only visualize them once) and rely on robust evaluation metrics (MAE/RMSE/WMAPE) + <strong>MAPE computed on non-zero days</strong> to avoid division-by-zero issues.</p>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>missing_%</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>date</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>channel</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>total_ht</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>total_ttc</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>revenue</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>doc_id</th>\n      <td>0.0</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "Missing values (%):\n",
+            "           missing_%\ndate             0.0\nchannel          0.0\ntotal_ht         0.0\ntotal_ttc        0.0\nrevenue          0.0\ndoc_id           0.0",
+            "Outliers by IQR rule: 128 days (14.7%) — kept\n",
+            "<Figure size 1100x330 with 1 Axes>"
+          ],
+          "images": [
+            "/static/notebook_assets/sell/data_prep_02.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "Feature Engineering & Selection (encoding, scaling, selection)",
+          "markdown": [
+            "<h3>Feature Engineering &amp; Selection (encoding, scaling, selection)</h3>\n<p>We use a domain-based approach for time series: calendar features + lags + rolling statistics.</p>\n<p>We also demonstrate feature-selection approaches on the engineered feature set:</p>\n<ul>\n<li>\n<p><strong>Filter</strong>: mutual information ranking</p>\n</li>\n<li>\n<p><strong>Embedded</strong>: model-based importance from XGBoost (when available)</p>\n</li>\n</ul>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>mutual_information</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>roll_std_14</th>\n      <td>0.264705</td>\n    </tr>\n    <tr>\n      <th>roll_std_28</th>\n      <td>0.245151</td>\n    </tr>\n    <tr>\n      <th>roll_mean_7</th>\n      <td>0.229975</td>\n    </tr>\n    <tr>\n      <th>roll_mean_14</th>\n      <td>0.226171</td>\n    </tr>\n    <tr>\n      <th>roll_mean_28</th>\n      <td>0.216158</td>\n    </tr>\n    <tr>\n      <th>roll_std_7</th>\n      <td>0.182272</td>\n    </tr>\n    <tr>\n      <th>lag_1</th>\n      <td>0.133567</td>\n    </tr>\n    <tr>\n      <th>lag_14</th>\n      <td>0.099344</td>\n    </tr>\n    <tr>\n      <th>lag_7</th>\n      <td>0.079209</td>\n    </tr>\n    <tr>\n      <th>month</th>\n      <td>0.077591</td>\n    </tr>\n    <tr>\n      <th>lag_28</th>\n      <td>0.069010</td>\n    </tr>\n    <tr>\n      <th>dow</th>\n      <td>0.034305</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>xgb_importance</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>cat__month_3</th>\n      <td>0.153685</td>\n    </tr>\n    <tr>\n      <th>num__lag_1</th>\n      <td>0.136028</td>\n    </tr>\n    <tr>\n      <th>num__roll_mean_7</th>\n      <td>0.126597</td>\n    </tr>\n    <tr>\n      <th>num__roll_mean_28</th>\n      <td>0.114189</td>\n    </tr>\n    <tr>\n      <th>num__roll_mean_14</th>\n      <td>0.110177</td>\n    </tr>\n    <tr>\n      <th>cat__month_1</th>\n      <td>0.087133</td>\n    </tr>\n    <tr>\n      <th>num__lag_7</th>\n      <td>0.062152</td>\n    </tr>\n    <tr>\n      <th>num__lag_14</th>\n      <td>0.031746</td>\n    </tr>\n    <tr>\n      <th>num__roll_std_28</th>\n      <td>0.026720</td>\n    </tr>\n    <tr>\n      <th>num__roll_std_7</th>\n      <td>0.021867</td>\n    </tr>\n    <tr>\n      <th>cat__dow_3</th>\n      <td>0.018700</td>\n    </tr>\n    <tr>\n      <th>num__roll_std_14</th>\n      <td>0.017161</td>\n    </tr>\n    <tr>\n      <th>cat__month_10</th>\n      <td>0.015618</td>\n    </tr>\n    <tr>\n      <th>cat__dow_4</th>\n      <td>0.013101</td>\n    </tr>\n    <tr>\n      <th>num__lag_28</th>\n      <td>0.013065</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "Engineered feature columns: ['ds', 'dow', 'month', 'lag_1', 'lag_7', 'lag_14', 'lag_28', 'roll_mean_7', 'roll_std_7', 'roll_mean_14', 'roll_std_14', 'roll_mean_28', 'roll_std_28']\nCategorical (encoded): ['dow', 'month']\nNumeric (scaled): 10 features\n",
+            "              mutual_information\nroll_std_14             0.264705\nroll_std_28             0.245151\nroll_mean_7             0.229975\nroll_mean_14            0.226171\nroll_mean_28            0.216158\nroll_std_7              0.182272\nlag_1                   0.133567\nlag_14                  0.099344\nlag_7                   0.079209\nmonth                   0.077591\nlag_28                  0.069010\ndow                     0.034305",
+            "                   xgb_importance\ncat__month_3             0.153685\nnum__lag_1               0.136028\nnum__roll_mean_7         0.126597\nnum__roll_mean_28        0.114189\nnum__roll_mean_14        0.110177\ncat__month_1             0.087133\nnum__lag_7               0.062152\nnum__lag_14              0.031746\nnum__roll_std_28         0.026720\nnum__roll_std_7          0.021867\ncat__dow_3               0.018700\nnum__roll_std_14         0.017161\ncat__month_10            0.015618\ncat__dow_4               0.013101\nnum__lag_28              0.013065"
+          ],
+          "images": [],
+          "plotly": []
+        }
+      ]
+    },
+    "model_understanding": {
+      "steps": [
+        {
+          "title": "Overview",
+          "markdown": [],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Model Understanding (mandatory for all models used)",
+          "markdown": [
+            "<hr>\n<h2>Model Understanding (mandatory for all models used)</h2>\n<h3>SARIMA (SARIMAX)</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: linear model for time series with trend/seasonality handled via differencing and seasonal terms.</p>\n</li>\n<li>\n<p><strong>Key parameters</strong>: <code>(p,d,q)</code> and seasonal <code>(P,D,Q,s)</code> (here <code>s=7</code> for weekly seasonality).</p>\n</li>\n<li>\n<p><strong>Assumptions</strong>: relationship is approximately linear; residuals should be roughly white-noise after differencing.</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: can struggle with abrupt spikes/outliers; sensitive to order choice; prediction intervals may be wide.</p>\n</li>\n</ul>\n<h3>Prophet</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: decomposes series into trend + seasonality (+ holidays if provided).</p>\n</li>\n<li>\n<p><strong>Key parameters</strong>: seasonality choices (weekly/yearly), trend flexibility (changepoints).</p>\n</li>\n<li>\n<p><strong>Assumptions</strong>: additive components; strong recurring seasonality; stable patterns.</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: may underperform on sparse/zero-heavy series; needs enough history; can oversmooth spikes.</p>\n</li>\n</ul>\n<h3>XGBoost time-series regression (lags/rolling + calendar)</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: transforms forecasting into supervised learning using engineered lag/rolling/calendar features.</p>\n</li>\n<li>\n<p><strong>Preprocessing</strong>: <strong>encoding</strong> (<code>dow</code>, <code>month</code>) via one-hot; <strong>scaling</strong> numeric lag/rolling features (shown in pipeline).</p>\n</li>\n<li>\n<p><strong>Assumptions</strong>: engineered features capture the signal; learns non-linear relationships.</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: recursive multi-step forecasting can drift; sensitive to outliers; needs careful validation to avoid leakage.</p>\n</li>\n</ul>\n<h3>Why these models?</h3>\n<ul>\n<li>\n<p>The target is <strong>daily revenue</strong> with likely <strong>weekly seasonality</strong> and occasional spikes.</p>\n</li>\n<li>\n<p>We compare a classical statistical TS model (SARIMA), a decomposition model (Prophet), and an ML-based TS regression approach (XGBoost-TS).</p>\n</li>\n<li>\n<p>Final selection is based on the <strong>mandatory metrics</strong> (MAE/RMSE/MAPE), computed on a holdout window.</p>\n</li>\n</ul>"
+          ],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Time Series / Forecasting (≥ 2 models + mandatory comparison)",
+          "markdown": [
+            "<hr>\n<h2>Time Series / Forecasting (≥ 2 models + mandatory comparison)</h2>"
+          ],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        }
+      ]
+    },
+    "models": {
+      "steps": [
+        {
+          "title": "Overview",
+          "markdown": [],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "F.1 Daily sales time series (CA)",
+          "markdown": [
+            "<h3>F.1 Daily sales time series (CA)</h3>\n<p>We build a <strong>daily</strong> sales series from <code>FactVente(e)</code> using your channel-specific CA rules (B2B &amp; SiteWeb use <code>MAX(total_ht)</code> logic).</p>\n<p>This is the target we forecast to recommend the best future selling date (with predicted sales value).</p>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>CA_B2B</th>\n      <th>CA_SiteWeb</th>\n      <th>CA_Other</th>\n      <th>CA_TOTAL</th>\n    </tr>\n    <tr>\n      <th>ds</th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>2025-12-26</th>\n      <td>0.0</td>\n      <td>409.9</td>\n      <td>0.0</td>\n      <td>409.9</td>\n    </tr>\n    <tr>\n      <th>2025-12-27</th>\n      <td>0.0</td>\n      <td>317.0</td>\n      <td>0.0</td>\n      <td>317.0</td>\n    </tr>\n    <tr>\n      <th>2025-12-28</th>\n      <td>0.0</td>\n      <td>317.0</td>\n      <td>0.0</td>\n      <td>317.0</td>\n    </tr>\n    <tr>\n      <th>2025-12-29</th>\n      <td>0.0</td>\n      <td>538.0</td>\n      <td>0.0</td>\n      <td>538.0</td>\n    </tr>\n    <tr>\n      <th>2025-12-30</th>\n      <td>0.0</td>\n      <td>90.0</td>\n      <td>0.0</td>\n      <td>90.0</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "✅ Forecasting target: daily CA_TOTAL\nDays in series: 873\nDate range: 2023-08-11 → 2025-12-30\n",
+            "            CA_B2B  CA_SiteWeb  CA_Other  CA_TOTAL\nds                                                \n2025-12-26     0.0       409.9       0.0     409.9\n2025-12-27     0.0       317.0       0.0     317.0\n2025-12-28     0.0       317.0       0.0     317.0\n2025-12-29     0.0       538.0       0.0     538.0\n2025-12-30     0.0        90.0       0.0      90.0",
+            "<Figure size 1320x770 with 2 Axes>"
+          ],
+          "images": [
+            "/static/notebook_assets/sell/models_01.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "F.2 Stationarity & decomposition (ADF/KPSS)",
+          "markdown": [
+            "<h3>F.2 Stationarity &amp; decomposition (ADF/KPSS)</h3>"
+          ],
+          "html": [],
+          "text": [
+            "<Figure size 1320x550 with 4 Axes>",
+            "ADF p-value (H0: unit root / non-stationary): 0.0\nKPSS p-value (H0: stationary): 0.1\n✅ ADF suggests the series is likely stationary.\n✅ KPSS suggests the series is likely stationary.\n"
+          ],
+          "images": [
+            "/static/notebook_assets/sell/models_02.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "F.3 Model 1 — SARIMA (holdout)",
+          "markdown": [
+            "<h3>F.3 Model 1 — SARIMA (holdout)</h3>\n<p>Metrics: MAE / RMSE / MAPE.</p>"
+          ],
+          "html": [],
+          "text": [
+            "{'MAE': 635.5337569935423, 'RMSE': 2342.5069513314497, 'MAPE%': 122.83137442485652, 'WMAPE%': 105.92404057892662}\n",
+            "<Figure size 1320x550 with 1 Axes>"
+          ],
+          "images": [
+            "/static/notebook_assets/sell/models_03.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "F.4 Model 2 — Prophet (if available)",
+          "markdown": [
+            "<h3>F.4 Model 2 — Prophet (if available)</h3>\n<p>If Prophet is not installed or the history is too short, this block is skipped.</p>"
+          ],
+          "html": [],
+          "text": [
+            "14:20:33 - cmdstanpy - INFO - Chain [1] start processing\n14:20:33 - cmdstanpy - INFO - Chain [1] done processing\n",
+            "{'MAE': 1342.6714463305607, 'RMSE': 2430.0812684605353, 'MAPE%': 649.0895665983813, 'WMAPE%': 223.78226679582892}\n",
+            "<Figure size 1320x550 with 1 Axes>",
+            "{'MAE': 1548.9590473879337, 'RMSE': 2889.992455143474, 'MAPE%': 765.9894233093887, 'WMAPE%': 258.1641009389878}\n",
+            "<Figure size 1320x550 with 1 Axes>"
+          ],
+          "images": [
+            "/static/notebook_assets/sell/models_04.png",
+            "/static/notebook_assets/sell/models_05.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "F.5 Forecasting comparison (model selection)",
+          "markdown": [
+            "<h3>F.5 Forecasting comparison (model selection)</h3>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>MAE</th>\n      <th>RMSE</th>\n      <th>MAPE%</th>\n      <th>WMAPE%</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>SARIMA</th>\n      <td>635.533757</td>\n      <td>2342.506951</td>\n      <td>122.831374</td>\n      <td>105.924041</td>\n    </tr>\n    <tr>\n      <th>Prophet</th>\n      <td>1342.671446</td>\n      <td>2430.081268</td>\n      <td>649.089567</td>\n      <td>223.782267</td>\n    </tr>\n    <tr>\n      <th>XGBoost_TS</th>\n      <td>1548.959047</td>\n      <td>2889.992455</td>\n      <td>765.989423</td>\n      <td>258.164101</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>ds</th>\n      <th>yhat</th>\n      <th>yhat_lower</th>\n      <th>yhat_upper</th>\n      <th>model</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>2025-12-31</td>\n      <td>866.994561</td>\n      <td>-10828.733489</td>\n      <td>12562.722612</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2026-01-01</td>\n      <td>778.448581</td>\n      <td>-10925.846401</td>\n      <td>12482.743564</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2026-01-02</td>\n      <td>995.467493</td>\n      <td>-10716.011318</td>\n      <td>12706.946305</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>2026-01-03</td>\n      <td>363.260696</td>\n      <td>-11355.387075</td>\n      <td>12081.908467</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>2026-01-04</td>\n      <td>340.618006</td>\n      <td>-11385.181308</td>\n      <td>12066.417321</td>\n      <td>SARIMA</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>month</th>\n      <th>expected_revenue_sum</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>2027-01</td>\n      <td>25676.948041</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>2027-02</td>\n      <td>23883.870417</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2027-03</td>\n      <td>27149.493348</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>2027-04</td>\n      <td>26547.520598</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>2027-05</td>\n      <td>26986.581354</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>2027-06</td>\n      <td>26952.132079</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>2027-07</td>\n      <td>28058.747196</td>\n    </tr>\n    <tr>\n      <th>7</th>\n      <td>2027-08</td>\n      <td>28260.156013</td>\n    </tr>\n    <tr>\n      <th>8</th>\n      <td>2027-09</td>\n      <td>28038.180843</td>\n    </tr>\n    <tr>\n      <th>9</th>\n      <td>2027-10</td>\n      <td>28619.709714</td>\n    </tr>\n    <tr>\n      <th>10</th>\n      <td>2027-11</td>\n      <td>28669.661065</td>\n    </tr>\n    <tr>\n      <th>11</th>\n      <td>2027-12</td>\n      <td>30224.041195</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "                    MAE         RMSE       MAPE%      WMAPE%\nSARIMA       635.533757  2342.506951  122.831374  105.924041\nProphet     1342.671446  2430.081268  649.089567  223.782267\nXGBoost_TS  1548.959047  2889.992455  765.989423  258.164101",
+            "✅ Selected best forecasting model: SARIMA\n",
+            "          ds        yhat    yhat_lower    yhat_upper   model\n0 2025-12-31  866.994561 -10828.733489  12562.722612  SARIMA\n1 2026-01-01  778.448581 -10925.846401  12482.743564  SARIMA\n2 2026-01-02  995.467493 -10716.011318  12706.946305  SARIMA\n3 2026-01-03  363.260696 -11355.387075  12081.908467  SARIMA\n4 2026-01-04  340.618006 -11385.181308  12066.417321  SARIMA",
+            "<Figure size 1320x550 with 1 Axes>",
+            "      month  expected_revenue_sum\n0   2027-01          25676.948041\n1   2027-02          23883.870417\n2   2027-03          27149.493348\n3   2027-04          26547.520598\n4   2027-05          26986.581354\n5   2027-06          26952.132079\n6   2027-07          28058.747196\n7   2027-08          28260.156013\n8   2027-09          28038.180843\n9   2027-10          28619.709714\n10  2027-11          28669.661065\n11  2027-12          30224.041195",
+            "🏆 Best month to sell in 2027: 2027-12\nExpected revenue in that month (sum of daily CA_TOTAL): 30224.04\n📅 Best day in 2027: 2027-12-27 (Monday)\nExpected revenue (CA_TOTAL) for that day: 1251.3\n"
+          ],
+          "images": [
+            "/static/notebook_assets/sell/models_06.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "Recommendation — Best Time to Sell (2027, by month)",
+          "markdown": [
+            "<hr>\n<h2>Recommendation — Best Time to Sell (2027, by month)</h2>\n<p>We combine:</p>\n<p>1) <strong>Historical</strong> behavior to find the best <strong>weekday</strong> (hour is not available from <code>dateFK</code>), and</p>\n<p>2) <strong>Forecast</strong> to pick the best <strong>month in 2027</strong> (and the best day inside that month) with expected <strong>revenue</strong> (<code>CA_TOTAL</code>).</p>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>weekday</th>\n      <th>revenue_mean</th>\n      <th>revenue_sum</th>\n      <th>n</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>4</th>\n      <td>Friday</td>\n      <td>1210.913718</td>\n      <td>151364.2148</td>\n      <td>125</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>Wednesday</td>\n      <td>741.596694</td>\n      <td>91957.9900</td>\n      <td>124</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>Tuesday</td>\n      <td>502.574880</td>\n      <td>62821.8600</td>\n      <td>125</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>Thursday</td>\n      <td>494.303274</td>\n      <td>61293.6060</td>\n      <td>124</td>\n    </tr>\n    <tr>\n      <th>0</th>\n      <td>Monday</td>\n      <td>444.662496</td>\n      <td>55582.8120</td>\n      <td>125</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>Saturday</td>\n      <td>91.594960</td>\n      <td>11449.3700</td>\n      <td>125</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>Sunday</td>\n      <td>87.670640</td>\n      <td>10958.8300</td>\n      <td>125</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>run_id</th>\n      <th>created_at</th>\n      <th>month</th>\n      <th>period_start</th>\n      <th>period_end</th>\n      <th>expected_revenue_sum</th>\n      <th>is_best_month</th>\n      <th>best_month</th>\n      <th>best_day</th>\n      <th>best_day_value</th>\n      <th>model</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-01</td>\n      <td>2027-01-01</td>\n      <td>2027-01-31</td>\n      <td>25676.948041</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-02</td>\n      <td>2027-02-01</td>\n      <td>2027-02-28</td>\n      <td>23883.870417</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-03</td>\n      <td>2027-03-01</td>\n      <td>2027-03-31</td>\n      <td>27149.493348</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-04</td>\n      <td>2027-04-01</td>\n      <td>2027-04-30</td>\n      <td>26547.520598</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-05</td>\n      <td>2027-05-01</td>\n      <td>2027-05-31</td>\n      <td>26986.581354</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-06</td>\n      <td>2027-06-01</td>\n      <td>2027-06-30</td>\n      <td>26952.132079</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-07</td>\n      <td>2027-07-01</td>\n      <td>2027-07-31</td>\n      <td>28058.747196</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>7</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-08</td>\n      <td>2027-08-01</td>\n      <td>2027-08-31</td>\n      <td>28260.156013</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>8</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-09</td>\n      <td>2027-09-01</td>\n      <td>2027-09-30</td>\n      <td>28038.180843</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>9</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-10</td>\n      <td>2027-10-01</td>\n      <td>2027-10-31</td>\n      <td>28619.709714</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>10</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-11</td>\n      <td>2027-11-01</td>\n      <td>2027-11-30</td>\n      <td>28669.661065</td>\n      <td>False</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n    <tr>\n      <th>11</th>\n      <td>6269fd94-b800-48da-8aa2-492cc190836d</td>\n      <td>2026-04-12 13:20:37.127092+00:00</td>\n      <td>2027-12</td>\n      <td>2027-12-01</td>\n      <td>2027-12-31</td>\n      <td>30224.041195</td>\n      <td>True</td>\n      <td>2027-12</td>\n      <td>2027-12-27</td>\n      <td>1251.303208</td>\n      <td>SARIMA</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "     weekday  revenue_mean  revenue_sum    n\n4     Friday   1210.913718  151364.2148  125\n2  Wednesday    741.596694   91957.9900  124\n1    Tuesday    502.574880   62821.8600  125\n3   Thursday    494.303274   61293.6060  124\n0     Monday    444.662496   55582.8120  125\n5   Saturday     91.594960   11449.3700  125\n6     Sunday     87.670640   10958.8300  125",
+            "✅ Historical best weekday (by mean CA_TOTAL): Friday\nHistorical mean revenue: 1210.91\n\n🏆 Recommendation (2027)\nBest month to sell: 2027-12\nExpected revenue in that month (sum of daily CA_TOTAL): 30224.04\nBest day to sell: 2027-12-27 (Monday)\nExpected revenue (CA_TOTAL) for that day: 1251.3\n",
+            "Engine URL: postgresql+psycopg2://postgres:***@localhost:5432/pi_bi\nML schema : ml\nConnected to: pi_bi as postgres (schema=public) at ::1:5432\nExisting tables in ML schema: ['best_period_promo_result', 'best_time_to_promote_monthly', 'best_time_to_sell_monthly', 'best_time_to_sell_result', 'forecast_daily', 'model_metrics', 'model_run_log', 'model_runs', 'promo_daily', 'promo_monthly', 'promo_plan', 'supplier_classification_result', 'supplier_clusters']\nIf the list is empty, run the next cell (export) to create and populate them.\n",
+            "Engine URL: postgresql+psycopg2://postgres:***@localhost:5432/pi_bi\nConnected to: pi_bi as postgres (schema=public) at ::1:5432\nTarget schema/table: ml.best_time_to_sell_monthly\n✅ Export complete\nRun ID: 6269fd94-b800-48da-8aa2-492cc190836d\nTables in schema: ['best_period_promo_result', 'best_time_to_promote_monthly', 'best_time_to_sell_monthly', 'best_time_to_sell_result', 'forecast_daily', 'model_metrics', 'model_run_log', 'model_runs', 'promo_daily', 'promo_monthly', 'promo_plan', 'supplier_classification_result', 'supplier_clusters']\n",
+            "                                  run_id                       created_at  \\\n0   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n1   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n2   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n3   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n4   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n5   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n6   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n7   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n8   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n9   6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n10  6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n11  6269fd94-b800-48da-8aa2-492cc190836d 2026-04-12 13:20:37.127092+00:00   \n\n      month period_start  period_end  expected_revenue_sum  is_best_month  \\\n0   2027-01   2027-01-01  2027-01-31          25676.948041          False   \n1   2027-02   2027-02-01  2027-02-28          23883.870417          False   \n2   2027-03   2027-03-01  2027-03-31          27149.493348          False   \n3   2027-04   2027-04-01  2027-04-30          26547.520598          False   \n4   2027-05   2027-05-01  2027-05-31          26986.581354          False   \n5   2027-06   2027-06-01  2027-06-30          26952.132079          False   \n6   2027-07   2027-07-01  2027-07-31          28058.747196          False   \n7   2027-08   2027-08-01  2027-08-31          28260.156013          False   \n8   2027-09   2027-09-01  2027-09-30          28038.180843          False   \n9   2027-10   2027-10-01  2027-10-31          28619.709714          False   \n10  2027-11   2027-11-01  2027-11-30          28669.661065          False   \n11  2027-12   2027-12-01  2027-12-31          30224.041195           True   \n\n   best_month    best_day  best_day_value   model  \n0     2027-12  2027-12-27     1251.303208  SARIMA  \n1     2027-12  2027-12-27     1251.303208  SARIMA  \n2     2027-12  2027-12-27     1251.303208  SARIMA  \n3     2027-12  2027-12-27     1251.303208  SARIMA  \n4     2027-12  2027-12-27     1251.303208  SARIMA  \n5     2027-12  2027-12-27     1251.303208  SARIMA  \n6     2027-12  2027-12-27     1251.303208  SARIMA  \n7     2027-12  2027-12-27     1251.303208  SARIMA  \n8     2027-12  2027-12-27     1251.303208  SARIMA  \n9     2027-12  2027-12-27     1251.303208  SARIMA  \n10    2027-12  2027-12-27     1251.303208  SARIMA  \n11    2027-12  2027-12-27     1251.303208  SARIMA  "
+          ],
+          "images": [],
+          "plotly": []
+        }
+      ]
+    }
+  }
+}

@@ -481,6 +481,20 @@ def get_notebook_view(key: str) -> dict[str, Any]:
             notebook_path=_resolve_notebook_path("3_best_time_to_promote_postgres_v2.ipynb"),
             models_used=["Prophet", "SARIMAX", "XGBoost"],
         ),
+        "campaign_success": NotebookSpec(
+            key="campaign_success",
+            title="Campaign Success Prediction",
+            subtitle="Notebook visualizations",
+            notebook_path=_resolve_notebook_path("Campaign_success_predictionn.ipynb"),
+            models_used=["RandomForest", "GradientBoosting", "LinearRegression", "KMeans"],
+        ),
+        "campaign_forecasting": NotebookSpec(
+            key="campaign_forecasting",
+            title="Campaign Time Series Forecasting",
+            subtitle="Notebook visualizations",
+            notebook_path=_resolve_notebook_path("campaign_time_series_forecasting.ipynb"),
+            models_used=["ARIMA", "SARIMA", "XGBoost"],
+        ),
     }
 
     if key not in specs:
@@ -663,6 +677,59 @@ def get_notebook_view(key: str) -> dict[str, Any]:
             include_text={"data_prep", "models"},
             include_plotly={"data_prep", "models"},
             version=11,
+        )
+    elif key == "campaign_success":
+        section_groups = {
+            "data_prep": [
+                {"title": "Notebook scope & setup", "cells": [1, 2]},
+                {"title": "Connection and loading", "cells": [6]},
+                {"title": "Exploratory analysis", "cells": [7, 8, 9, 10, 11]},
+            ],
+            "model_understanding": [
+                {"title": "Model rationale", "cells": [12]},
+            ],
+            "models": [
+                {"title": "Classification", "cells": [14, 15, 16]},
+                {"title": "Regression", "cells": [17, 18]},
+                {"title": "Clustering", "cells": [19, 20]},
+            ],
+        }
+        sections = _extract_assets_targeted(
+            spec,
+            section_groups,
+            include_markdown={"data_prep", "model_understanding", "models"},
+            include_images={"data_prep", "models"},
+            include_html={"data_prep", "models"},
+            include_text={"data_prep", "models"},
+            include_plotly={"data_prep", "models"},
+            version=12,
+        )
+    elif key == "campaign_forecasting":
+        section_groups = {
+            "data_prep": [
+                {"title": "Objective & setup", "cells": [1, 2, 5]},
+                {"title": "Connection and series preparation", "cells": [6, 7, 8]},
+                {"title": "Series exploration", "cells": [9, 10]},
+            ],
+            "model_understanding": [
+                {"title": "ARIMA/SARIMA approach", "cells": [11]},
+                {"title": "XGBoost lag-based approach", "cells": [13]},
+            ],
+            "models": [
+                {"title": "ARIMA/SARIMA results", "cells": [12]},
+                {"title": "XGBoost results", "cells": [14]},
+                {"title": "Future forecast", "cells": [15, 16]},
+            ],
+        }
+        sections = _extract_assets_targeted(
+            spec,
+            section_groups,
+            include_markdown={"data_prep", "model_understanding", "models"},
+            include_images={"data_prep", "models"},
+            include_html={"data_prep", "models"},
+            include_text={"data_prep", "models"},
+            include_plotly={"data_prep", "models"},
+            version=13,
         )
     else:
         sections = _extract_assets(spec)

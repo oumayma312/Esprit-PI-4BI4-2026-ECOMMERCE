@@ -1,0 +1,226 @@
+{
+  "version": 13,
+  "source_mtime": 1776160733.8158967,
+  "generated_at": "2026-04-14T10:11:57Z",
+  "plan": {
+    "section_groups": {
+      "data_prep": [
+        {
+          "title": "Objective & setup",
+          "cells": [
+            1,
+            2,
+            5
+          ]
+        },
+        {
+          "title": "Connection and series preparation",
+          "cells": [
+            6,
+            7,
+            8
+          ]
+        },
+        {
+          "title": "Series exploration",
+          "cells": [
+            9,
+            10
+          ]
+        }
+      ],
+      "model_understanding": [
+        {
+          "title": "ARIMA/SARIMA approach",
+          "cells": [
+            11
+          ]
+        },
+        {
+          "title": "XGBoost lag-based approach",
+          "cells": [
+            13
+          ]
+        }
+      ],
+      "models": [
+        {
+          "title": "ARIMA/SARIMA results",
+          "cells": [
+            12
+          ]
+        },
+        {
+          "title": "XGBoost results",
+          "cells": [
+            14
+          ]
+        },
+        {
+          "title": "Future forecast",
+          "cells": [
+            15,
+            16
+          ]
+        }
+      ]
+    },
+    "include_markdown": [
+      "data_prep",
+      "model_understanding",
+      "models"
+    ],
+    "include_images": [
+      "data_prep",
+      "models"
+    ],
+    "include_html": [
+      "data_prep",
+      "models"
+    ],
+    "include_text": [
+      "data_prep",
+      "models"
+    ],
+    "include_plotly": [
+      "data_prep",
+      "models"
+    ]
+  },
+  "sections": {
+    "data_prep": {
+      "steps": [
+        {
+          "title": "Objective & setup",
+          "markdown": [
+            "<pre class=\"pre\"># Forecasting temporel des campagnes publicitaires\n\n\n\nCe notebook isole la partie F du projet: détection d&#x27;une colonne temporelle dans PostgreSQL, analyse de stationnarité, décomposition, tests ADF/KPSS, puis comparaison de deux approches de prévision.\n\n\n\nLes données proviennent uniquement des tables `fact_campaign` et `FactCampaign` de la base `pi_bi`.</pre>",
+            "<pre class=\"pre\">## Objectif\n\n\n\n1. Charger les tables depuis PostgreSQL.\n\n2. Identifier une colonne temporelle exploitable.\n\n3. Agréger la variable cible numérique dans le temps.\n\n4. Vérifier la stationnarité avec ADF et KPSS.\n\n5. Comparer au moins deux modèles: ARIMA/SARIMA et XGBoost basé sur des variables de retard.\n\n6. Évaluer avec RMSE, MAE et MAPE.\n\n7. Visualiser le réel vs prédit et le forecast futur.</pre>",
+            "<pre class=\"pre\">## 1. Connexion et chargement\n\n\n\nLa connexion est testée d&#x27;abord via la fonction de gestion d&#x27;erreurs déjà présente dans `pg_connect.py`. Ensuite les deux tables sont chargées et fusionnées pour détecter la meilleure colonne temporelle.</pre>"
+          ],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Connection and series preparation",
+          "markdown": [
+            "<pre class=\"pre\">## 2. Préparation de la série temporelle\n\n\n\nOn identifie une colonne temporelle et une cible numérique. Si plusieurs colonnes existent, la logique priorise les indicateurs métiers comme `roi`, `revenue`, `sales`, `ctr` ou `conversion_rate`.</pre>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>date_pk</th>\n      <th>documentpk</th>\n      <th>reach</th>\n      <th>impressions</th>\n      <th>frequency</th>\n      <th>result</th>\n      <th>price</th>\n      <th>views</th>\n      <th>factcampaignpk</th>\n      <th>datefk</th>\n      <th>documentfk</th>\n      <th>campaign_date</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>20250211.0</td>\n      <td>1430.0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0.0</td>\n      <td>0</td>\n      <td>2.0</td>\n      <td>0.0</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>2025-02-11</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20250211.0</td>\n      <td>1431.0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0.0</td>\n      <td>0</td>\n      <td>2.0</td>\n      <td>0.0</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>2025-02-11</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>20250211.0</td>\n      <td>1432.0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0.0</td>\n      <td>0</td>\n      <td>2.0</td>\n      <td>0.0</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>2025-02-11</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>20250211.0</td>\n      <td>1433.0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0.0</td>\n      <td>0</td>\n      <td>2.0</td>\n      <td>0.0</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>2025-02-11</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>20250211.0</td>\n      <td>1434.0</td>\n      <td>0</td>\n      <td>0</td>\n      <td>0.0</td>\n      <td>0</td>\n      <td>3.0</td>\n      <td>0.0</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>NaN</td>\n      <td>2025-02-11</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "Connexion reussie a PostgreSQL.\nAttention: connexion sans SSL (serveur local sans TLS).\nVersion du serveur: PostgreSQL 15.15, compiled by Visual C++ build 1944, 64-bit\nfact_campaign shape: (91, 8)\nFactCampaign shape: (80, 9)\nLoaded relation fact_campaign: ('datawarehouse', 'fact_campaign')\nLoaded relation FactCampaign: ('datawarehouse', 'FactCampaign')\nCombined shape: (171, 12)\n",
+            "      date_pk  documentpk  reach  impressions  frequency  result  price  views  factcampaignpk  datefk  documentfk campaign_date\n0  20250211.0      1430.0      0            0        0.0       0    2.0    0.0             NaN     NaN         NaN    2025-02-11\n1  20250211.0      1431.0      0            0        0.0       0    2.0    0.0             NaN     NaN         NaN    2025-02-11\n2  20250211.0      1432.0      0            0        0.0       0    2.0    0.0             NaN     NaN         NaN    2025-02-11\n3  20250211.0      1433.0      0            0        0.0       0    2.0    0.0             NaN     NaN         NaN    2025-02-11\n4  20250211.0      1434.0      0            0        0.0       0    3.0    0.0             NaN     NaN         NaN    2025-02-11",
+            "Colonne temporelle détectée: campaign_date\nCible numérique détectée: views\nFréquence retenue: D\nNombre de points agrégés: 263\n",
+            "campaign_date\n2025-01-03    0.0\n2025-01-04    0.0\n2025-01-05    0.0\n2025-01-06    0.0\n2025-01-07    0.0\nFreq: D, Name: views, dtype: float64"
+          ],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "Series exploration",
+          "markdown": [
+            "<pre class=\"pre\">## 3. Exploration de la série\n\n\n\nOn vérifie la tendance globale, la saisonnalité potentielle, puis les tests de stationnarité ADF et KPSS.</pre>"
+          ],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>test</th>\n      <th>statistic</th>\n      <th>p_value</th>\n      <th>decision</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>ADF</td>\n      <td>-2.186534</td>\n      <td>0.211169</td>\n      <td>stationary si p&lt;0.05</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>KPSS</td>\n      <td>1.293485</td>\n      <td>0.010000</td>\n      <td>stationary si p&gt;0.05</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "<Figure size 1200x400 with 1 Axes>",
+            "<Figure size 640x480 with 4 Axes>",
+            "<Figure size 1000x400 with 0 Axes>",
+            "<Figure size 640x480 with 1 Axes>",
+            "<Figure size 1000x400 with 0 Axes>",
+            "<Figure size 640x480 with 1 Axes>",
+            "ADF statistic: -2.186533771653814\nADF p-value: 0.21116917304261112\nKPSS statistic: 1.293484593454935\nKPSS p-value: 0.01\n",
+            "   test  statistic   p_value              decision\n0   ADF  -2.186534  0.211169  stationary si p<0.05\n1  KPSS   1.293485  0.010000  stationary si p>0.05"
+          ],
+          "images": [
+            "/static/notebook_assets/campaign_forecasting/data_prep_01.png",
+            "/static/notebook_assets/campaign_forecasting/data_prep_02.png",
+            "/static/notebook_assets/campaign_forecasting/data_prep_03.png",
+            "/static/notebook_assets/campaign_forecasting/data_prep_04.png"
+          ],
+          "plotly": []
+        }
+      ]
+    },
+    "model_understanding": {
+      "steps": [
+        {
+          "title": "ARIMA/SARIMA approach",
+          "markdown": [
+            "<pre class=\"pre\">## 4. Modèle 1: ARIMA et SARIMA\n\n\n\nLa première approche repose sur des modèles statistiques classiques adaptés aux séries temporelles. Le split est chronologique, sans mélange aléatoire.</pre>"
+          ],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        },
+        {
+          "title": "XGBoost lag-based approach",
+          "markdown": [
+            "<pre class=\"pre\">## 5. Modèle 2: XGBoost sur variables de retard\n\n\n\nCette approche transforme la série en problème supervisé avec des retards, des moyennes mobiles et des variables calendaires. Elle est plus flexible qu&#x27;ARIMA sur des dynamiques non linéaires.</pre>"
+          ],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        }
+      ]
+    },
+    "models": {
+      "steps": [
+        {
+          "title": "ARIMA/SARIMA results",
+          "markdown": [],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>model</th>\n      <th>RMSE</th>\n      <th>MAE</th>\n      <th>MAPE</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>ARIMA(1,1,1)</td>\n      <td>28.486981</td>\n      <td>23.257471</td>\n      <td>297.095152</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>SARIMA(1,1,1)x(1,1,1,12)</td>\n      <td>43.030398</td>\n      <td>35.868067</td>\n      <td>446.154715</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "Meilleur modèle statistique: ARIMA(1,1,1)\n",
+            "                      model       RMSE        MAE        MAPE\n0              ARIMA(1,1,1)  28.486981  23.257471  297.095152\n1  SARIMA(1,1,1)x(1,1,1,12)  43.030398  35.868067  446.154715",
+            "<Figure size 1200x500 with 1 Axes>"
+          ],
+          "images": [
+            "/static/notebook_assets/campaign_forecasting/models_01.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "XGBoost results",
+          "markdown": [],
+          "html": [
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>model</th>\n      <th>RMSE</th>\n      <th>MAE</th>\n      <th>MAPE</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>XGBoost TS</td>\n      <td>2.576283</td>\n      <td>2.356171</td>\n      <td>16.773742</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
+            "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>model</th>\n      <th>RMSE</th>\n      <th>MAE</th>\n      <th>MAPE</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>ARIMA(1,1,1)</td>\n      <td>28.486981</td>\n      <td>23.257471</td>\n      <td>297.095152</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>SARIMA(1,1,1)x(1,1,1,12)</td>\n      <td>43.030398</td>\n      <td>35.868067</td>\n      <td>446.154715</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>XGBoost TS</td>\n      <td>2.576283</td>\n      <td>2.356171</td>\n      <td>16.773742</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
+          ],
+          "text": [
+            "        model      RMSE       MAE       MAPE\n0  XGBoost TS  2.576283  2.356171  16.773742",
+            "                      model       RMSE        MAE        MAPE\n0              ARIMA(1,1,1)  28.486981  23.257471  297.095152\n1  SARIMA(1,1,1)x(1,1,1,12)  43.030398  35.868067  446.154715\n2                XGBoost TS   2.576283   2.356171   16.773742",
+            "<Figure size 800x400 with 1 Axes>",
+            "<Figure size 1200x500 with 1 Axes>",
+            "<Figure size 1000x400 with 1 Axes>"
+          ],
+          "images": [
+            "/static/notebook_assets/campaign_forecasting/models_02.png",
+            "/static/notebook_assets/campaign_forecasting/models_03.png",
+            "/static/notebook_assets/campaign_forecasting/models_04.png"
+          ],
+          "plotly": []
+        },
+        {
+          "title": "Future forecast",
+          "markdown": [
+            "<pre class=\"pre\">## 6. Forecast futur\n\n\n\nOn utilise le meilleur modèle statistique pour projeter les prochaines périodes. Dans ce jeu de données, ARIMA conserve souvent une lecture plus stable à court terme que SARIMA si la saisonnalité est faible ou irrégulière.\n\n\n\n## 7. Conclusion\n\n\n\n- Si les tests ADF/KPSS montrent non-stationnarité, ARIMA/SARIMA reste pertinent après différenciation.\n\n- Si la saisonnalité est visible, SARIMA doit être comparé en priorité.\n\n- Si la dynamique dépend fortement de relations non linéaires, XGBoost TS peut mieux suivre les variations locales.\n\n- Le meilleur modèle est celui qui minimise RMSE, MAE et MAPE sur le test chronologique.</pre>"
+          ],
+          "html": [],
+          "text": [],
+          "images": [],
+          "plotly": []
+        }
+      ]
+    }
+  }
+}

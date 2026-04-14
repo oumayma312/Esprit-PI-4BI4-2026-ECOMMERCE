@@ -38,6 +38,16 @@ def create_app() -> Flask:
                     "subtitle": "Data prep + understanding + promo visuals",
                     "href": "/best-time-to-promote",
                 },
+                {
+                    "title": "Campaign Success Prediction",
+                    "subtitle": "EDA + classification + regression + clustering",
+                    "href": "/campaign-success-prediction",
+                },
+                {
+                    "title": "Campaign Time Series Forecasting",
+                    "subtitle": "Time series prep + ARIMA/SARIMA + XGBoost forecast",
+                    "href": "/campaign-time-series-forecasting",
+                },
             ],
         )
 
@@ -54,6 +64,16 @@ def create_app() -> Flask:
     @app.get("/best-time-to-promote")
     def best_time_to_promote():
         view = get_notebook_view("promote")
+        return render_template("notebook_view.html", **view)
+
+    @app.get("/campaign-success-prediction")
+    def campaign_success_prediction():
+        view = get_notebook_view("campaign_success")
+        return render_template("notebook_view.html", **view)
+
+    @app.get("/campaign-time-series-forecasting")
+    def campaign_time_series_forecasting():
+        view = get_notebook_view("campaign_forecasting")
         return render_template("notebook_view.html", **view)
 
     return app

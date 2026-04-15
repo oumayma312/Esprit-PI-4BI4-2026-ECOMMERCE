@@ -1,7 +1,7 @@
 {
   "version": 6,
-  "source_mtime": 1776160911.488617,
-  "generated_at": "2026-04-14T10:15:42Z",
+  "source_mtime": 1776207643.0079136,
+  "generated_at": "2026-04-14T23:38:23Z",
   "sections": {
     "data_prep": {
       "steps": [
@@ -16,7 +16,7 @@
         {
           "title": "Required notebook order",
           "markdown": [
-            "<h1>Best Time to Sell — Forecasting (PostgreSQL)</h1>\n<p><strong>Goal</strong>: prepare the data, engineer/select features, compare <strong>time-series forecasting</strong> models, then recommend the <strong>best time to sell in 2027</strong> with the <strong>expected revenue</strong>.</p>\n<p><strong>DW semantics</strong>: <code>startDate/endDate</code> are execution-history artifacts; the only valid sales date is <code>dateFK</code> (via <code>DimDate</code>).</p>\n<p><strong>Training window</strong> (history): July 2023 → end of 2025 (filter applied on the sales date).</p>\n<h2>Required notebook order</h2>\n<ol>\n<li><strong>Data Preparation &amp; Feature Engineering</strong></li>\n</ol>\n<ul>\n<li>\n<p>Data cleaning: missing values, outliers (kept), encoding, scaling</p>\n</li>\n<li>\n<p>Feature engineering &amp; selection (domain + filter/embedded approaches)</p>\n</li>\n</ul>\n<ol start=\"2\">\n<li><strong>Model Understanding</strong> (mandatory for all models used)</li>\n</ol>\n<ul>\n<li>\n<p>Intuition, key parameters, assumptions, limitations</p>\n</li>\n<li>\n<p>Justification of model choice for this problem</p>\n</li>\n</ul>\n<ol start=\"3\">\n<li><strong>Time Series / Forecasting</strong></li>\n</ol>\n<ul>\n<li>\n<p>Stationarity analysis (ADF/KPSS) + decomposition</p>\n</li>\n<li>\n<p>≥ 2 forecasting models + mandatory comparison (MAE/RMSE/MAPE)</p>\n</li>\n<li>\n<p>2027 recommendation: <strong>best month</strong> (and best day) + expected revenue</p>\n</li>\n</ul>"
+            "<pre class=\"pre\"># Best Time to Sell — Forecasting (PostgreSQL)\n\n\n\n**Goal**: prepare the data, engineer/select features, compare **time-series forecasting** models, then recommend the **best time to sell in 2027** with the **expected revenue**.\n\n\n\n**DW semantics**: `startDate/endDate` are execution-history artifacts; the only valid sales date is `dateFK` (via `DimDate`).\n\n\n\n**Training window** (history): July 2023 → end of 2025 (filter applied on the sales date).\n\n\n\n## Required notebook order\n\n1. **Data Preparation &amp; Feature Engineering**\n\n   - Data cleaning: missing values, outliers (kept), encoding, scaling\n\n   - Feature engineering &amp; selection (domain + filter/embedded approaches)\n\n2. **Model Understanding** (mandatory for all models used)\n\n   - Intuition, key parameters, assumptions, limitations\n\n   - Justification of model choice for this problem\n\n3. **Time Series / Forecasting**\n\n   - Stationarity analysis (ADF/KPSS) + decomposition\n\n   - ≥ 2 forecasting models + mandatory comparison (MAE/RMSE/MAPE)\n\n   - 2027 recommendation: **best month** (and best day) + expected revenue</pre>"
           ],
           "html": [],
           "text": [],
@@ -26,7 +26,7 @@
         {
           "title": "Data Preparation & Feature Engineering",
           "markdown": [
-            "<hr>\n<h2>Data Preparation &amp; Feature Engineering</h2>\n<h3>Setup &amp; Imports</h3>"
+            "<pre class=\"pre\">---\n\n## Data Preparation &amp; Feature Engineering\n\n### Setup &amp; Imports</pre>"
           ],
           "html": [],
           "text": [
@@ -39,7 +39,7 @@
         {
           "title": "Secure PostgreSQL connection",
           "markdown": [
-            "<h3>Secure PostgreSQL connection</h3>\n<p>Supported variables: <code>PGHOST</code>, <code>PGPORT</code>, <code>PGDATABASE</code>, <code>PGUSER</code>, <code>PGPASSWORD</code>, <code>DW_SCHEMA</code>.</p>"
+            "<pre class=\"pre\">### Secure PostgreSQL connection\n\nSupported variables: `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`, `DW_SCHEMA`.</pre>"
           ],
           "html": [],
           "text": [
@@ -51,7 +51,7 @@
         {
           "title": "DW Extraction & Daily Time Series Build",
           "markdown": [
-            "<hr>\n<h3>DW Extraction &amp; Daily Time Series Build</h3>"
+            "<pre class=\"pre\">---\n\n### DW Extraction &amp; Daily Time Series Build</pre>"
           ],
           "html": [],
           "text": [],
@@ -61,7 +61,7 @@
         {
           "title": "Load DW tables (robust discovery)",
           "markdown": [
-            "<h3>Load DW tables (robust discovery)</h3>\n<p>We load the sales fact table <code>FactVente(e)</code> from the DW schema, and (when available) <code>DimDate</code> and <code>DimChannel</code> for correct date and channel labels.</p>"
+            "<pre class=\"pre\">### Load DW tables (robust discovery)\n\nWe load the sales fact table `FactVente(e)` from the DW schema, and (when available) `DimDate` and `DimChannel` for correct date and channel labels.</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>dateFK</th>\n      <th>saleDate_dim</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>0</th>\n      <td>20200101</td>\n      <td>20200101</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>20200102</td>\n      <td>20200102</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>20200103</td>\n      <td>20200103</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>20200104</td>\n      <td>20200104</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>20200105</td>\n      <td>20200105</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
@@ -83,7 +83,7 @@
         {
           "title": "Build the daily revenue time series",
           "markdown": [
-            "<h3>Build the daily revenue time series</h3>\n<p>We derive the sales date strictly from <code>dateFK</code> (via <code>DimDate</code> when available), filter the period (Jul-2023 → Dec-2025), then build a <strong>daily</strong> revenue series <code>CA_TOTAL</code> used for forecasting.</p>"
+            "<pre class=\"pre\">### Build the daily revenue time series\n\nWe derive the sales date strictly from `dateFK` (via `DimDate` when available), filter the period (Jul-2023 → Dec-2025), then build a **daily** revenue series `CA_TOTAL` used for forecasting.</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>date</th>\n      <th>channel</th>\n      <th>total_ht</th>\n      <th>total_ttc</th>\n      <th>revenue</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>1</th>\n      <td>2025-12-30</td>\n      <td>site web</td>\n      <td>90.0</td>\n      <td>90.0</td>\n      <td>90.0</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>2025-12-29</td>\n      <td>site web</td>\n      <td>153.0</td>\n      <td>153.0</td>\n      <td>153.0</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>2025-12-29</td>\n      <td>site web</td>\n      <td>153.0</td>\n      <td>153.0</td>\n      <td>153.0</td>\n    </tr>\n    <tr>\n      <th>4</th>\n      <td>2025-12-29</td>\n      <td>site web</td>\n      <td>153.0</td>\n      <td>153.0</td>\n      <td>153.0</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>2025-12-29</td>\n      <td>site web</td>\n      <td>90.0</td>\n      <td>90.0</td>\n      <td>90.0</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
@@ -102,7 +102,7 @@
         {
           "title": "Data Cleaning (missing values, outliers)",
           "markdown": [
-            "<h3>Data Cleaning (missing values, outliers)</h3>\n<p>We keep outliers (we only visualize them once) and rely on robust evaluation metrics (MAE/RMSE/WMAPE) + <strong>MAPE computed on non-zero days</strong> to avoid division-by-zero issues.</p>"
+            "<pre class=\"pre\">### Data Cleaning (missing values, outliers)\n\n\n\nWe keep outliers (we only visualize them once) and rely on robust evaluation metrics (MAE/RMSE/WMAPE) + **MAPE computed on non-zero days** to avoid division-by-zero issues.</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>missing_%</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>date</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>channel</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>total_ht</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>total_ttc</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>revenue</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>doc_id</th>\n      <td>0.0</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
@@ -121,7 +121,7 @@
         {
           "title": "Feature Engineering & Selection (encoding, scaling, selection)",
           "markdown": [
-            "<h3>Feature Engineering &amp; Selection (encoding, scaling, selection)</h3>\n<p>We use a domain-based approach for time series: calendar features + lags + rolling statistics.</p>\n<p>We also demonstrate feature-selection approaches on the engineered feature set:</p>\n<ul>\n<li>\n<p><strong>Filter</strong>: mutual information ranking</p>\n</li>\n<li>\n<p><strong>Embedded</strong>: model-based importance from XGBoost (when available)</p>\n</li>\n</ul>"
+            "<pre class=\"pre\">### Feature Engineering &amp; Selection (encoding, scaling, selection)\n\n\n\nWe use a domain-based approach for time series: calendar features + lags + rolling statistics.\n\n\n\nWe also demonstrate feature-selection approaches on the engineered feature set:\n\n- **Filter**: mutual information ranking\n\n- **Embedded**: model-based importance from XGBoost (when available)</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>mutual_information</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>roll_std_14</th>\n      <td>0.264705</td>\n    </tr>\n    <tr>\n      <th>roll_std_28</th>\n      <td>0.245151</td>\n    </tr>\n    <tr>\n      <th>roll_mean_7</th>\n      <td>0.229975</td>\n    </tr>\n    <tr>\n      <th>roll_mean_14</th>\n      <td>0.226171</td>\n    </tr>\n    <tr>\n      <th>roll_mean_28</th>\n      <td>0.216158</td>\n    </tr>\n    <tr>\n      <th>roll_std_7</th>\n      <td>0.182272</td>\n    </tr>\n    <tr>\n      <th>lag_1</th>\n      <td>0.133567</td>\n    </tr>\n    <tr>\n      <th>lag_14</th>\n      <td>0.099344</td>\n    </tr>\n    <tr>\n      <th>lag_7</th>\n      <td>0.079209</td>\n    </tr>\n    <tr>\n      <th>month</th>\n      <td>0.077591</td>\n    </tr>\n    <tr>\n      <th>lag_28</th>\n      <td>0.069010</td>\n    </tr>\n    <tr>\n      <th>dow</th>\n      <td>0.034305</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
@@ -150,7 +150,7 @@
         {
           "title": "Model Understanding (mandatory for all models used)",
           "markdown": [
-            "<hr>\n<h2>Model Understanding (mandatory for all models used)</h2>\n<h3>SARIMA (SARIMAX)</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: linear model for time series with trend/seasonality handled via differencing and seasonal terms.</p>\n</li>\n<li>\n<p><strong>Key parameters</strong>: <code>(p,d,q)</code> and seasonal <code>(P,D,Q,s)</code> (here <code>s=7</code> for weekly seasonality).</p>\n</li>\n<li>\n<p><strong>Assumptions</strong>: relationship is approximately linear; residuals should be roughly white-noise after differencing.</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: can struggle with abrupt spikes/outliers; sensitive to order choice; prediction intervals may be wide.</p>\n</li>\n</ul>\n<h3>Prophet</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: decomposes series into trend + seasonality (+ holidays if provided).</p>\n</li>\n<li>\n<p><strong>Key parameters</strong>: seasonality choices (weekly/yearly), trend flexibility (changepoints).</p>\n</li>\n<li>\n<p><strong>Assumptions</strong>: additive components; strong recurring seasonality; stable patterns.</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: may underperform on sparse/zero-heavy series; needs enough history; can oversmooth spikes.</p>\n</li>\n</ul>\n<h3>XGBoost time-series regression (lags/rolling + calendar)</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: transforms forecasting into supervised learning using engineered lag/rolling/calendar features.</p>\n</li>\n<li>\n<p><strong>Preprocessing</strong>: <strong>encoding</strong> (<code>dow</code>, <code>month</code>) via one-hot; <strong>scaling</strong> numeric lag/rolling features (shown in pipeline).</p>\n</li>\n<li>\n<p><strong>Assumptions</strong>: engineered features capture the signal; learns non-linear relationships.</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: recursive multi-step forecasting can drift; sensitive to outliers; needs careful validation to avoid leakage.</p>\n</li>\n</ul>\n<h3>Why these models?</h3>\n<ul>\n<li>\n<p>The target is <strong>daily revenue</strong> with likely <strong>weekly seasonality</strong> and occasional spikes.</p>\n</li>\n<li>\n<p>We compare a classical statistical TS model (SARIMA), a decomposition model (Prophet), and an ML-based TS regression approach (XGBoost-TS).</p>\n</li>\n<li>\n<p>Final selection is based on the <strong>mandatory metrics</strong> (MAE/RMSE/MAPE), computed on a holdout window.</p>\n</li>\n</ul>"
+            "<pre class=\"pre\">---\n\n## Model Understanding (mandatory for all models used)\n\n\n\n### SARIMA (SARIMAX)\n\n- **Intuition**: linear model for time series with trend/seasonality handled via differencing and seasonal terms.\n\n- **Key parameters**: `(p,d,q)` and seasonal `(P,D,Q,s)` (here `s=7` for weekly seasonality).\n\n- **Assumptions**: relationship is approximately linear; residuals should be roughly white-noise after differencing.\n\n- **Limitations**: can struggle with abrupt spikes/outliers; sensitive to order choice; prediction intervals may be wide.\n\n\n\n### Prophet\n\n- **Intuition**: decomposes series into trend + seasonality (+ holidays if provided).\n\n- **Key parameters**: seasonality choices (weekly/yearly), trend flexibility (changepoints).\n\n- **Assumptions**: additive components; strong recurring seasonality; stable patterns.\n\n- **Limitations**: may underperform on sparse/zero-heavy series; needs enough history; can oversmooth spikes.\n\n\n\n### XGBoost time-series regression (lags/rolling + calendar)\n\n- **Intuition**: transforms forecasting into supervised learning using engineered lag/rolling/calendar features.\n\n- **Preprocessing**: **encoding** (`dow`, `month`) via one-hot; **scaling** numeric lag/rolling features (shown in pipeline).\n\n- **Assumptions**: engineered features capture the signal; learns non-linear relationships.\n\n- **Limitations**: recursive multi-step forecasting can drift; sensitive to outliers; needs careful validation to avoid leakage.\n\n\n\n### Why these models?\n\n- The target is **daily revenue** with likely **weekly seasonality** and occasional spikes.\n\n- We compare a classical statistical TS model (SARIMA), a decomposition model (Prophet), and an ML-based TS regression approach (XGBoost-TS).\n\n- Final selection is based on the **mandatory metrics** (MAE/RMSE/MAPE), computed on a holdout window.</pre>"
           ],
           "html": [],
           "text": [],
@@ -160,7 +160,7 @@
         {
           "title": "Time Series / Forecasting (≥ 2 models + mandatory comparison)",
           "markdown": [
-            "<hr>\n<h2>Time Series / Forecasting (≥ 2 models + mandatory comparison)</h2>"
+            "<pre class=\"pre\">---\n\n## Time Series / Forecasting (≥ 2 models + mandatory comparison)</pre>"
           ],
           "html": [],
           "text": [],
@@ -182,7 +182,7 @@
         {
           "title": "F.1 Daily sales time series (CA)",
           "markdown": [
-            "<h3>F.1 Daily sales time series (CA)</h3>\n<p>We build a <strong>daily</strong> sales series from <code>FactVente(e)</code> using your channel-specific CA rules (B2B &amp; SiteWeb use <code>MAX(total_ht)</code> logic).</p>\n<p>This is the target we forecast to recommend the best future selling date (with predicted sales value).</p>"
+            "<pre class=\"pre\">### F.1 Daily sales time series (CA)\n\nWe build a **daily** sales series from `FactVente(e)` using your channel-specific CA rules (B2B &amp; SiteWeb use `MAX(total_ht)` logic).\n\nThis is the target we forecast to recommend the best future selling date (with predicted sales value).</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>CA_B2B</th>\n      <th>CA_SiteWeb</th>\n      <th>CA_Other</th>\n      <th>CA_TOTAL</th>\n    </tr>\n    <tr>\n      <th>ds</th>\n      <th></th>\n      <th></th>\n      <th></th>\n      <th></th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>2025-12-26</th>\n      <td>0.0</td>\n      <td>409.9</td>\n      <td>0.0</td>\n      <td>409.9</td>\n    </tr>\n    <tr>\n      <th>2025-12-27</th>\n      <td>0.0</td>\n      <td>317.0</td>\n      <td>0.0</td>\n      <td>317.0</td>\n    </tr>\n    <tr>\n      <th>2025-12-28</th>\n      <td>0.0</td>\n      <td>317.0</td>\n      <td>0.0</td>\n      <td>317.0</td>\n    </tr>\n    <tr>\n      <th>2025-12-29</th>\n      <td>0.0</td>\n      <td>538.0</td>\n      <td>0.0</td>\n      <td>538.0</td>\n    </tr>\n    <tr>\n      <th>2025-12-30</th>\n      <td>0.0</td>\n      <td>90.0</td>\n      <td>0.0</td>\n      <td>90.0</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
@@ -200,7 +200,7 @@
         {
           "title": "F.2 Stationarity & decomposition (ADF/KPSS)",
           "markdown": [
-            "<h3>F.2 Stationarity &amp; decomposition (ADF/KPSS)</h3>"
+            "<pre class=\"pre\">### F.2 Stationarity &amp; decomposition (ADF/KPSS)</pre>"
           ],
           "html": [],
           "text": [
@@ -215,7 +215,7 @@
         {
           "title": "F.3 Model 1 — SARIMA (holdout)",
           "markdown": [
-            "<h3>F.3 Model 1 — SARIMA (holdout)</h3>\n<p>Metrics: MAE / RMSE / MAPE.</p>"
+            "<pre class=\"pre\">### F.3 Model 1 — SARIMA (holdout)\n\nMetrics: MAE / RMSE / MAPE.</pre>"
           ],
           "html": [],
           "text": [
@@ -230,7 +230,7 @@
         {
           "title": "F.4 Model 2 — Prophet (if available)",
           "markdown": [
-            "<h3>F.4 Model 2 — Prophet (if available)</h3>\n<p>If Prophet is not installed or the history is too short, this block is skipped.</p>"
+            "<pre class=\"pre\">### F.4 Model 2 — Prophet (if available)\n\nIf Prophet is not installed or the history is too short, this block is skipped.</pre>"
           ],
           "html": [],
           "text": [
@@ -249,7 +249,7 @@
         {
           "title": "F.5 Forecasting comparison (model selection)",
           "markdown": [
-            "<h3>F.5 Forecasting comparison (model selection)</h3>"
+            "<pre class=\"pre\">### F.5 Forecasting comparison (model selection)</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>MAE</th>\n      <th>RMSE</th>\n      <th>MAPE%</th>\n      <th>WMAPE%</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>SARIMA</th>\n      <td>635.533757</td>\n      <td>2342.506951</td>\n      <td>122.831374</td>\n      <td>105.924041</td>\n    </tr>\n    <tr>\n      <th>Prophet</th>\n      <td>1342.671446</td>\n      <td>2430.081268</td>\n      <td>649.089567</td>\n      <td>223.782267</td>\n    </tr>\n    <tr>\n      <th>XGBoost_TS</th>\n      <td>1548.959047</td>\n      <td>2889.992455</td>\n      <td>765.989423</td>\n      <td>258.164101</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
@@ -272,7 +272,7 @@
         {
           "title": "Recommendation — Best Time to Sell (2027, by month)",
           "markdown": [
-            "<hr>\n<h2>Recommendation — Best Time to Sell (2027, by month)</h2>\n<p>We combine:</p>\n<p>1) <strong>Historical</strong> behavior to find the best <strong>weekday</strong> (hour is not available from <code>dateFK</code>), and</p>\n<p>2) <strong>Forecast</strong> to pick the best <strong>month in 2027</strong> (and the best day inside that month) with expected <strong>revenue</strong> (<code>CA_TOTAL</code>).</p>"
+            "<pre class=\"pre\">---\n\n## Recommendation — Best Time to Sell (2027, by month)\n\nWe combine:\n\n1) **Historical** behavior to find the best **weekday** (hour is not available from `dateFK`), and\n\n2) **Forecast** to pick the best **month in 2027** (and the best day inside that month) with expected **revenue** (`CA_TOTAL`).</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>weekday</th>\n      <th>revenue_mean</th>\n      <th>revenue_sum</th>\n      <th>n</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>4</th>\n      <td>Friday</td>\n      <td>1210.913718</td>\n      <td>151364.2148</td>\n      <td>125</td>\n    </tr>\n    <tr>\n      <th>2</th>\n      <td>Wednesday</td>\n      <td>741.596694</td>\n      <td>91957.9900</td>\n      <td>124</td>\n    </tr>\n    <tr>\n      <th>1</th>\n      <td>Tuesday</td>\n      <td>502.574880</td>\n      <td>62821.8600</td>\n      <td>125</td>\n    </tr>\n    <tr>\n      <th>3</th>\n      <td>Thursday</td>\n      <td>494.303274</td>\n      <td>61293.6060</td>\n      <td>124</td>\n    </tr>\n    <tr>\n      <th>0</th>\n      <td>Monday</td>\n      <td>444.662496</td>\n      <td>55582.8120</td>\n      <td>125</td>\n    </tr>\n    <tr>\n      <th>5</th>\n      <td>Saturday</td>\n      <td>91.594960</td>\n      <td>11449.3700</td>\n      <td>125</td>\n    </tr>\n    <tr>\n      <th>6</th>\n      <td>Sunday</td>\n      <td>87.670640</td>\n      <td>10958.8300</td>\n      <td>125</td>\n    </tr>\n  </tbody>\n</table>\n</div>",

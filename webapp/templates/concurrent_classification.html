@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-kicker">Concurrent ML</div>
+  <h1 class="title">Concurrent Classification</h1>
+  <p class="subtitle">Competitor classification and Sougui recommendations.</p>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <div class="card-title">Best Model</div>
+    <div class="card-subtitle">{{ result.best_model_name }}</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">ROC-AUC</div>
+    <div class="card-subtitle">{{ "%.4f"|format(result.roc_auc) }}</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">F1 Weighted</div>
+    <div class="card-subtitle">{{ "%.4f"|format(result.f1_weighted) }}</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Missing Categories</div>
+    <div class="card-subtitle">{{ result.missing_categories }}</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recommended Categories</div>
+    <div class="card-subtitle">{{ result.recommended_categories_count }}</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recommended Products</div>
+    <div class="card-subtitle">{{ result.recommended_products_count }}</div>
+  </div>
+</section>
+
+<section class="note">
+  <div class="note-title">Classification Charts</div>
+  <div class="note-body">
+    <img src="{{ url_for('static', filename='outputs/concurrents/viz_model_comparison_metrics.png') }}" style="max-width:100%; margin-bottom:16px;">
+    <img src="{{ url_for('static', filename='outputs/concurrents/viz_confusion_matrix.png') }}" style="max-width:100%; margin-bottom:16px;">
+    <img src="{{ url_for('static', filename='outputs/concurrents/viz_roc_curves.png') }}" style="max-width:100%; margin-bottom:16px;">
+    <img src="{{ url_for('static', filename='outputs/concurrents/viz_feature_importance.png') }}" style="max-width:100%; margin-bottom:16px;">
+    <img src="{{ url_for('static', filename='outputs/concurrents/viz_class_distribution.png') }}" style="max-width:100%; margin-bottom:16px;">
+  </div>
+</section>
+
+<section class="note">
+  <div class="note-title">Top 10 Product Recommendations</div>
+  <div class="note-body">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in result.product_recommendations %}
+        <tr>
+          <td>{{ p.product }}</td>
+          <td>{{ p.category }}</td>
+          <td>{{ "%.3f"|format(p.product_score) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

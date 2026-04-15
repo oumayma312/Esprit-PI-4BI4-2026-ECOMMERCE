@@ -1,7 +1,7 @@
 {
   "version": 11,
-  "source_mtime": 1776160911.4936185,
-  "generated_at": "2026-04-14T10:14:37Z",
+  "source_mtime": 1776207643.0157144,
+  "generated_at": "2026-04-14T23:38:16Z",
   "plan": {
     "section_groups": {
       "data_prep": [
@@ -110,7 +110,7 @@
         {
           "title": "1) Data Preparation & Feature Engineering",
           "markdown": [
-            "<hr>\n<h2>1) Data Preparation &amp; Feature Engineering</h2>\n<h3>1.1 Data Cleaning (outliers kept)</h3>\n<ul>\n<li>\n<p>automatic detection of DW tables/columns</p>\n</li>\n<li>\n<p>date parsing <strong>strictly via <code>dateFK</code></strong> (via <code>DimDate</code> if available, otherwise parse <code>YYYYMMDD</code>)</p>\n</li>\n<li>\n<p>numeric conversion (revenue, discount)</p>\n</li>\n<li>\n<p>missing values (diagnostics)</p>\n</li>\n<li>\n<p><strong>outlier visualization (only once), but keep all values</strong></p>\n</li>\n</ul>\n<h3>1.2 Feature Engineering / Selection</h3>\n<ul>\n<li>\n<p>time features: <code>dow</code>, <code>month</code></p>\n</li>\n<li>\n<p>time-series features: <code>lag_*</code>, <code>roll_mean_*</code>, <code>roll_std_*</code></p>\n</li>\n<li>\n<p>encoding + scaling (pipeline)</p>\n</li>\n<li>\n<p>selection: mutual information + XGBoost importance (demo)</p>\n</li>\n</ul>\n<h3>1.3 Series preparation</h3>\n<ul>\n<li>\n<p><strong>Target series for forecasting</strong>: daily revenue (<code>CA_TOTAL</code>)</p>\n</li>\n<li>\n<p><strong>Promo series</strong> (diagnostic): weighted average discount (if a discount column exists)</p>\n</li>\n</ul>"
+            "<pre class=\"pre\">---\n\n## 1) Data Preparation &amp; Feature Engineering\n\n\n\n### 1.1 Data Cleaning (outliers kept)\n\n- automatic detection of DW tables/columns\n\n- date parsing **strictly via `dateFK`** (via `DimDate` if available, otherwise parse `YYYYMMDD`)\n\n- numeric conversion (revenue, discount)\n\n- missing values (diagnostics)\n\n- **outlier visualization (only once), but keep all values**\n\n\n\n### 1.2 Feature Engineering / Selection\n\n- time features: `dow`, `month`\n\n- time-series features: `lag_*`, `roll_mean_*`, `roll_std_*`\n\n- encoding + scaling (pipeline)\n\n- selection: mutual information + XGBoost importance (demo)\n\n\n\n### 1.3 Series preparation\n\n- **Target series for forecasting**: daily revenue (`CA_TOTAL`)\n\n- **Promo series** (diagnostic): weighted average discount (if a discount column exists)</pre>"
           ],
           "html": [],
           "text": [],
@@ -151,7 +151,7 @@
         {
           "title": "Data Cleaning (missing values, outliers)",
           "markdown": [
-            "<hr>\n<h3>Data Cleaning (missing values, outliers)</h3>\n<p>We keep outliers (visualize <strong>only once</strong>) and rely on robust metrics (MAE/RMSE + MAPE computed excluding zero days).</p>"
+            "<pre class=\"pre\">---\n\n### Data Cleaning (missing values, outliers)\n\n\n\nWe keep outliers (visualize **only once**) and rely on robust metrics (MAE/RMSE + MAPE computed excluding zero days).</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>missing_%</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>date</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>channel</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>revenue</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>discount_pct_line</th>\n      <td>0.0</td>\n    </tr>\n    <tr>\n      <th>doc_id</th>\n      <td>0.0</td>\n    </tr>\n  </tbody>\n</table>\n</div>"
@@ -170,7 +170,7 @@
         {
           "title": "Feature Engineering & Selection",
           "markdown": [
-            "<hr>\n<h3>Feature Engineering &amp; Selection (encoding, scaling, selection)</h3>\n<p>We turn forecasting into a supervised learning problem using lags/rolling + calendar features, then demonstrate:</p>\n<ul>\n<li>\n<p><strong>filter</strong>: mutual information</p>\n</li>\n<li>\n<p><strong>embedded</strong>: XGBoost feature importance (if available)</p>\n</li>\n</ul>"
+            "<pre class=\"pre\">---\n\n### Feature Engineering &amp; Selection (encoding, scaling, selection)\n\n\n\nWe turn forecasting into a supervised learning problem using lags/rolling + calendar features, then demonstrate:\n\n- **filter**: mutual information\n\n- **embedded**: XGBoost feature importance (if available)</pre>"
           ],
           "html": [
             "<div>\n<style scoped>\n    .dataframe tbody tr th:only-of-type {\n        vertical-align: middle;\n    }\n\n    .dataframe tbody tr th {\n        vertical-align: top;\n    }\n\n    .dataframe thead th {\n        text-align: right;\n    }\n</style>\n<table border=\"1\" class=\"dataframe\">\n  <thead>\n    <tr style=\"text-align: right;\">\n      <th></th>\n      <th>mutual_information</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <th>roll_mean_14</th>\n      <td>0.250340</td>\n    </tr>\n    <tr>\n      <th>roll_std_14</th>\n      <td>0.232232</td>\n    </tr>\n    <tr>\n      <th>roll_std_28</th>\n      <td>0.227295</td>\n    </tr>\n    <tr>\n      <th>roll_mean_7</th>\n      <td>0.225596</td>\n    </tr>\n    <tr>\n      <th>roll_mean_28</th>\n      <td>0.216280</td>\n    </tr>\n    <tr>\n      <th>roll_std_7</th>\n      <td>0.205358</td>\n    </tr>\n    <tr>\n      <th>lag_1</th>\n      <td>0.088554</td>\n    </tr>\n    <tr>\n      <th>lag_14</th>\n      <td>0.085488</td>\n    </tr>\n    <tr>\n      <th>month</th>\n      <td>0.076364</td>\n    </tr>\n    <tr>\n      <th>lag_7</th>\n      <td>0.073664</td>\n    </tr>\n    <tr>\n      <th>lag_28</th>\n      <td>0.052536</td>\n    </tr>\n    <tr>\n      <th>is_eid</th>\n      <td>0.009773</td>\n    </tr>\n    <tr>\n      <th>dow</th>\n      <td>0.000000</td>\n    </tr>\n    <tr>\n      <th>is_eid_window_3d</th>\n      <td>0.000000</td>\n    </tr>\n    <tr>\n      <th>is_new_year</th>\n      <td>0.000000</td>\n    </tr>\n  </tbody>\n</table>\n</div>",
@@ -200,7 +200,7 @@
         {
           "title": "2) Model Understanding (mandatory for all models used)",
           "markdown": [
-            "<hr>\n<h2>2) Model Understanding (mandatory for all models used)</h2>\n<h3>SARIMA (SARIMAX)</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: a linear time-series model where trend/seasonality are handled via differencing + seasonal terms.</p>\n</li>\n<li>\n<p><strong>Key parameters</strong>: $(p,d,q)$ and $(P,D,Q,s)$ (here $s=7$ for weekly seasonality).</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: sensitive to order selection; spikes/outliers can hurt; linear assumptions.</p>\n</li>\n</ul>\n<h3>Prophet</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: decomposition into trend + seasonalities (weekly/yearly).</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: can oversmooth; requires enough history; less suitable if the structure changes abruptly.</p>\n</li>\n</ul>\n<h3>XGBoost-TS (lags/rolling + calendar)</h3>\n<ul>\n<li>\n<p><strong>Intuition</strong>: predict $y_t$ from $y_{t-1}, y_{t-7}, \\dots$ + calendar/event features.</p>\n</li>\n<li>\n<p><strong>Preprocessing</strong>: <strong>encoding</strong> (OneHot on <code>dow</code>,<code>month</code>) + <strong>scaling</strong> (StandardScaler on numeric features) inside a pipeline.</p>\n</li>\n<li>\n<p><strong>Limitations</strong>: recursive multi-step forecasts can drift; watch out for time leakage.</p>\n</li>\n</ul>\n<h3>Why these models here?</h3>\n<ul>\n<li>\n<p>Goal: forecast <strong>daily revenue</strong> to identify <strong>low-sales</strong> periods (→ strong promo) vs <strong>high-sales</strong> periods (→ weak promo).</p>\n</li>\n<li>\n<p>We compare ≥2 approaches: statistical (SARIMA), decomposition (Prophet), supervised ML (XGBoost-TS).</p>\n</li>\n</ul>"
+            "<pre class=\"pre\">---\n\n## 2) Model Understanding (mandatory for all models used)\n\n\n\n### SARIMA (SARIMAX)\n\n- **Intuition**: a linear time-series model where trend/seasonality are handled via differencing + seasonal terms.\n\n- **Key parameters**: $(p,d,q)$ and $(P,D,Q,s)$ (here $s=7$ for weekly seasonality).\n\n- **Limitations**: sensitive to order selection; spikes/outliers can hurt; linear assumptions.\n\n\n\n### Prophet\n\n- **Intuition**: decomposition into trend + seasonalities (weekly/yearly).\n\n- **Limitations**: can oversmooth; requires enough history; less suitable if the structure changes abruptly.\n\n\n\n### XGBoost-TS (lags/rolling + calendar)\n\n- **Intuition**: predict $y_t$ from $y_{t-1}, y_{t-7}, \\dots$ + calendar/event features.\n\n- **Preprocessing**: **encoding** (OneHot on `dow`,`month`) + **scaling** (StandardScaler on numeric features) inside a pipeline.\n\n- **Limitations**: recursive multi-step forecasts can drift; watch out for time leakage.\n\n\n\n### Why these models here?\n\n- Goal: forecast **daily revenue** to identify **low-sales** periods (→ strong promo) vs **high-sales** periods (→ weak promo).\n\n- We compare ≥2 approaches: statistical (SARIMA), decomposition (Prophet), supervised ML (XGBoost-TS).</pre>"
           ],
           "html": [],
           "text": [],
@@ -214,7 +214,7 @@
         {
           "title": "3) Time Series / Forecasting (intro)",
           "markdown": [
-            "<hr>\n<h2>3) Time Series / Forecasting (≥ 2 models + MAE/RMSE/MAPE comparison)</h2>\n<p>We backtest on a holdout window, then forecast through end of 2027 to produce the promotion calendar (month + %).</p>"
+            "<pre class=\"pre\">---\n\n## 3) Time Series / Forecasting (≥ 2 models + MAE/RMSE/MAPE comparison)\n\n\n\nWe backtest on a holdout window, then forecast through end of 2027 to produce the promotion calendar (month + %).</pre>"
           ],
           "html": [],
           "text": [],

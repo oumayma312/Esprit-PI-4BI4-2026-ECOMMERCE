@@ -1,0 +1,101 @@
+﻿product,category,avg_price,nb_concurrents,confidence_score,product_score,feat_cat_popularity,feat_concurrent_coverage,niveau_recommandation,cat_score
+q-floral ceramic rectangular dish plate,handcrafted ceramics,31.2,1,0.97,0.8584219213785043,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-floral ceramic hexagonal dish,handcrafted ceramics,31.2,1,0.955,0.8546719213785042,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramics oval plate,handcrafted ceramics,34.32,1,0.98,0.8536183969486698,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handcrafted trio ceramic snack plate blue color,handcrafted ceramics,34.32,1,0.975,0.8523683969486698,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade decorated ceramic tureen,handcrafted ceramics,34.32,1,0.975,0.8523683969486698,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-olive oil bottle ceramics ' face ',handcrafted ceramics,26.52,1,0.995,0.8519585123991141,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-olive oil bottle ceramics ' jilani ',handcrafted ceramics,26.52,1,0.995,0.8519585123991141,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-olive oil bottle ceramics ' khat ',handcrafted ceramics,26.52,1,0.995,0.8519585123991141,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-olive oil bottle ceramics' flowers ',handcrafted ceramics,26.52,1,0.995,0.8519585123991141,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handcrafted trio ceramic snack plate green color,handcrafted ceramics,34.32,1,0.97,0.8511183969486699,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic deep salad bowl,handcrafted ceramics,37.44,1,1.0,0.8509710153586496,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic butter dish,handcrafted ceramics,28.08,1,0.975,0.8508175711267933,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic oval plate,handcrafted ceramics,25.272,1,0.995,0.8491011026252775,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-khomsa appetizer tray – blue | tunisian ceramic,handcrafted ceramics,34.32,1,0.96,0.8486183969486698,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-deep salad bowl green color,handcrafted ceramics,34.32,1,0.96,0.8486183969486698,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic octagonal dish,handcrafted ceramics,24.96,1,0.995,0.8484160531301385,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic rectangular dish,handcrafted ceramics,28.08,1,0.965,0.8483175711267933,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-large floral ceramic serving bowl,handcrafted ceramics,25.272,1,0.99,0.8478511026252774,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-oval salad bowl - makroudh rouge,handcrafted ceramics,37.44,1,0.985,0.8472210153586497,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramics flat plate,handcrafted ceramics,24.96,1,0.99,0.8471660531301384,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade flat plate : green ceramics,handcrafted ceramics,24.96,1,0.99,0.8471660531301384,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-oval salad bowl – lara,handcrafted ceramics,37.44,1,0.98,0.8459710153586497,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic serving plate,handcrafted ceramics,23.4,1,0.995,0.8451527675269018,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-decorated ceramic deep salad profond,handcrafted ceramics,37.44,1,0.975,0.8447210153586497,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic bread basket,handcrafted ceramics,24.96,1,0.98,0.8446660531301384,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic egg cup,handcrafted ceramics,21.84,1,1.0,0.8433869050625968,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-deep salad bowl blue color,handcrafted ceramics,34.32,1,0.935,0.8423683969486698,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-tunisian handcrafted ceramic plate,handcrafted ceramics,39.0,1,0.975,0.8413561674472756,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-blue floral ceramic trivet,handcrafted ceramics,24.96,1,0.965,0.8409160531301384,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramics decorated plate,handcrafted ceramics,21.84,1,0.99,0.8408869050625968,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-decorated deep salad bowl,handcrafted ceramics,37.44,1,0.955,0.8397210153586496,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic oval oven tray,handcrafted ceramics,37.44,1,0.955,0.8397210153586496,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade blue ceramic oval plate,handcrafted ceramics,21.84,1,0.985,0.8396369050625968,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade floral ceramic square dish,handcrafted ceramics,26.52,1,0.945,0.8394585123991141,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-plat apéritif khomsa – flowers,handcrafted ceramics,42.12,1,0.99,0.8391242155870801,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-plat apéritif ovale – lara,handcrafted ceramics,37.44,1,0.95,0.8384710153586497,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-plat apéritif ovale – flowers,handcrafted ceramics,37.44,1,0.95,0.8384710153586497,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-floral ceramic camel oil bottle,handcrafted ceramics,21.84,1,0.98,0.8383869050625968,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic deep plate eye safari,handcrafted ceramics,18.72,1,0.995,0.8367428241645565,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade tunisian ceramic olive oil bottle,handcrafted ceramics,18.72,1,0.995,0.8367428241645565,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-plat apéritif khomsa – lara,handcrafted ceramics,42.12,1,0.98,0.8366242155870801,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-plat apéritif rond – flowers,handcrafted ceramics,42.12,1,0.98,0.8366242155870801,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-bowl – flowers,handcrafted ceramics,23.4,1,0.955,0.8351527675269018,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-sea star 8 piece ceramic serveware set,handcrafted ceramics,39.0,1,0.95,0.8351061674472755,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-decorated oval plate : blue ceramics,handcrafted ceramics,34.32,1,0.905,0.8348683969486698,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-matte black ceramic bowl with polka dots,handcrafted ceramics,21.84,1,0.965,0.8346369050625968,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade decorated plates,handcrafted ceramics,28.08,1,0.91,0.8345675711267934,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-floral ceramic seashell bowl,handcrafted ceramics,18.72,1,0.985,0.8342428241645564,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-plat apéritif khomsa – oriental black,handcrafted ceramics,42.12,1,0.97,0.8341242155870802,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade rectangular plate : jilani ceramics,handcrafted ceramics,43.68,1,0.98,0.833953701356442,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-artisan ceramic plate handcrafted from tunisia,handcrafted ceramics,39.0,1,0.945,0.8338561674472755,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-andalusian design ceramic bottle,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic oval plate,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade decorated ceramic cup : khat design,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic olive oil bottle – tunisia craft,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-tunisian handmade ceramic olive oil dispenser,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-floral ceramic plate,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-tunisian ceramic oil dispenser,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-decorated ceramic olive oil pourer,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade octagonal ceramic dish,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade decorated ceramic tajine,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade decorated ceramic plate dish,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-tunisian artisan ceramic olive oil bottle,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic octagonal bowl,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-modern & simple handmade ceramic tajine,handcrafted ceramics,15.6,1,1.0,0.8333090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-bowl – zarbia,handcrafted ceramics,23.4,1,0.945,0.8326527675269018,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-bowl – lara,handcrafted ceramics,23.4,1,0.945,0.8326527675269018,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade red ceramic dinner plate,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade orange ceramic plate dish,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade decorated rectangular ceramic dish,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic serving platters,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-tunisian ceramic oil pourer – authentic north african craft,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade floral ceramic oval dish,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade floral rectangular ceramic plate,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade floral ceramic tea-pot,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-tunisian pottery olive oil bottle,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade decorated ceramic bowl,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-artisan wall tiles – ceramic,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade decorated ceramic dinner plate,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic trivets,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic decorated bowl,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic bowl,handcrafted ceramics,15.6,1,0.995,0.8320590006335638,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-bowls nabeul ceramics handmade,handcrafted ceramics,16.38,1,0.99,0.8319211700027019,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-white & black decorated ceramic plate,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-blue ceramic oval plate,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-floral ceramic champagne glass,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramics blue octogonal dish,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade deep ceramic bowl,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramics bowl,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic oil bottle from tunisia,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic oval plate green,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic olive oil dispenser from tunisia,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade ceramic cup & saucer,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handmade orange ceramic serving platters,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-handcrafted ceramic wall tiles,handcrafted ceramics,15.6,1,0.99,0.8308090006335637,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-ceramic dinner plate,handcrafted ceramics,16.224,1,0.985,0.83044576818485,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-plat apéritif rond – makroudh rouge,handcrafted ceramics,42.12,1,0.955,0.8303742155870801,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-black & white rectangular ceramic dish,handcrafted ceramics,26.302,1,0.91,0.8301953686209945,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-bowl - makroudh rouge,handcrafted ceramics,23.4,1,0.935,0.8301527675269018,0.5368852459016393,1.0,Priorite haute,0.7973638311850832
+q-natural handmade ceramic tajine,handcrafted ceramics,39.0,1,0.93,0.8301061674472756,0.5368852459016393,1.0,Priorite haute,0.7973638311850832

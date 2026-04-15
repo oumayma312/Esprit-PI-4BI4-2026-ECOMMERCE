@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sougui Product Prediction</title>
+  <style>
+    :root {
+      --bg: #f8f5f1;
+      --card: #ffffff;
+      --text: #2f2a26;
+      --muted: #7b6f66;
+      --accent: #b86f4c;
+      --accent-soft: #f2e2d8;
+      --success: #2f7d4a;
+      --warning: #9b6a1d;
+      --border: #eadfd6;
+      --shadow: 0 10px 30px rgba(76, 53, 38, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #fbf8f5 0%, #f5efe9 100%);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff 0%, #f7ece5 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    button:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      min-width: 220px;
+      font-size: 14px;
+    }
+
+    .table-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 620px;
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      background: white;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #fbf6f2;
+      z-index: 1;
+      text-align: left;
+      font-size: 13px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+    }
+
+    tbody td {
+      padding: 12px;
+      border-bottom: 1px solid #f1e8e1;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: #fcf8f4;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-high {
+      background: #dff4e6;
+      color: var(--success);
+    }
+
+    .badge-not-high {
+      background: #f3eee9;
+      color: #6d5a4d;
+    }
+
+    .badge-promote {
+      background: #e7f6ec;
+      color: var(--success);
+    }
+
+    .badge-monitor {
+      background: #fff2df;
+      color: var(--warning);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar input,
+      .toolbar select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Sougui Product Potential Dashboard</h1>
+      <p>
+        Predict which products are likely to be <strong>High</strong> next month and identify
+        which ones should be <strong>Promoted</strong> or simply <strong>Monitored</strong>.
+      </p>
+
+      <div class="actions">
+        <button class="primary" onclick="loadLatestPredictions()">Load Latest Predictions</button>
+        <button class="secondary" onclick="savePredictions()">Save Predictions to Database</button>
+      </div>
+
+      <div id="status" class="status">Ready.</div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <div class="card-title">Total Products</div>
+        <div id="totalProducts" class="card-value">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Predicted High</div>
+        <div id="totalHigh" class="card-value">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Predicted Not High</div>
+        <div id="totalNotHigh" class="card-value">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Promote Actions</div>
+        <div id="totalPromote" class="card-value">0</div>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <input id="searchInput" type="text" placeholder="Search by product name..." oninput="renderTable()" />
+      <select id="classFilter" onchange="renderTable()">
+        <option value="All">All predicted classes</option>
+        <option value="High">High</option>
+        <option value="Not High">Not High</option>
+      </select>
+      <select id="actionFilter" onchange="renderTable()">
+        <option value="All">All actions</option>
+        <option value="Promote">Promote</option>
+        <option value="Monitor">Monitor</option>
+      </select>
+    </section>
+
+    <section class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Month</th>
+              <th>Total Quantity</th>
+              <th>Avg Price</th>
+              <th>Revenue</th>
+              <th>Order Count</th>
+              <th>Predicted Class</th>
+              <th>Suggested Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="8" class="muted">No data loaded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let allPredictions = [];
+
+    function setStatus(message) {
+      document.getElementById("status").textContent = message;
+    }
+
+    function updateCards(rows) {
+      const total = rows.length;
+      const high = rows.filter(r => r.predicted_next_month_class === "High").length;
+      const notHigh = rows.filter(r => r.predicted_next_month_class === "Not High").length;
+      const promote = rows.filter(r => r.suggested_action === "Promote").length;
+
+      document.getElementById("totalProducts").textContent = total;
+      document.getElementById("totalHigh").textContent = high;
+      document.getElementById("totalNotHigh").textContent = notHigh;
+      document.getElementById("totalPromote").textContent = promote;
+    }
+
+    function renderTable() {
+      const body = document.getElementById("tableBody");
+      const search = document.getElementById("searchInput").value.toLowerCase().trim();
+      const classFilter = document.getElementById("classFilter").value;
+      const actionFilter = document.getElementById("actionFilter").value;
+
+      let filtered = allPredictions.filter(row => {
+        const matchesSearch = !search || (row.product || "").toLowerCase().includes(search);
+        const matchesClass = classFilter === "All" || row.predicted_next_month_class === classFilter;
+        const matchesAction = actionFilter === "All" || row.suggested_action === actionFilter;
+        return matchesSearch && matchesClass && matchesAction;
+      });
+
+      updateCards(filtered);
+
+      if (filtered.length === 0) {
+        body.innerHTML = `
+          <tr>
+            <td colspan="8" class="muted">No matching rows.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      body.innerHTML = filtered.map(row => `
+        <tr>
+          <td>${row.product ?? ""}</td>
+          <td>${row.month ?? ""}</td>
+          <td>${row.total_quantity ?? ""}</td>
+          <td>${row.avg_price ?? ""}</td>
+          <td>${row.revenue ?? ""}</td>
+          <td>${row.order_count ?? ""}</td>
+          <td>
+            <span class="badge ${row.predicted_next_month_class === "High" ? "badge-high" : "badge-not-high"}">
+              ${row.predicted_next_month_class}
+            </span>
+          </td>
+          <td>
+            <span class="badge ${row.suggested_action === "Promote" ? "badge-promote" : "badge-monitor"}">
+              ${row.suggested_action}
+            </span>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadLatestPredictions() {
+      setStatus("Loading latest predictions...");
+      try {
+        const response = await fetch("/api/predict/latest");
+        const data = await response.json();
+
+        allPredictions = data.predictions || [];
+        renderTable();
+        setStatus(`Loaded ${allPredictions.length} predictions.`);
+      } catch (error) {
+        console.error(error);
+        setStatus("Failed to load latest predictions.");
+      }
+    }
+
+    async function savePredictions() {
+      setStatus("Saving predictions to database...");
+      try {
+        const response = await fetch("/api/predict/save");
+        const data = await response.json();
+        setStatus(data.message || "Predictions saved.");
+      } catch (error) {
+        console.error(error);
+        setStatus("Failed to save predictions.");
+      }
+    }
+
+    // Auto-load on page open
+    loadLatestPredictions();
+  </script>
+</body>
+</html>

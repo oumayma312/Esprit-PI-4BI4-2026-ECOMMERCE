@@ -91,6 +91,10 @@ class MarketingChatbot:
 
             return gemini_first
 
+        gemini_status = self.gemini.status_message()
+        if not self.gemini.available and self.config.gemini_enabled:
+            return f"{base_answer}\n\nNote Gemini: {gemini_status}"
+
         return base_answer
 
     @staticmethod

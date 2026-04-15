@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Optional
 
 import google.generativeai as genai
+from google.api_core import exceptions as google_exceptions
 
 
 class GeminiClient:
@@ -11,10 +12,18 @@ class GeminiClient:
         self.model_name = model_name
         self.active_model_name = ""
         self.model = None
+        self.last_error = ""
 
         if self.available:
-            genai.configure(api_key=api_key)
-            self.model = self._build_model(model_name)
+            try:
+                genai.configure(api_key=api_key)
+                self.model = self._build_model(model_name)
+            except google_exceptions.GoogleAPICallError as exc:
+                self.available = False
+                self.last_error = self._format_error(exc)
+            except Exception as exc:
+                self.available = False
+                self.last_error = str(exc)
 
     def _build_model(self, preferred_model: str):
         candidates = [
@@ -38,11 +47,53 @@ class GeminiClient:
                 _ = model.generate_content("ping")
                 self.active_model_name = normalized
                 return model
-            except Exception:
+            except google_exceptions.GoogleAPICallError as exc:
+                self.last_error = self._format_error(exc)
+                continue
+            except Exception as exc:
+                self.last_error = str(exc)
                 continue
 
         self.available = False
         return None
+
+    @staticmethod
+    def _format_error(error: Exception) -> str:
+        message = str(error)
+        lowered = message.lower()
+
+        if "reported as leaked" in lowered:
+            return (
+                "La clé Gemini a été rejetée par Google car elle est signalée comme compromise. "
+                "Remplace-la par une nouvelle clé API."
+            )
+
+        if "quota" in lowered or "resourceexhausted" in lowered:
+            return (
+                "Le quota Gemini est épuisé pour cette clé ou ce projet. "
+                "Active la facturation ou attends la remise à zéro du quota."
+            )
+
+        if "not found" in lowered:
+            return (
+                "Le modèle Gemini configuré n'est pas disponible pour cette clé. "
+                "Vérifie le nom du modèle dans GEMINI_MODEL."
+            )
+
+        return message
+
+    def status_message(self) -> str:
+        if self.available and self.model is not None:
+            model_name = self.active_model_name or self.model_name
+            return f"Gemini actif avec le modele {model_name}."
+
+        if self.last_error:
+            return f"Gemini indisponible: {self.last_error}"
+
+        if not self.model_name.strip():
+            return "Gemini indisponible: aucun modele configure."
+
+        return "Gemini indisponible."
 
     def generate_initial_answer(self, user_message: str) -> Optional[str]:
         if not self.available or self.model is None:
@@ -61,7 +112,13 @@ class GeminiClient:
             response = self.model.generate_content(prompt)
             if response and getattr(response, "text", None):
                 return response.text.strip()
-        except Exception:
+        except google_exceptions.GoogleAPICallError as exc:
+            self.available = False
+            self.last_error = self._format_error(exc)
+            return None
+        except Exception as exc:
+            self.available = False
+            self.last_error = str(exc)
             return None
 
         return None
@@ -98,7 +155,13 @@ class GeminiClient:
             response = self.model.generate_content(prompt)
             if response and getattr(response, "text", None):
                 return response.text.strip()
-        except Exception:
+        except google_exceptions.GoogleAPICallError as exc:
+            self.available = False
+            self.last_error = self._format_error(exc)
+            return None
+        except Exception as exc:
+            self.available = False
+            self.last_error = str(exc)
             return None
 
         return None

@@ -1,4 +1,4 @@
-# Koudos — ML Pipeline & n8n Setup
+# ML Pipeline & n8n Setup
 
 ## 1. Start n8n (Docker)
 

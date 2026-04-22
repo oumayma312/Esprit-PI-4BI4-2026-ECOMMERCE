@@ -1,0 +1,635 @@
+{
+  "name": "ml automsation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1216,
+        -560
+      ],
+      "id": "9197e403-303b-4963-9514-d91f73b2de06",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "trigger-ml-pipeline",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1216,
+        -992
+      ],
+      "id": "a806b437-9a5d-4ec5-a371-a93e16a75f47",
+      "name": "Webhook",
+      "webhookId": "73888b67-8dd6-4352-a037-85b27882d033",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "mTSk8Y1Lsjn6PXSU",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8000/train/supplier/dataset",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "90"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -992,
+        -944
+      ],
+      "id": "19d8925a-f0fb-4686-9823-dc66cde6abc7",
+      "name": "Fetch Supplier Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/train/supplier/train",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "n_clusters",
+              "value": "3"
+            },
+            {
+              "name": "random_state",
+              "value": "42"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -768,
+        -944
+      ],
+      "id": "742948f3-6cb8-4a26-828c-9e58a9e8c4c5",
+      "name": "Predict Supplier Clustering",
+      "retryOnFail": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/lookup/supplier-clusters/save",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        -848
+      ],
+      "id": "48ab3628-1c4b-45c6-b912-2f7d39f7be72",
+      "name": "Store Clustering Results"
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8000/train/sell/dataset",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "2000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -992,
+        -560
+      ],
+      "id": "cbc68956-1e0a-4b9a-bdc3-ee93af99613e",
+      "name": "Fetch Sales Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/train/sell/train",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "random_state",
+              "value": "42"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -768,
+        -560
+      ],
+      "id": "fdc00d87-03a1-4e7c-8810-13261820b51a",
+      "name": "Predict Best Time To Sell",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/lookup/sell-monthly/save",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        -656
+      ],
+      "id": "a8115ea3-6c0a-47ed-b4d1-d87503dc5a5e",
+      "name": "Store Timing Results"
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8000/train/promote/dataset",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "limit",
+              "value": "3000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -992,
+        -176
+      ],
+      "id": "43b440c0-1dd1-4ee4-8771-7a021d11a02e",
+      "name": "Fetch Promotion Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/train/promote/train",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "random_state",
+              "value": "42"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -768,
+        -176
+      ],
+      "id": "677b1b7d-85be-4905-b6b1-6cf1f3276af4",
+      "name": "Predict Best Time To Promote",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8000/lookup/promote-monthly/save",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        -272
+      ],
+      "id": "a31f2ed4-8e2d-46b2-9e00-1f60ba3efc85",
+      "name": "Store Promotion Results"
+    },
+    {
+      "parameters": {
+        "code": "{\n  result: 'Pipeline ML executed successfully'\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -656
+      ],
+      "id": "2a904db8-5f37-49c5-8702-552112b0f202",
+      "name": "Log Pipeline Execution"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -320,
+        -672
+      ],
+      "id": "e27c408a-cad7-4477-81c7-dcac64b3dbb7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "sendTo": "maysa.guesmi463@gmail.com",
+        "subject": "✅ Pipeline ML Sougui - Success",
+        "message": "=<h2>✅ ML Pipeline executed successfully!</h2>   <p><b>Date:</b> {{ $now }}</p>   <p><b>Models executed:</b></p>   <ul>     <li>Supplier Clustering</li>     <li>Best Time To Sell</li>     <li>Best Time To Promote</li>     <li>Churn Prediction + Segmentation</li>   </ul>   <p>The results have been stored in the database.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        -656
+      ],
+      "id": "57174ebe-379f-42b2-b2c6-010acfaf1321",
+      "name": "mail succes",
+      "webhookId": "f5fa0475-750e-4732-b5a8-0b7f451ff76b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fDBXKDo6dkD2aPQ1",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "maysa.guesmi463@gmail.com",
+        "subject": "❌ Pipeline ML Sougui - ECHEC",
+        "message": "=<h2>❌ Pipeline ML a échoué !</h2>\n<p><b>Date :</b> {{ $now }}</p>\n<p><b>Modèle :</b> Best Time To Promote</p>\n<p>Veuillez vérifier le workflow n8n.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        -80
+      ],
+      "id": "ef85de4f-b159-4cf7-9446-92f855c42b04",
+      "name": "mail echec promote",
+      "webhookId": "f5fa0475-750e-4732-b5a8-0b7f451ff76b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fDBXKDo6dkD2aPQ1",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "maysa.guesmi463@gmail.com",
+        "subject": "❌ Pipeline ML Sougui - ECHEC",
+        "message": "=<h2>❌ Pipeline ML a échoué !</h2>\n<p><b>Date :</b> {{ $now }}</p>\n<p><b>Modèle :</b> Best Time To Sell</p>\n<p>Veuillez vérifier le workflow n8n.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        -464
+      ],
+      "id": "d119fd5c-477e-4880-89fe-da2510cd9caf",
+      "name": "mail echec sell",
+      "webhookId": "f5fa0475-750e-4732-b5a8-0b7f451ff76b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fDBXKDo6dkD2aPQ1",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "maysa.guesmi463@gmail.com",
+        "subject": "❌ Pipeline ML Sougui - ECHEC",
+        "message": "=<h2>❌ Pipeline ML a échoué !</h2>\n<p><b>Date :</b> {{ $now }}</p>\n<p><b>Modèle :</b> Supplier Clustering</p>\n<p>Veuillez vérifier le workflow n8n.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        -1040
+      ],
+      "id": "8b5a2fd5-511f-4b4e-8d19-456ded31b27a",
+      "name": "mail echec supplier",
+      "webhookId": "f5fa0475-750e-4732-b5a8-0b7f451ff76b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fDBXKDo6dkD2aPQ1",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8001/run",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -960,
+        208
+      ],
+      "id": "ml-churn-pipeline-trigger",
+      "name": "Call ML Churn Pipeline",
+      "retryOnFail": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "http://127.0.0.1:8001/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -736,
+        208
+      ],
+      "id": "ml-churn-status",
+      "name": "Store Churn Results"
+    },
+    {
+      "parameters": {
+        "sendTo": "maysa.guesmi463@gmail.com",
+        "subject": "❌ Pipeline ML Churn - ECHEC",
+        "message": "=<h2>❌ Pipeline ML Churn a échoué !</h2>\n<p><b>Date :</b> {{ $now }}</p>\n<p><b>Modèle :</b> Churn Prediction + Segmentation</p>\n<p>Veuillez vérifier le workflow n8n.</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -512,
+        400
+      ],
+      "id": "mail-echec-churn",
+      "name": "mail echec churn",
+      "webhookId": "f5fa0475-750e-4732-b5a8-0b7f451ff76b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fDBXKDo6dkD2aPQ1",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Fetch Sales Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Promotion Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Supplier Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call ML Churn Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Supplier Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Supplier Data": {
+      "main": [
+        [
+          {
+            "node": "Predict Supplier Clustering",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predict Supplier Clustering": {
+      "main": [
+        [
+          {
+            "node": "Store Clustering Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "mail echec supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Clustering Results": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Sales Data": {
+      "main": [
+        [
+          {
+            "node": "Predict Best Time To Sell",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predict Best Time To Sell": {
+      "main": [
+        [
+          {
+            "node": "Store Timing Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "mail echec sell",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Timing Results": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Fetch Promotion Data": {
+      "main": [
+        [
+          {
+            "node": "Predict Best Time To Promote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predict Best Time To Promote": {
+      "main": [
+        [
+          {
+            "node": "Store Promotion Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "mail echec promote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Promotion Results": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Log Pipeline Execution": {
+      "main": [
+        [
+          {
+            "node": "mail succes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Log Pipeline Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call ML Churn Pipeline": {
+      "main": [
+        [
+          {
+            "node": "Store Churn Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "mail echec churn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Churn Results": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dfe23a26-5abd-4209-a69a-60e4fcfacefd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d62488ce445c9e19fe99a645ab14d34fd844d04897c3310eeabf1e69d797db24"
+  },
+  "id": "28SHz2lDGKgzvQF8",
+  "tags": []
+}

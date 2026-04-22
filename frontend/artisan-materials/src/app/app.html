@@ -1,0 +1,605 @@
+<div class="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <h1>Atelier Materials</h1>
+      <p class="subtitle">{{ t('header.subtitle') }}</p>
+    </div>
+    <button class="lang-toggle" (click)="toggleLanguage()">{{ lang() === 'fr' ? 'EN' : 'FR' }}</button>
+  </header>
+
+  <!-- Tabs -->
+  <nav class="tabs">
+    <button [class.active]="activeTab() === 'materials'" (click)="activeTab.set('materials')">
+      {{ t('tabs.materials') }}
+    </button>
+    <button [class.active]="activeTab() === 'orders'" (click)="activeTab.set('orders')">
+      {{ t('tabs.orders') }}
+    </button>
+    <button [class.active]="activeTab() === 'customers'" (click)="activeTab.set('customers')">
+      {{ t('tabs.customers') }}
+    </button>
+    <button [class.active]="activeTab() === 'chat'" (click)="activeTab.set('chat')">
+      {{ t('tabs.chat') }}
+    </button>
+  </nav>
+
+  <!-- Materials Tab -->
+  @if (activeTab() === 'materials') {
+  <section class="tab-content">
+    <div class="toolbar">
+      <h2>{{ t('materials.title') }}</h2>
+      <button class="btn btn-primary" (click)="openMaterialForm()">{{ t('materials.add') }}</button>
+    </div>
+
+    <!-- Material Form Modal -->
+    @if (showMaterialForm()) {
+    <div class="modal-overlay" (click)="closeMaterialForm()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>{{ editingMaterial()?.id ? t('material.edit') : t('material.new') }} {{ t('material.name').charAt(0).toLowerCase() + t('material.name').slice(1) }}</h3>
+        <div class="form-grid">
+          <label class="full-width">{{ t('material.name') }} <input [(ngModel)]="materialForm.name" [placeholder]="t('material.name_placeholder')" /></label>
+          <label>{{ t('material.category') }} <input [(ngModel)]="materialForm.category" [placeholder]="t('material.category_placeholder')" /></label>
+          <label>{{ t('material.price') }} <input type="number" [(ngModel)]="materialForm.unit_price" step="0.01" min="0" /></label>
+          <label>{{ t('material.unit') }}
+            <select [(ngModel)]="materialForm.unit">
+              <option value="meter">meter</option>
+              <option value="sheet">sheet</option>
+              <option value="spool">spool</option>
+              <option value="kg">kg</option>
+              <option value="sq meter">sq meter</option>
+              <option value="piece">piece</option>
+            </select>
+          </label>
+          <label>{{ t('material.min_order') }} <input type="number" [(ngModel)]="materialForm.min_order_qty" min="1" /></label>
+          <label>{{ t('material.in_stock') }} <input type="number" [(ngModel)]="materialForm.stock_quantity" min="0" /></label>
+          <label class="full-width">{{ t('material.manufacturer') }}
+            <select [(ngModel)]="materialForm.manufacturer_id">
+              <option [ngValue]="undefined">{{ t('material.none') }}</option>
+              @for (m of manufacturers(); track m.id) {
+              <option [ngValue]="m.id">{{ m.name }}</option>
+              }
+            </select>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" (click)="closeMaterialForm()">{{ t('form.cancel') }}</button>
+          <button class="btn btn-primary" (click)="saveMaterial()">{{ t('form.save') }}</button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Materials Cards -->
+    @if (materials().length === 0) {
+    <div class="empty">
+      <div class="empty-icon">&#128230;</div>
+      <p>{{ t('materials.empty') }}</p>
+    </div>
+    }
+    @if (materials().length > 0) {
+    <div class="materials-grid">
+      @for (m of materials(); track m.id) {
+      <div class="material-card" [attr.data-category]="getCategoryClass(m.category)">
+        <div class="card-header">
+          <h3>{{ m.name }}</h3>
+          <div class="card-actions">
+            <button class="btn btn-sm btn-icon" (click)="openMaterialForm(m)" title="Edit">&#9998;</button>
+            <button class="btn btn-sm btn-icon btn-danger" (click)="deleteMaterial(m.id!)" title="Delete">&#10005;</button>
+          </div>
+        </div>
+        <div class="card-badges">
+          <span class="category-badge {{ getCategoryClass(m.category) }}">{{ m.category }}</span>
+          <span class="stock-badge" [class.low]="(m.stock_quantity || 0) <= m.min_order_qty">
+            {{ (m.stock_quantity || 0) <= m.min_order_qty ? '&#9888;' : '&#9679;' }} {{ m.stock_quantity || 0 }} in stock
+          </span>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-price-section">
+          <span class="card-price">
+            <span class="currency">&#8364;</span>{{ m.unit_price.toFixed(2) }}
+          </span>
+          <span class="unit">per {{ m.unit }}</span>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item">
+            <span class="meta-label">Min Order</span>
+            <span class="meta-value">{{ m.min_order_qty }} {{ m.unit }}</span>
+          </div>
+          @if (m.manufacturer_name) {
+          <div class="manufacturer">{{ m.manufacturer_name }}</div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </section>
+  }
+
+  <!-- Orders Tab -->
+  @if (activeTab() === 'orders') {
+  <section class="tab-content">
+    <div class="toolbar">
+      <h2>{{ t('orders.title') }}</h2>
+      <button class="btn btn-primary" (click)="openOrderForm()">{{ t('orders.add') }}</button>
+    </div>
+
+    <!-- Order Form Modal -->
+    @if (showOrderForm()) {
+    <div class="modal-overlay" (click)="showOrderForm.set(false)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>{{ t('order.new') }}</h3>
+        <div class="form-grid">
+          <label class="full-width">{{ t('material.name') }}
+            <select [(ngModel)]="orderForm.material_id">
+              <option [ngValue]="undefined">{{ t('order.select_material') }}</option>
+              @for (m of materials(); track m.id) {
+              <option [ngValue]="m.id">{{ m.name }} (min {{ m.min_order_qty }} {{ m.unit }})</option>
+              }
+            </select>
+          </label>
+          <label>{{ t('material.quantity') }} <input type="number" [(ngModel)]="orderForm.quantity" min="1" /></label>
+          <label class="full-width">{{ t('order.notes') }} <input [(ngModel)]="orderForm.notes" [placeholder]="t('order.notes_placeholder')" /></label>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" (click)="showOrderForm.set(false)">{{ t('form.cancel') }}</button>
+          <button class="btn btn-primary" (click)="saveOrder()">{{ t('order.create') }}</button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Orders List -->
+    @if (orders().length === 0) {
+    <div class="empty">
+      <div class="empty-icon">&#128203;</div>
+      <p>{{ t('orders.empty') }}</p>
+    </div>
+    }
+    @if (orders().length > 0) {
+    <div class="orders-list">
+      @for (o of orders(); track o.id) {
+      <div class="order-card" [attr.data-status]="o.status">
+        <div class="order-header">
+          <span class="order-id">Order #{{ o.id }}</span>
+          <span class="order-status {{ o.status }}">{{ o.status }}</span>
+        </div>
+        <div class="order-body">
+          <div class="order-detail">
+            <span class="label">Material</span>
+            <span class="value">{{ o.material_name || 'Unknown' }}</span>
+          </div>
+          <div class="order-detail">
+            <span class="label">Quantity</span>
+            <span class="value">{{ o.quantity }}</span>
+          </div>
+          @if (o.manufacturer_name) {
+          <div class="order-detail">
+            <span class="label">Manufacturer</span>
+            <span class="value">{{ o.manufacturer_name }}</span>
+          </div>
+          }
+          <div class="order-detail">
+            <span class="label">Created</span>
+            <span class="value">{{ o.created_at }}</span>
+          </div>
+        </div>
+        <div class="order-footer">
+          @if (o.status !== 'completed') {
+          <select [(ngModel)]="o.status" (ngModelChange)="updateOrderStatus(o.id!, $event)" class="status-select">
+            <option value="pending">pending</option>
+            <option value="approved">approved</option>
+            <option value="completed">completed</option>
+          </select>
+          }
+          <div style="display:flex;gap:0.35rem;">
+            @if (o.notes) {
+            <button class="btn btn-sm" title="Notes" style="font-style:italic;">&#128221; {{ o.notes }}</button>
+            }
+            <button class="btn btn-sm btn-danger" (click)="deleteOrder(o.id!)">&#10005; Delete</button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </section>
+  }
+
+  <!-- Customers Tab -->
+  @if (activeTab() === 'customers') {
+  <section class="tab-content customers-tab">
+    <!-- Segment Overview -->
+    <h2>{{ t('customers.title') }}</h2>
+    <div class="segment-overview">
+      @for (seg of segmentStats(); track seg.segment) {
+      <div class="segment-card">
+        <h3>Segment {{ seg.segment }} - {{ seg.segment_label }}</h3>
+        <div class="segment-metrics">
+          <span class="metric-value">{{ seg.count }}</span>
+          <span class="metric-label">customers</span>
+        </div>
+        <div class="segment-risk">
+          <span class="metric-label">Avg Risk</span>
+          <div class="risk-bar">
+            <div class="risk-fill" [style.width.%]="seg.avg_probability * 100" [class]="getRiskClass('')"></div>
+          </div>
+          <span class="metric-value">{{ seg.avg_probability | percent }}</span>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- PCA Plot -->
+    @if (pcaPlotUrl) {
+    <div class="pca-plot">
+      <h3>Segment Visualization</h3>
+      <img [src]="pcaPlotUrl" alt="PCA Segment Plot" />
+    </div>
+    }
+
+    <!-- Filters -->
+    <div class="customer-filters">
+      <input [(ngModel)]="searchQuery" [placeholder]="t('customers.search_placeholder')" class="filter-input" />
+      <select [(ngModel)]="segmentFilter" class="filter-select">
+        <option [ngValue]="null">{{ t('customers.all_segments') }}</option>
+        <option [value]="0">{{ t('customers.segments.vip') }}</option>
+        <option [value]="1">{{ t('customers.segments.lost') }}</option>
+        <option [value]="2">{{ t('customers.segments.atrisk') }}</option>
+        <option [value]="3">{{ t('customers.segments.new') }}</option>
+      </select>
+      <select [(ngModel)]="riskFilter" class="filter-select">
+        <option [ngValue]="null">{{ t('customers.all_risk') }}</option>
+        <option value="Eleve">High Risk</option>
+        <option value="Modere">Moderate Risk</option>
+        <option value="Faible">Low Risk</option>
+      </select>
+      <button class="btn btn-primary" (click)="loadCustomers()">{{ t('customers.search_btn') }}</button>
+    </div>
+
+    <!-- Customer Table -->
+    <div class="customer-table-container">
+      <table class="customer-table">
+        <thead>
+          <tr>
+            <th>{{ t('customers.customer') }}</th>
+            <th>{{ t('customers.code') }}</th>
+            <th>{{ t('customers.segment') }}</th>
+            <th>{{ t('customers.churn_prob') }}</th>
+            <th>{{ t('customers.risk') }}</th>
+            <th>{{ t('customers.status') }}</th>
+            <th>{{ t('customers.actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cust of customers(); track cust.id) {
+          <tr>
+            <td>{{ cust.name }}</td>
+            <td>{{ cust.code || '-' }}</td>
+            <td>
+              <span class="segment-badge" [class]="getSegmentClass(cust.segment || 0)">
+                {{ cust.segment_label || 'N/A' }}
+              </span>
+            </td>
+            <td>
+              <div class="risk-bar">
+                <div class="risk-fill" [style.width.%]="getRiskWidth(cust.churn_probability || 0)" [class]="getRiskClass(cust.risk_level || '')"></div>
+              </div>
+              <span class="prob-value">{{ cust.churn_probability | percent }}</span>
+            </td>
+            <td><span class="risk-badge {{ getRiskClass(cust.risk_level || '') }}">{{ cust.risk_level || 'N/A' }}</span></td>
+            <td>{{ cust.churn_prediction || 'N/A' }}</td>
+            <td>
+              <button class="btn btn-sm" (click)="viewCustomer(cust.id!)">{{ t('customers.details') }}</button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      @if (customers().length === 0) {
+      <div class="empty"><p>{{ t('customers.no_results') }}</p></div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 0) {
+    <div class="pagination-bar">
+      <div class="pagination-info">
+        <label class="page-size-label">{{ t('pagination.page_size') }}:
+          <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+            <option [value]="25">25</option>
+            <option [value]="50">50</option>
+            <option [value]="100">100</option>
+          </select>
+        </label>
+        <span class="page-range">
+          {{ (currentPage() - 1) * pageSize() + 1 }}-{{ Math.min(currentPage() * pageSize(), _totalCustomers) }} {{ t('pagination.of') }} {{ _totalCustomers }} {{ t('customers.customer').toLowerCase() }}s
+        </span>
+      </div>
+      <div class="page-numbers">
+        @if (currentPage() > 1) {
+          <button class="page-btn" (click)="goToPage(1)">&laquo;</button>
+          <button class="page-btn" (click)="prevPage()">&lsaquo;</button>
+        }
+        @for (page of getPageNumbers(); track page) {
+          @if (page === '...') {
+            <span class="page-ellipsis">...</span>
+          } @else {
+            <button class="page-btn" [class.active]="page === currentPage()" (click)="goToPage(+page)">{{ page }}</button>
+          }
+        }
+        @if (currentPage() < totalPages()) {
+          <button class="page-btn" (click)="nextPage()">&rsaquo;</button>
+          <button class="page-btn" (click)="goToPage(totalPages())">&raquo;</button>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- Quick Predict (collapsible) -->
+    <div class="predict-collapsible">
+      <button class="predict-toggle" (click)="showPredictForm = !showPredictForm">
+        {{ showPredictForm ? '▼' : '▶' }} {{ t('customers.predict') }}
+      </button>
+      @if (showPredictForm) {
+      <div class="predict-form-expanded">
+        <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <label>{{ t('customers.recency') }} <input type="number" [(ngModel)]="predictionForm.recency" min="0" /></label>
+          <label>{{ t('customers.frequency') }} <input type="number" [(ngModel)]="predictionForm.frequency" min="0" step="0.1" /></label>
+          <label>{{ t('customers.monetary') }} <input type="number" [(ngModel)]="predictionForm.monetary_total" min="0" step="0.01" /></label>
+          <label>{{ t('customers.trend') }} <input type="number" [(ngModel)]="predictionForm.monetary_trend" step="0.01" /></label>
+          <label>{{ t('customers.product_div') }} <input type="number" [(ngModel)]="predictionForm.product_diversity" min="0" step="0.1" /></label>
+          <label>{{ t('customers.channel_div') }} <input type="number" [(ngModel)]="predictionForm.channel_diversity" min="0" step="0.1" /></label>
+          <label>{{ t('customers.lifetime') }} <input type="number" [(ngModel)]="predictionForm.lifetime_days" min="0" /></label>
+          <label>{{ t('customers.velocity') }} <input type="number" [(ngModel)]="predictionForm.purchase_velocity" min="0" step="0.1" /></label>
+          <label>{{ t('customers.avg_price') }} <input type="number" [(ngModel)]="predictionForm.avg_price" min="0" step="0.01" /></label>
+          <label class="full-width">{{ t('customers.channel') }}
+            <select [(ngModel)]="predictionForm.channel">
+              <option value="">{{ t('customers.baseline') }}</option>
+              <option value="vente direct">vente direct</option>
+              <option value="foire sousse">foire sousse</option>
+              <option value="popup store">popup store</option>
+              <option value="site web">site web</option>
+            </select>
+          </label>
+        </div>
+        <div class="predict-actions">
+          <button class="btn btn-primary predict-btn" (click)="runPrediction()" [disabled]="predictionLoading"
+                  style="background: #1B4332; color: #ffffff; border: 3px solid #1B4332; padding: 0.8rem 2rem; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer; min-width: 220px; text-align: center; box-shadow: 0 2px 8px rgba(27, 67, 50, 0.3);">
+            @if (predictionLoading) {
+            <span>⏳ Calcul en cours...</span>
+            } @else {
+            &#9654; {{ t('customers.predict_btn') }}
+            }
+          </button>
+          <span class="predict-hint">{{ t('pagination.predict_hint') }}</span>
+        </div>
+        @if (predictionError) {
+        <div class="prediction-error">{{ predictionError }}</div>
+        }
+        @if (predictionResult()) {
+        <div class="prediction-result" #resultRef>
+          <div class="result-grid">
+            <div class="result-item">
+              <span class="result-label">{{ t('prediction.churn_prob') }}</span>
+              <span class="result-value" [class]="getRiskClass(predictionResult()?.risk_level)">{{ predictionResult()?.churn_probability | percent }}</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">{{ t('prediction.status') }}</span>
+              <span class="result-value">{{ churnLabel(predictionResult()?.churn_prediction) }}</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">{{ t('prediction.segment') }}</span>
+              <span class="result-value">{{ predictionResult()?.segment }} - {{ predictionResult()?.segment_label }}</span>
+            </div>
+            <div class="result-item">
+              <span class="result-label">{{ t('prediction.risk') }}</span>
+              <span class="result-value risk-badge {{ getRiskClass(predictionResult()?.risk_level) }}">{{ predictionResult()?.risk_level }}</span>
+            </div>
+          </div>
+          <div class="result-recommendation">
+            <strong>{{ t('prediction.recommendation') }}:</strong> {{ predictionResult()?.recommendation }}
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Customer Detail Modal -->
+    @if (selectedCustomer) {
+    <div class="modal-overlay" (click)="closeDetail()">
+      <div class="modal customer-detail-modal" (click)="$event.stopPropagation()">
+        <h3>{{ selectedCustomer.name }}</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Code</span>
+            <span class="detail-value">{{ selectedCustomer.code || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Churn Probability</span>
+            <span class="detail-value">{{ selectedCustomer.prediction?.churn_probability | percent }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Segment</span>
+            <span class="detail-value">{{ selectedCustomer.prediction?.segment }} - {{ selectedCustomer.prediction?.segment_label }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Risk Level</span>
+            <span class="detail-value risk-badge {{ getRiskClass(selectedCustomer.prediction?.risk_level || '') }}">{{ selectedCustomer.prediction?.risk_level || 'N/A' }}</span>
+          </div>
+          <div class="detail-item full-width">
+            <span class="detail-label">Recommendation</span>
+            <span class="detail-value">{{ selectedCustomer.prediction?.recommendation || 'N/A' }}</span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" (click)="closeDetail()">{{ t('customers.close') }}</button>
+        </div>
+      </div>
+    </div>
+    }
+  </section>
+  }
+
+  <!-- Chat Tab -->
+  @if (activeTab() === 'chat') {
+  <section class="tab-content chat-tab">
+    <div class="chat-container">
+      <div class="chat-messages" #chatMessagesRef>
+        @if (chatMessages().length === 0) {
+        <div class="chat-welcome">
+          <div class="chat-welcome-icon">&#128161;</div>
+          <h2>{{ t('chat.welcome_title') }}</h2>
+          <p>{{ t('chat.welcome_desc') }}</p>
+          <div class="suggestions">
+            <button class="btn btn-sm" (click)="chatInput='I need 50 meters of copper wire for the workshop'; sendChat()">Need 50m copper wire</button>
+            <button class="btn btn-sm" (click)="chatInput='Show me all materials in the Metal category'; sendChat()">Show metal materials</button>
+            <button class="btn btn-sm" (click)="chatInput='Search for leather suppliers in Italy'; sendChat()">Search leather suppliers</button>
+            <button class="btn btn-sm" (click)="chatInput='What orders do I have pending?'; sendChat()">Pending orders</button>
+          </div>
+        </div>
+        }
+
+        @for (msg of chatMessages(); track msg) {
+        <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+          @if (msg.role === 'assistant') {
+          <div class="avatar">&#9881;</div>
+          }
+          @if (msg.role === 'user') {
+          <div class="avatar">U</div>
+          }
+
+          <div>
+            <div class="message-bubble">
+              <div class="message-content" [innerHTML]="msg.content | highlight"></div>
+
+              <!-- Streaming cursor -->
+              @if (msg.isStreaming) {
+              <span class="streaming-cursor"></span>
+              }
+
+              <!-- HITL Actions -->
+               @if (msg.pending) {
+               <div class="hitl-actions">
+                 <p class="hitl-label">&#9203; Action pending your approval:</p>
+
+                 <!-- Edit Panel with prefill -->
+                 @if (currentInterrupt()) {
+                 <div class="edit-panel">
+                   <div class="edit-panel-header">
+                     <h4>&#9998; Review & Edit Order</h4>
+                   </div>
+
+                   <!-- Order summary from prefill -->
+                   @if (prefillData()) {
+                   <div class="order-summary">
+                     <div class="order-summary-row">
+                       <span class="label">Items</span>
+                       <span class="value">
+                         @for (item of prefillData()?.materials; track $index) {
+                           @if ($index > 0) { , }
+                           {{ getMaterialName(item.material_id) }} x{{ item.quantity }}
+                         }
+                       </span>
+                     </div>
+                     @if (prefillData()?.notes) {
+                     <div class="order-summary-row">
+                       <span class="label">Notes</span>
+                       <span class="value">{{ prefillData()?.notes }}</span>
+                     </div>
+                     }
+                   </div>
+                   }
+
+                   <p class="edit-instruction">Modify the order before approving:</p>
+                   <div class="edit-items-list">
+                     @for (item of editItems; track $index) {
+                     <div class="edit-item-row">
+                       <div class="edit-row">
+                         <label>Material {{ $index + 1 }}:</label>
+                         <select [(ngModel)]="item.material_id">
+                           <option [ngValue]="null">-- Select --</option>
+                           @for (m of materials(); track m.id) {
+                           <option [ngValue]="m.id">{{ m.name }} (min {{ m.min_order_qty }} {{ m.unit }})</option>
+                           }
+                         </select>
+                       </div>
+                       <div class="edit-row">
+                         <label>Qty:</label>
+                         <input type="number" [(ngModel)]="item.quantity" min="1" />
+                         <button class="btn btn-sm btn-danger" (click)="removeMaterialItem($index)" title="Remove" style="padding:0.3rem 0.5rem;">×</button>
+                       </div>
+                     </div>
+                     }
+                   </div>
+                   <button class="btn btn-sm" (click)="addMaterialItem()" style="margin-bottom:0.75rem;">+ Add Material</button>
+                   <div class="edit-row">
+                     <label>Notes:</label>
+                     <input type="text" [(ngModel)]="editNotes" placeholder="Optional notes" />
+                   </div>
+                 </div>
+                 }
+
+                 <div class="hitl-buttons">
+                   <button class="btn btn-sm btn-success" (click)="approveThread(msg.threadId!)">&#10003; Approve</button>
+                   <button class="btn btn-sm btn-primary" (click)="editThread(msg.threadId!)">&#9998; Edit & Approve</button>
+                   <button class="btn btn-sm btn-danger" (click)="rejectThread(msg.threadId!)">&#10007; Reject</button>
+                 </div>
+               </div>
+              }
+            </div>
+
+            <!-- Timestamp -->
+            @if (msg.timestamp) {
+            <div class="message-time">{{ msg.timestamp }}</div>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- Typing indicator -->
+        @if (chatLoading && chatMessages().length === 0) {
+        <div class="message assistant">
+          <div class="avatar">&#9881;</div>
+          <div class="message-bubble">
+            <div class="typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+
+      <div class="chat-input-area">
+        <input
+          [(ngModel)]="chatInput"
+          (keydown.enter)="sendChat()"
+          [placeholder]="t('chat.placeholder')"
+          [disabled]="isStreaming"
+        />
+        <button class="btn btn-primary" (click)="sendChat()" [disabled]="isStreaming || !chatInput.trim()">
+          {{ t('chat.send') }}
+        </button>
+      </div>
+    </div>
+  </section>
+  }
+</div>
+
+<!-- Toast Notification -->
+@if (showToast()) {
+<div class="toast" [class.error]="toastType === 'error'" [class.success]="toastType === 'success'" [class.info]="toastType === 'info'">
+  @if (toastType === 'error') {
+  <span>&#10007;</span>
+  }
+  @if (toastType === 'success') {
+  <span>&#10003;</span>
+  }
+  @if (toastType === 'info') {
+  <span>&#8505;</span>
+  }
+  {{ toastMessage }}
+</div>
+}

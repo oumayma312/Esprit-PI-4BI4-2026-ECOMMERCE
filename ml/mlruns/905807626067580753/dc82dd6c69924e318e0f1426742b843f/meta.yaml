@@ -1,0 +1,14 @@
+artifact_uri: file:D:/4BI4/PI/workflow_n8n/ml/mlartifacts/905807626067580753/dc82dd6c69924e318e0f1426742b843f/artifacts
+end_time: 1777146012652
+entry_point_name: ''
+experiment_id: '905807626067580753'
+lifecycle_stage: active
+run_id: dc82dd6c69924e318e0f1426742b843f
+run_name: supplier_kmeans_k4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1777146012606
+status: 3
+tags: []
+user_id: maysa

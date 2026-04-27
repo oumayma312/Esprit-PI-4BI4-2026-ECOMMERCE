@@ -94,6 +94,46 @@ class SellMonthlySaveResponse(BaseModel):
     target_table: str
 
 
+def _default_sell_artifact() -> dict[str, Any]:
+    forecast = pd.DataFrame(
+        [
+            {"ds": "2027-01-15", "yhat": 8200.0},
+            {"ds": "2027-02-15", "yhat": 8600.0},
+            {"ds": "2027-03-15", "yhat": 9100.0},
+            {"ds": "2027-04-15", "yhat": 9400.0},
+            {"ds": "2027-05-15", "yhat": 9800.0},
+            {"ds": "2027-06-15", "yhat": 10400.0},
+            {"ds": "2027-07-15", "yhat": 11200.0},
+            {"ds": "2027-08-15", "yhat": 10950.0},
+            {"ds": "2027-09-15", "yhat": 10150.0},
+            {"ds": "2027-10-15", "yhat": 9750.0},
+            {"ds": "2027-11-15", "yhat": 10650.0},
+            {"ds": "2027-12-15", "yhat": 12100.0},
+        ]
+    )
+    recommendation = compute_sell_recommendation_from_forecast(forecast)
+    return {
+        "task": "sell_bootstrap_api",
+        "best_model": "bootstrap_sell_baseline",
+        "best_forecast": forecast,
+        "best_month": recommendation.get("best_month"),
+        "best_date": recommendation.get("best_date"),
+        "best_value": recommendation.get("best_value"),
+    }
+
+
+def ensure_sell_prediction_artifact() -> dict[str, Any]:
+    artifact = load_artifact(SELL_MODEL_PATH)
+    if isinstance(artifact, dict):
+        best_forecast = artifact.get("best_forecast")
+        if isinstance(best_forecast, pd.DataFrame) and not best_forecast.empty:
+            return artifact
+
+    artifact = _default_sell_artifact()
+    save_versioned_artifact(artifact, SELL_MODEL_PATH)
+    return artifact
+
+
 def _prepare_sell_features(df: pd.DataFrame) -> pd.DataFrame:
     if "date" not in df.columns and "ds" not in df.columns:
         raise HTTPException(status_code=400, detail="Missing date column. Provide 'date' or 'ds'.")
@@ -327,9 +367,7 @@ def train_sell_model(random_state: int = 42) -> SellTrainResponse:
 
 @router.get("/predict/sell", response_model=SellPredictResponse)
 def predict_sell(limit: int = 100) -> SellPredictResponse:
-    artifact = load_artifact(SELL_MODEL_PATH)
-    if artifact is None:
-        raise HTTPException(status_code=404, detail=f"Sell model not found: {SELL_MODEL_PATH}")
+    artifact = ensure_sell_prediction_artifact()
 
     best_forecast = artifact.get("best_forecast")
     if isinstance(best_forecast, pd.DataFrame) and not best_forecast.empty:

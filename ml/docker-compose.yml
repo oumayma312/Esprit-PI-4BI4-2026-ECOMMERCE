@@ -22,12 +22,39 @@ services:
       PROMOTE_MODEL_PATH: ${PROMOTE_MODEL_PATH:-best_time_to_promote_model.pkl}
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MLFLOW_EXPERIMENT_NAME: supplier_clustering
+      MLFLOW_PROMOTE_EXPERIMENT_NAME: ${MLFLOW_PROMOTE_EXPERIMENT_NAME:-promote-forecasting}
+      MLFLOW_PROMOTE_MODEL_NAME: ${MLFLOW_PROMOTE_MODEL_NAME:-promote-demand-forecaster}
+      MLFLOW_CAMPAIGN_EXPERIMENT_NAME: ${MLFLOW_CAMPAIGN_EXPERIMENT_NAME:-campaign-analytics}
+      MLFLOW_CAMPAIGN_CLASSIFIER_MODEL_NAME: ${MLFLOW_CAMPAIGN_CLASSIFIER_MODEL_NAME:-campaign-success-classifier}
+      MLFLOW_CAMPAIGN_REGRESSOR_MODEL_NAME: ${MLFLOW_CAMPAIGN_REGRESSOR_MODEL_NAME:-campaign-kpi-regressor}
+      MLFLOW_CAMPAIGN_CLUSTERING_MODEL_NAME: ${MLFLOW_CAMPAIGN_CLUSTERING_MODEL_NAME:-campaign-segmentation-kmeans}
     volumes:
       - .:/app
       - mlruns:/app/mlruns
       - mlartifacts:/app/mlartifacts
     depends_on:
       - mlflow
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python flask_app.py
+    ports:
+      - "3000:3000"
+    environment:
+      FASTAPI_BASE_URL: http://api:8000
+      FLASK_HOST: 0.0.0.0
+      FLASK_PORT: 3000
+      PGHOST: ${PGHOST}
+      PGPORT: ${PGPORT:-5432}
+      PGDATABASE: ${PGDATABASE}
+      PGUSER: ${PGUSER}
+      PGPASSWORD: ${PGPASSWORD}
+    volumes:
+      - .:/app
+    depends_on:
+      - api
 
   mlflow:
     build:

@@ -13,8 +13,8 @@ RUN apt-get update \
 COPY . /app
 
 RUN pip install --upgrade pip \
-    && pip install fastapi uvicorn pandas numpy scikit-learn sqlalchemy psycopg2-binary joblib mlflow matplotlib seaborn
+    && pip install -r requirements.txt
 
-EXPOSE 8000 5000
+EXPOSE 8000 5000 3000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

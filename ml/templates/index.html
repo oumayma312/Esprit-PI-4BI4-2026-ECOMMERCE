@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - ML Dashboard{% endblock %}
+
+{% block content %}
+  <section class="hero reveal">
+    <div class="logo-box">
+      <img src="{{ url_for('logo') }}" alt="Logo du projet" />
+    </div>
+    <div>
+      <h1>Accueil</h1>
+      <p>
+        Cette page presente les modeles du dashboard en lecture seule, avec un focus sur leur utilite concrete, leurs avantages operationnels et la valeur creee pour les clients.
+      </p>
+      <span class="pill">Vue descriptive</span>
+      <span class="pill">Modeles ML metier</span>
+      <span class="pill">Valeur client</span>
+    </div>
+  </section>
+
+  <section class="card reveal mt-16">
+    <div class="section-heading">
+      <div>
+        <h2>Portefeuille de modeles</h2>
+        <p class="helper">
+          Chaque modele repond a un besoin metier precis: mieux choisir, mieux planifier, mieux promouvoir et mieux piloter les campagnes.
+        </p>
+      </div>
+      <div class="mini-stats">
+        <div class="metric">
+          <small>Modeles suivis</small>
+          <strong>4</strong>
+        </div>
+        <div class="metric">
+          <small>Etat global</small>
+          <strong>{{ health.status if health else 'lecture seule' }}</strong>
+        </div>
+        <div class="metric">
+          <small>Campagnes analysees</small>
+          <strong>{{ campaign_summary.dataset.rows if campaign_summary and campaign_summary.dataset else 'n/a' }}</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="model-grid">
+    <article class="card model-card reveal">
+      <div class="model-head">
+        <span class="eyebrow">Achats et fournisseurs</span>
+        <span class="status-badge {{ 'status-ok' if models and models.get('supplier') and models.get('supplier').get('exists') else 'status-muted' }}">
+          {{ 'Disponible' if models and models.get('supplier') and models.get('supplier').get('exists') else 'A verifier' }}
+        </span>
+      </div>
+      <h3>Supplier Classification</h3>
+      <p class="helper">
+        Ce modele segmente les fournisseurs selon leurs profils d'achat et leurs signaux transactionnels afin de faciliter les decisions de sourcing.
+      </p>
+      <div class="detail-list">
+        <div class="detail-item">
+          <small>Avantages</small>
+          <strong>Vision plus claire du portefeuille fournisseur, priorisation rapide des partenaires et reduction des choix intuitifs.</strong>
+        </div>
+        <div class="detail-item">
+          <small>Utilite</small>
+          <strong>Il aide les equipes a identifier les fournisseurs fiables, a anticiper les risques et a adapter la relation commerciale.</strong>
+        </div>
+        <div class="detail-item">
+          <small>Valeur client</small>
+          <strong>Une supply chain plus stable se traduit par une meilleure disponibilite produit, des delais plus fiables et moins de rupture pour le client final.</strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="card model-card reveal">
+      <div class="model-head">
+        <span class="eyebrow">Pilotage commercial</span>
+        <span class="status-badge {{ 'status-ok' if models and models.get('sell') and models.get('sell').get('exists') else 'status-muted' }}">
+          {{ 'Disponible' if models and models.get('sell') and models.get('sell').get('exists') else 'A verifier' }}
+        </span>
+      </div>
+      <h3>Best Time to Sell</h3>
+      <p class="helper">
+        Le modele estime les moments les plus favorables pour vendre, afin d'aligner l'effort commercial avec les periodes de demande reelle.
+      </p>
+      <div class="detail-list">
+        <div class="detail-item">
+          <small>Avantages</small>
+          <strong>Moins d'actions declenchees au hasard, une meilleure allocation des stocks et une exploitation plus fine des pics de demande.</strong>
+        </div>
+        <div class="detail-item">
+          <small>Utilite</small>
+          <strong>Il soutient les decisions de lancement, de relance et de mise en avant produit au bon moment.</strong>
+        </div>
+        <div class="detail-item">
+          <small>Valeur client</small>
+          <strong>Le client voit plus facilement les bons produits au bon moment, avec une experience d'achat plus fluide et des offres plus pertinentes.</strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="card model-card reveal">
+      <div class="model-head">
+        <span class="eyebrow">Promotion et saisonnalite</span>
+        <span class="status-badge {{ 'status-ok' if models and models.get('promote') and models.get('promote').get('exists') else 'status-muted' }}">
+          {{ 'Disponible' if models and models.get('promote') and models.get('promote').get('exists') else 'A verifier' }}
+        </span>
+      </div>
+      <h3>Best Time to Promote</h3>
+      <p class="helper">
+        Ce modele recommande les fenetres promotionnelles les plus opportunes en tenant compte des tendances recentes et du contexte saisonnier.
+      </p>
+      <div class="detail-list">
+        <div class="detail-item">
+          <small>Avantages</small>
+          <strong>Des campagnes promotionnelles mieux cadencees, moins de remises inutiles et une meilleure protection de la marge.</strong>
+        </div>
+        <div class="detail-item">
+          <small>Utilite</small>
+          <strong>Il aide a choisir le bon timing pour stimuler la demande sans banaliser la promotion.</strong>
+        </div>
+        <div class="detail-item">
+          <small>Valeur client</small>
+          <strong>Les clients recoivent des offres plus justes, plus attendues et mieux synchronisees avec leurs besoins reels.</strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="card model-card reveal">
+      <div class="model-head">
+        <span class="eyebrow">Performance marketing</span>
+        <span class="status-badge {{ 'status-ok' if models and models.get('campaign') and models.get('campaign').get('exists') else 'status-muted' }}">
+          {{ 'Disponible' if models and models.get('campaign') and models.get('campaign').get('exists') else 'A verifier' }}
+        </span>
+      </div>
+      <h3>Campaign Prediction</h3>
+      <p class="helper">
+        Le modele estime la probabilite de succes d'une campagne a partir de signaux de diffusion, d'engagement et de cout, avec des regles metier pour fiabiliser la lecture.
+      </p>
+      <div class="detail-list">
+        <div class="detail-item">
+          <small>Avantages</small>
+          <strong>Des previsions plus coherentes, capables de tenir compte des cas limites, des incoherences de donnees et de la realite economique d'une campagne.</strong>
+        </div>
+        <div class="detail-item">
+          <small>Utilite</small>
+          <strong>Il aide les equipes marketing a comparer les scenarios, a detecter les campagnes peu rentables et a ajuster les budgets plus tot.</strong>
+        </div>
+        <div class="detail-item">
+          <small>Valeur client</small>
+          <strong>Des campagnes mieux ciblees signifient des messages plus utiles, moins de pression publicitaire et un meilleur retour sur investissement pour la marque.</strong>
+        </div>
+      </div>
+      <div class="grid mt-14">
+        <div class="metric">
+          <small>Base analysee</small>
+          <strong>{{ campaign_summary.dataset.rows if campaign_summary and campaign_summary.dataset else 'n/a' }} campagnes</strong>
+        </div>
+        <div class="metric">
+          <small>Logique cible</small>
+          <strong>{{ campaign_summary.target_rule if campaign_summary else 'n/a' }}</strong>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="card reveal mt-16">
+    <h2>Ce que cela apporte au client final</h2>
+    <p class="helper">
+      En combinant ces modeles, l'entreprise gagne en precision sur ses decisions internes tout en ameliorant la qualite de service percue par les clients.
+    </p>
+    <div class="grid mt-14">
+      <div class="metric">
+        <small>Pertinence</small>
+        <strong>Des actions commerciales plus utiles et moins intrusives.</strong>
+      </div>
+      <div class="metric">
+        <small>Disponibilite</small>
+        <strong>Une meilleure synchronisation entre approvisionnement, stock et demande.</strong>
+      </div>
+      <div class="metric">
+        <small>Rentabilite</small>
+        <strong>Des budgets marketing et promotionnels mieux exploites.</strong>
+      </div>
+      <div class="metric">
+        <small>Experience</small>
+        <strong>Une relation plus fluide entre la marque, ses offres et les attentes du client.</strong>
+      </div>
+    </div>
+  </section>
+{% endblock %}

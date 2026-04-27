@@ -1,18 +1,12 @@
 import os
 import re
-from glob import glob
+from pathlib import Path
 from typing import Any
 
 import joblib
 import pandas as pd
 from fastapi import HTTPException
-from pydantic import BaseModel, Field
 from sqlalchemy import create_engine, text
-
-SUPPLIER_MODEL_PATH = os.getenv("SUPPLIER_MODEL_PATH", "supplier_clustering_model.pkl")
-SELL_MODEL_PATH = os.getenv("SELL_MODEL_PATH", "best_time_to_sell_model.pkl")
-PROMOTE_MODEL_PATH = os.getenv("PROMOTE_MODEL_PATH", "best_time_to_promote_model.pkl")
-
 
 def _load_local_env_file() -> None:
     candidates = [os.path.join(os.getcwd(), ".env"), os.path.join(os.path.dirname(__file__), ".env")]
@@ -36,32 +30,77 @@ def _load_local_env_file() -> None:
 
 _load_local_env_file()
 
+APP_DIR = Path(__file__).resolve().parent
+SUPPLIER_MODEL_PATH = os.getenv("SUPPLIER_MODEL_PATH", "supplier_clustering_model.pkl")
+SELL_MODEL_PATH = os.getenv("SELL_MODEL_PATH", "best_time_to_sell_model.pkl")
+PROMOTE_MODEL_PATH = os.getenv("PROMOTE_MODEL_PATH", "best_time_to_promote_model.pkl")
+
 
 def _is_valid_identifier(name: str | None) -> bool:
     return bool(name) and bool(re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name or ""))
 
 
+def _path_candidates(path: str) -> list[Path]:
+    raw = Path(path)
+    if raw.is_absolute():
+        return [raw]
+
+    candidates: list[Path] = []
+    for candidate in (Path.cwd() / raw, APP_DIR / raw):
+        if candidate not in candidates:
+            candidates.append(candidate)
+    return candidates
+
+
+def resolve_artifact_path(path: str) -> Path | None:
+    for candidate in _path_candidates(path):
+        if candidate.exists():
+            return candidate
+
+    for candidate in _path_candidates(path):
+        matches = sorted(candidate.parent.glob(f"{candidate.stem}_*{candidate.suffix}"), reverse=True)
+        if matches:
+            return matches[0]
+
+    return None
+
+
+def artifact_exists(path: str) -> bool:
+    return resolve_artifact_path(path) is not None
+
+
+def artifact_display_path(path: str) -> str:
+    resolved = resolve_artifact_path(path)
+    if resolved is not None:
+        return str(resolved)
+    return str(_path_candidates(path)[-1])
+
+
+def resolve_output_path(path: str) -> Path:
+    candidates = _path_candidates(path)
+    return candidates[-1]
+
+
 def load_artifact(path: str) -> dict[str, Any] | None:
-    if not os.path.exists(path):
-        base, ext = os.path.splitext(path)
-        candidates = sorted(glob(f"{base}_*{ext}"), reverse=True)
-        if not candidates:
-            return None
-        path = candidates[0]
-    artifact = joblib.load(path)
+    resolved_path = resolve_artifact_path(path)
+    if resolved_path is None:
+        return None
+    artifact = joblib.load(resolved_path)
     if not isinstance(artifact, dict):
-        raise ValueError(f"Artifact at {path} must be a dict.")
+        raise ValueError(f"Artifact at {resolved_path} must be a dict.")
     return artifact
 
 
 def dated_artifact_path(path: str, timestamp: str | None = None) -> str:
-    base, ext = os.path.splitext(path)
     stamp = timestamp or pd.Timestamp.utcnow().strftime("%Y%m%d_%H%M%S")
-    return f"{base}_{stamp}{ext}"
+    resolved = resolve_output_path(path)
+    return str(resolved.with_name(f"{resolved.stem}_{stamp}{resolved.suffix}"))
 
 
 def save_versioned_artifact(artifact: dict[str, Any], path: str) -> str:
-    joblib.dump(artifact, path)
+    output_path = resolve_output_path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(artifact, output_path)
     versioned_path = dated_artifact_path(path)
     joblib.dump(artifact, versioned_path)
     return versioned_path

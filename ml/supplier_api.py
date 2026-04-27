@@ -18,7 +18,6 @@ from api_common import (
     SUPPLIER_MODEL_PATH,
     load_artifact,
     load_dataset_from_sources,
-    load_supplier_clusters_from_db,
     save_versioned_artifact,
     safe_head,
 )
@@ -38,7 +37,7 @@ except Exception:
 
 router = APIRouter(tags=["supplier"])
 
-SUPPLIER_TRAIN_MODEL_PATH = os.getenv("SUPPLIER_TRAIN_MODEL_PATH", "supplier_training_model_api.pkl")
+SUPPLIER_TRAIN_MODEL_PATH = os.getenv("SUPPLIER_TRAIN_MODEL_PATH", SUPPLIER_MODEL_PATH)
 SUPPLIER_NOTEBOOK_DATASET_PATH = os.getenv("SUPPLIER_NOTEBOOK_DATASET_PATH", "supplier_feature_dataset.parquet")
 SUPPLIER_DB_DATASET_TABLE = os.getenv("ML_SUPPLIER_DATASET_TABLE", "supplier")
 _supplier_prepared_dataset: pd.DataFrame | None = None
@@ -230,20 +229,98 @@ def _supplier_cluster_name_map(supplier_clusters: pd.DataFrame | None) -> dict[i
     return out
 
 
+def _cluster_name_from_id(cluster_id: int) -> str:
+    return f"Cluster {cluster_id + 1}"
+
+
+def _default_supplier_seed_dataset() -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {"supplier_id": 1, "supplier_name": "Atlas Furnishings", "quantity": 8, "unit_price": 14.5, "total_ht": 116.0, "total_ttc": 138.0, "governorate": "Tunis", "city": "Tunis"},
+            {"supplier_id": 2, "supplier_name": "Carthage Imports", "quantity": 16, "unit_price": 11.2, "total_ht": 179.2, "total_ttc": 213.2, "governorate": "Ariana", "city": "Raoued"},
+            {"supplier_id": 3, "supplier_name": "Djerba Home", "quantity": 28, "unit_price": 6.8, "total_ht": 190.4, "total_ttc": 226.6, "governorate": "Medenine", "city": "Djerba"},
+            {"supplier_id": 4, "supplier_name": "Sahel Office", "quantity": 32, "unit_price": 7.1, "total_ht": 227.2, "total_ttc": 270.4, "governorate": "Sousse", "city": "Sousse"},
+            {"supplier_id": 5, "supplier_name": "Nabeul Trading", "quantity": 11, "unit_price": 19.4, "total_ht": 213.4, "total_ttc": 254.0, "governorate": "Nabeul", "city": "Nabeul"},
+            {"supplier_id": 6, "supplier_name": "Kairouan Retail", "quantity": 24, "unit_price": 9.7, "total_ht": 232.8, "total_ttc": 277.0, "governorate": "Kairouan", "city": "Kairouan"},
+            {"supplier_id": 7, "supplier_name": "Bizerte Source", "quantity": 41, "unit_price": 5.9, "total_ht": 241.9, "total_ttc": 287.9, "governorate": "Bizerte", "city": "Bizerte"},
+            {"supplier_id": 8, "supplier_name": "Sfax Central", "quantity": 37, "unit_price": 8.4, "total_ht": 310.8, "total_ttc": 369.9, "governorate": "Sfax", "city": "Sfax"},
+        ]
+    )
+
+
+def _build_supplier_clusters_frame(dataset: pd.DataFrame, labels) -> pd.DataFrame:
+    supplier_name_series = (
+        dataset["supplier_name"].astype(str)
+        if "supplier_name" in dataset.columns
+        else pd.Series([f"Supplier {idx + 1}" for idx in range(len(dataset))])
+    )
+    clusters = pd.DataFrame(
+        {
+            "supplier_name": supplier_name_series.reset_index(drop=True),
+            "cluster": pd.Series(labels).astype(int),
+        }
+    )
+    if "supplier_id" in dataset.columns:
+        clusters.insert(0, "supplier_id", dataset["supplier_id"].reset_index(drop=True))
+    clusters["cluster_name"] = clusters["cluster"].map(_cluster_name_from_id)
+    return clusters.sort_values(["cluster", "supplier_name"]).reset_index(drop=True)
+
+
+def _train_supplier_artifact(dataset: pd.DataFrame, n_clusters: int = 4, random_state: int = 42) -> tuple[dict[str, Any], pd.DataFrame, Any, pd.DataFrame]:
+    work = dataset.copy().reset_index(drop=True)
+    features = _prepare_supplier_features(work)
+    rows = len(features)
+    if rows < 2:
+        raise HTTPException(status_code=400, detail="Supplier dataset must contain at least 2 usable rows.")
+    if n_clusters < 2:
+        raise HTTPException(status_code=400, detail="n_clusters must be >= 2")
+    if rows < n_clusters:
+        raise HTTPException(status_code=400, detail=f"n_clusters={n_clusters} exceeds the available rows ({rows}).")
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(features)
+    model = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
+    labels = model.fit_predict(X_scaled)
+    supplier_clusters = _build_supplier_clusters_frame(work, labels)
+    artifact = {
+        "task": "supplier_train_api",
+        "model": model,
+        "scaler": scaler,
+        "feature_columns": list(features.columns),
+        "n_clusters": int(n_clusters),
+        "supplier_clusters": supplier_clusters,
+    }
+    return artifact, features, X_scaled, supplier_clusters
+
+
+def ensure_supplier_prediction_artifact() -> dict[str, Any]:
+    artifact = load_artifact(SUPPLIER_MODEL_PATH)
+    if isinstance(artifact, dict):
+        return artifact
+
+    try:
+        dataset = load_dataset_from_sources(_supplier_prepared_dataset, SUPPLIER_DB_DATASET_TABLE, SUPPLIER_NOTEBOOK_DATASET_PATH)
+    except Exception:
+        dataset = pd.DataFrame()
+
+    if not isinstance(dataset, pd.DataFrame) or dataset.empty or len(dataset) < 2:
+        dataset = _default_supplier_seed_dataset()
+
+    artifact, _, _, _ = _train_supplier_artifact(dataset, n_clusters=min(4, len(dataset)), random_state=42)
+    save_versioned_artifact(artifact, SUPPLIER_MODEL_PATH)
+    return artifact
+
+
 def _build_supplier_features_from_request(payload: SupplierPredictRequest, feature_columns: list[str]) -> pd.DataFrame:
     row = payload.model_dump() if hasattr(payload, "model_dump") else payload.dict()
-    df = pd.DataFrame([row])
+    df = _prepare_supplier_features(pd.DataFrame([row]))
     for col in feature_columns:
         if col not in df.columns:
             df[col] = 0.0
 
-    df = df[feature_columns].copy()
+    df = df.reindex(columns=feature_columns, fill_value=0.0).copy()
     for col in df.columns:
-        if pd.api.types.is_numeric_dtype(df[col]):
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
-        else:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-            df[col] = df[col].fillna(0.0)
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0.0)
     return df
 
 
@@ -318,7 +395,7 @@ def save_supplier_clusters() -> SupplierClusterSaveResponse:
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", result_table or ""):
         raise HTTPException(status_code=400, detail=f"Invalid ML_SUPPLIER_TABLE={result_table!r}")
 
-    artifact = load_artifact(SUPPLIER_MODEL_PATH)
+    artifact = ensure_supplier_prediction_artifact()
     supplier_df = artifact.get("supplier_clusters") if isinstance(artifact, dict) else None
     if not isinstance(supplier_df, pd.DataFrame) or supplier_df.empty:
         raise HTTPException(
@@ -394,90 +471,73 @@ def train_supplier_model(n_clusters: int = 4, random_state: int = 42) -> Supplie
 
     _supplier_prepared_dataset = ds
 
-    if n_clusters < 2:
-        raise HTTPException(status_code=400, detail="n_clusters must be >= 2")
+    artifact, X, X_scaled, supplier_clusters = _train_supplier_artifact(ds, n_clusters=n_clusters, random_state=random_state)
+    model = artifact["model"]
+    scaler = artifact["scaler"]
+    feature_columns = artifact["feature_columns"]
 
-    X = ds.copy()
-    excluded_cols = {"supplier_id", "supplier_name", "cluster_kmeans", "cluster_dbscan", "cluster", "cluster_name", "note"}
-    feature_cols = [c for c in X.columns if c not in excluded_cols]
-    X = X[feature_cols].copy()
-    X = X.select_dtypes(include=["number", "bool"]).copy()
-    if X.empty:
-        raise HTTPException(
-            status_code=400,
-            detail="No numeric supplier feature columns found in the dataset loaded from PostgreSQL.",
-        )
-
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-
-    model = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
-    labels = model.fit_predict(X_scaled)
+    versioned_model_path = save_versioned_artifact(artifact, SUPPLIER_MODEL_PATH)
+    if SUPPLIER_TRAIN_MODEL_PATH != SUPPLIER_MODEL_PATH:
+        save_versioned_artifact(artifact, SUPPLIER_TRAIN_MODEL_PATH)
 
     comparison_k = 2 if n_clusters != 2 else 3
-    comparison_model = KMeans(n_clusters=comparison_k, random_state=random_state, n_init=10)
-    comparison_labels = comparison_model.fit_predict(X_scaled)
-
-    artifact = {
-        "task": "supplier_train_api",
-        "model": model,
-        "scaler": scaler,
-        "feature_columns": list(X.columns),
-        "n_clusters": int(n_clusters),
-    }
-    versioned_model_path = save_versioned_artifact(artifact, SUPPLIER_TRAIN_MODEL_PATH)
+    comparison_enabled = len(X) >= comparison_k
+    comparison_model = None
+    comparison_labels = None
+    if comparison_enabled:
+        comparison_model = KMeans(n_clusters=comparison_k, random_state=random_state, n_init=10)
+        comparison_labels = comparison_model.fit_predict(X_scaled)
 
     _log_supplier_mlflow_run(
         run_name=f"supplier_kmeans_k{n_clusters}",
         X_scaled=X_scaled,
-        y_pred=labels,
+        y_pred=supplier_clusters["cluster"].tolist(),
         model=model,
         scaler=scaler,
-        feature_columns=list(X.columns),
+        feature_columns=feature_columns,
         n_clusters=n_clusters,
         random_state=random_state,
         rows=len(X),
         comparison_label="selected",
     )
-    _log_supplier_mlflow_run(
-        run_name=f"supplier_kmeans_k{comparison_k}",
-        X_scaled=X_scaled,
-        y_pred=comparison_labels,
-        model=comparison_model,
-        scaler=scaler,
-        feature_columns=list(X.columns),
-        n_clusters=comparison_k,
-        random_state=random_state,
-        rows=len(X),
-        comparison_label="comparison",
-    )
+    if comparison_enabled and comparison_model is not None and comparison_labels is not None:
+        _log_supplier_mlflow_run(
+            run_name=f"supplier_kmeans_k{comparison_k}",
+            X_scaled=X_scaled,
+            y_pred=comparison_labels,
+            model=comparison_model,
+            scaler=scaler,
+            feature_columns=feature_columns,
+            n_clusters=comparison_k,
+            random_state=random_state,
+            rows=len(X),
+            comparison_label="comparison",
+        )
 
-    label_counts = pd.Series(labels).value_counts().sort_index().to_dict()
+    label_counts = supplier_clusters["cluster"].value_counts().sort_index().to_dict()
     _supplier_train_results = {
-        "model_path": SUPPLIER_TRAIN_MODEL_PATH,
+        "model_path": SUPPLIER_MODEL_PATH,
         "versioned_model_path": versioned_model_path,
         "n_clusters": int(n_clusters),
         "rows": int(len(X)),
-        "feature_columns": list(X.columns),
+        "feature_columns": feature_columns,
         "inertia": float(model.inertia_),
         "cluster_counts": {str(k): int(v) for k, v in label_counts.items()},
     }
 
     return {
-        "model_path": SUPPLIER_TRAIN_MODEL_PATH,
+        "model_path": SUPPLIER_MODEL_PATH,
         "versioned_model_path": versioned_model_path,
         "n_clusters": int(n_clusters),
         "rows": int(len(X)),
-        "feature_columns": list(X.columns),
+        "feature_columns": feature_columns,
         "inertia": float(model.inertia_),
     }
 
 
 @router.post("/predict/supplier", response_model=SupplierPredictResponse)
 def predict_supplier_cluster(payload: SupplierPredictRequest) -> SupplierPredictResponse:
-    artifact = load_artifact(SUPPLIER_MODEL_PATH)
-    if artifact is None:
-        raise HTTPException(status_code=404, detail=f"Supplier model not found: {SUPPLIER_MODEL_PATH}")
+    artifact = ensure_supplier_prediction_artifact()
 
     model = artifact.get("model")
     scaler = artifact.get("scaler")

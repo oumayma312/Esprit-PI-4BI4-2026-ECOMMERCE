@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}Churn Prediction - ML Dashboard{% endblock %}
+
+{% block content %}
+  <section class="hero reveal">
+    <div class="logo-box">
+      <img src="{{ url_for('logo') }}" alt="Logo du projet" />
+    </div>
+    <div>
+      <h1>Churn Prediction & Segmentation</h1>
+      <p>
+        Estimez le risque de desabonnement de vos clients et segmentez-les selon leur comportement d'achat pour des actions cibleses.
+      </p>
+      <span class="pill">Scoring en temps reel</span>
+      <span class="pill">Double modele</span>
+      <span class="pill">Recommandations operationnelles</span>
+    </div>
+  </section>
+
+  {% if churn_errors %}
+    <section class="card reveal mt-16">
+      {% for error in churn_errors %}
+        <div class="alert alert-error">{{ error }}</div>
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  <section class="card reveal mt-16">
+    <div class="section-heading">
+      <div>
+        <h2>Profil Client</h2>
+        <p class="helper">
+          Entrez les caracteristiques du client pour obtenir une prediction de churn et un segment comportemental.
+        </p>
+      </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('predict_churn') }}" class="form-grid churn-form">
+      <div class="row-2">
+        <div>
+          <label for="recency">Recence (jours)</label>
+          <input id="recency" name="recency" type="number" step="any" min="0" value="{{ input_values.get('recency', '120') }}" />
+          {% if field_errors and field_errors.get('recency') %}<small class="field-error">{{ field_errors.recency }}</small>{% endif %}
+        </div>
+        <div>
+          <label for="frequency">Frequence (transactions)</label>
+          <input id="frequency" name="frequency" type="number" step="any" min="0" value="{{ input_values.get('frequency', '2') }}" />
+          {% if field_errors and field_errors.get('frequency') %}<small class="field-error">{{ field_errors.frequency }}</small>{% endif %}
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div>
+          <label for="monetary_total">Depense totale</label>
+          <input id="monetary_total" name="monetary_total" type="number" step="any" min="0" value="{{ input_values.get('monetary_total', '250') }}" />
+          {% if field_errors and field_errors.get('monetary_total') %}<small class="field-error">{{ field_errors.monetary_total }}</small>{% endif %}
+        </div>
+        <div>
+          <label for="monetary_trend">Tendance depense</label>
+          <input id="monetary_trend" name="monetary_trend" type="number" step="any" min="0" value="{{ input_values.get('monetary_trend', '1.0') }}" />
+          {% if field_errors and field_errors.get('monetary_trend') %}<small class="field-error">{{ field_errors.monetary_trend }}</small>{% endif %}
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div>
+          <label for="product_diversity">Diversite produits</label>
+          <input id="product_diversity" name="product_diversity" type="number" step="any" min="0" value="{{ input_values.get('product_diversity', '3') }}" />
+          {% if field_errors and field_errors.get('product_diversity') %}<small class="field-error">{{ field_errors.product_diversity }}</small>{% endif %}
+        </div>
+        <div>
+          <label for="channel_diversity">Diversite canaux</label>
+          <input id="channel_diversity" name="channel_diversity" type="number" step="any" min="0" value="{{ input_values.get('channel_diversity', '1') }}" />
+          {% if field_errors and field_errors.get('channel_diversity') %}<small class="field-error">{{ field_errors.channel_diversity }}</small>{% endif %}
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div>
+          <label for="lifetime_days">Anciennete (jours)</label>
+          <input id="lifetime_days" name="lifetime_days" type="number" step="any" min="0" value="{{ input_values.get('lifetime_days', '365') }}" />
+          {% if field_errors and field_errors.get('lifetime_days') %}<small class="field-error">{{ field_errors.lifetime_days }}</small>{% endif %}
+        </div>
+        <div>
+          <label for="purchase_velocity">Vitesse d'achat</label>
+          <input id="purchase_velocity" name="purchase_velocity" type="number" step="any" min="0" value="{{ input_values.get('purchase_velocity', '1.5') }}" />
+          {% if field_errors and field_errors.get('purchase_velocity') %}<small class="field-error">{{ field_errors.purchase_velocity }}</small>{% endif %}
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div>
+          <label for="avg_price">Prix moyen</label>
+          <input id="avg_price" name="avg_price" type="number" step="any" min="0" value="{{ input_values.get('avg_price', '80') }}" />
+          {% if field_errors and field_errors.get('avg_price') %}<small class="field-error">{{ field_errors.avg_price }}</small>{% endif %}
+        </div>
+        <div>
+          <label for="channel">Canal principal</label>
+          <select id="channel" name="channel">
+            <option value="vente direct" {% if input_values.get('channel') == 'vente direct' %}selected{% endif %}>Vente direct</option>
+            <option value="" {% if not input_values.get('channel') %}selected{% endif %}>Autre / baseline</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-actions mt-14">
+        <button type="submit" class="button primary">Predire churn et segment</button>
+      </div>
+    </form>
+  </section>
+
+  {% if churn_result and not is_train_result %}
+    <section class="card reveal mt-16">
+      <div class="section-heading">
+        <div>
+          <h2>Resultat de Prediction</h2>
+          <p class="helper">
+            Double modele: classification churn + segmentation comportementale.
+          </p>
+        </div>
+      </div>
+
+      <div class="result-grid">
+        <div class="metric">
+          <small>Probabilite de churn</small>
+          <strong style="color: {{ '#b64249' if churn_result.get('churn_probability', 0) >= 0.7 else ('#b97815' if churn_result.get('churn_probability', 0) >= 0.4 else '#1f8f5f') }}">
+            {{ "%.1f"|format(churn_result.get('churn_probability', 0) * 100) }}%
+          </strong>
+        </div>
+        <div class="metric">
+          <small>Statut predit</small>
+          <strong>{{ 'Client a risque' if churn_result.get('churn_prediction') == '1' else 'Client actif' }}</strong>
+        </div>
+        <div class="metric">
+          <small>Segment</small>
+          <strong>{{ churn_result.get('segment', 0) }} - {{ churn_result.get('segment_label', '') }}</strong>
+        </div>
+        <div class="metric">
+          <small>Niveau de risque</small>
+          <strong style="color: {{ '#b64249' if churn_result.get('risk_level') == 'Eleve' else ('#b97815' if churn_result.get('risk_level') == 'Modere' else '#1f8f5f') }}">
+            {{ churn_result.get('risk_level', '') }}
+          </strong>
+        </div>
+      </div>
+
+      {% if churn_result.get('recommendation') %}
+        <div class="note-panel mt-14">
+          <strong>Action recommandee:</strong> {{ churn_result.recommendation }}
+        </div>
+      {% endif %}
+
+      {% if churn_result.get('segment') is defined %}
+        <div class="card mt-14" style="background: var(--panel-soft);">
+          <h3>Interpretation du segment: {{ churn_result.get('segment_label', '') }}</h3>
+          {% set profiles = {
+            0: {'meaning': 'Clients premium avec depenses elevees et achats frequents.', 'profile': 'Panier moyen eleve, engagement fort.', 'action': 'Preserver la fidelite via avantages VIP.'},
+            1: {'meaning': 'Clients probablement inactifs depuis une longue periode.', 'profile': 'Engagement recent faible, dynamique en baisse.', 'action': 'Activer des campagnes de reconquete.'},
+            2: {'meaning': 'Clients de valeur moyenne montrant des signes de desengagement.', 'profile': 'Valeur correcte mais frequence qui baisse.', 'action': 'Lancer des parcours de nurturing.'},
+            3: {'meaning': 'Clients recents avec historique d\'achat encore limite.', 'profile': 'Anciennete faible, volume d\'achat bas.', 'action': 'Accelerer l\'onboarding avec education produit.'}
+          } %}
+          {% set p = profiles.get(churn_result.segment, profiles[3]) %}
+          <div class="mt-10">
+            <p><strong>Signification:</strong> {{ p.meaning }}</p>
+            <p><strong>Profil type:</strong> {{ p.profile }}</p>
+            <p><strong>Strategie:</strong> {{ p.action }}</p>
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="card reveal mt-16">
+      <div class="section-heading">
+        <div>
+          <h2>Carte PCA des segments</h2>
+        </div>
+      </div>
+      <img src="{{ url_for('pca_plot_churn') }}" alt="PCA Plot" class="pca-image" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--border);" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+      <p style="display:none; color: var(--muted);">PCA plot non disponible</p>
+    </section>
+  {% endif %}
+
+  {% if is_train_result and churn_result %}
+    <section class="card reveal mt-16">
+      <div class="section-heading">
+        <div>
+          <h2>Resultat de l'entrainement</h2>
+        </div>
+      </div>
+      <div class="result-grid">
+        <div class="metric">
+          <small>Source de donnees</small>
+          <strong>{{ churn_result.get('data_source', '') }}</strong>
+        </div>
+        <div class="metric">
+          <small>Nombre de clients</small>
+          <strong>{{ churn_result.get('n_customers', 0) }}</strong>
+        </div>
+        <div class="metric">
+          <small>Modele churn</small>
+          <strong>{{ churn_result.get('churn_model', '') }}</strong>
+        </div>
+        <div class="metric">
+          <small>MLflow</small>
+          <strong>{{ 'Connecte' if churn_result.get('mlflow_available') else 'Deconnecte' }}</strong>
+        </div>
+      </div>
+      {% if churn_result.get('churn_metrics') %}
+        <div class="mt-14">
+          <h3>Metriques du modele churn:</h3>
+          <div class="result-grid">
+            {% for key, value in churn_result.churn_metrics.items() %}
+              <div class="metric">
+                <small>{{ key }}</small>
+                <strong>{{ "%.4f"|format(value) }}</strong>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  <section class="card reveal mt-16">
+    <form method="POST" action="{{ url_for('train_churn') }}">
+      <div class="section-heading">
+        <div>
+          <h2>Re-entrainer le modele</h2>
+          <p class="helper">
+            Lance l'entrainement complet avec suivi MLflow. Produit 2+ runs comparables (logistic regression + random forest).
+          </p>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="button secondary">Entrainer maintenant</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}

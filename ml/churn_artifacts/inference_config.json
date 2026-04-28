@@ -1,0 +1,49 @@
+{
+  "reference_date": "2026-01-02",
+  "global_floor": 90,
+  "decision_threshold": 0.50,
+  "decision_metric": "f1",
+  "test_roc_auc": 0.8688524590163934,
+  "best_f1": 0.8872180451127819,
+  "roc_tradeoff_threshold": 0.6535525316346806,
+  "log_features": [
+    "monetary_total",
+    "quantity_total",
+    "lifetime_days",
+    "monetary_std",
+    "purchase_velocity",
+    "avg_price"
+  ],
+  "churn_feature_columns": [
+    "frequency",
+    "monetary_total_log",
+    "monetary_trend",
+    "product_diversity",
+    "channel_diversity",
+    "lifetime_days_log",
+    "purchase_velocity_log",
+    "avg_price_log",
+    "ch_vente direct"
+  ],
+  "churn_base_numeric_features": [
+    "frequency",
+    "monetary_total_log",
+    "monetary_trend",
+    "product_diversity",
+    "channel_diversity",
+    "lifetime_days_log",
+    "purchase_velocity_log",
+    "avg_price_log"
+  ],
+  "churn_channel_dummy_columns": [
+    "ch_vente direct"
+  ],
+  "segmentation_feature_columns": [
+    "recency",
+    "frequency",
+    "monetary_total_log",
+    "product_diversity",
+    "purchase_velocity_log"
+  ],
+  "segment_count": 4
+}

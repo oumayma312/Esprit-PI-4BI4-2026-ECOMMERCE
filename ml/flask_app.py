@@ -47,6 +47,7 @@ APP_DIR = Path(__file__).resolve().parent
 LOGO_PATH = Path(__file__).resolve().parent.parent / 'logo.png'
 TEMPLATE_LOGO_PATH = Path(__file__).resolve().parent / 'templates' / 'logo.png'
 CAMPAIGN_SUMMARY_PATH = Path(__file__).resolve().parent / 'mlops_artifacts' / 'campaign_summary.json'
+CHURN_API_URL = os.getenv('CHURN_API_URL', 'http://127.0.0.1:8001')
 _LAST_WORKING_BASE = BASE_URLS[0]
 _FASTAPI_PROCESS: subprocess.Popen[Any] | None = None
 
@@ -86,6 +87,35 @@ def _default_campaign_inputs() -> dict[str, str]:
         'views': '0',
         'price': '0',
     }
+
+
+def _default_churn_inputs() -> dict[str, str]:
+    return {
+        'recency': '120',
+        'frequency': '2',
+        'monetary_total': '250',
+        'monetary_trend': '1.0',
+        'product_diversity': '3',
+        'channel_diversity': '1',
+        'lifetime_days': '365',
+        'purchase_velocity': '1.5',
+        'avg_price': '80',
+        'channel': 'vente direct',
+    }
+
+
+def _api_request_churn(path: str, method: str = 'GET', payload: dict[str, Any] | None = None) -> tuple[dict[str, Any], str]:
+    """Make HTTP request to churn API on port 8001."""
+    url = f'{CHURN_API_URL}{path}'
+    headers = {'Accept': 'application/json'}
+    body = None
+    if payload is not None:
+        headers['Content-Type'] = 'application/json'
+        body = json.dumps(payload).encode('utf-8')
+    request_object = Request(url, data=body, headers=headers, method=method)
+    with urlopen(request_object, timeout=API_TIMEOUT_SECONDS) as response:
+        raw = response.read().decode('utf-8')
+        return json.loads(raw) if raw else {}, url
 
 
 def _parse_source_page(form_data: Any, default: str = 'home') -> str:
@@ -705,6 +735,112 @@ def campaign_predict() -> str:
         field_errors=field_errors,
         local_errors=[error] if error else [],
     )
+
+
+@app.get('/churn')
+def churn_page() -> str:
+    return render_template(
+        'churn.html',
+        churn_result=None,
+        field_errors=None,
+        input_values=_default_churn_inputs(),
+        churn_errors=[],
+    )
+
+
+@app.post('/predict/churn')
+def predict_churn() -> str:
+    input_values = _default_churn_inputs()
+    field_errors: dict[str, str] = {}
+    payload: dict[str, Any] = {}
+
+    for key in input_values:
+        input_values[key] = str(request.form.get(key, input_values[key])).strip()
+
+    def _parse_float(name: str, label: str, minimum: float = 0.0) -> None:
+        raw_value = input_values[name]
+        if not raw_value:
+            field_errors[name] = f'{label} est obligatoire.'
+            return
+        try:
+            numeric_value = float(raw_value)
+        except ValueError:
+            field_errors[name] = f'{label} doit etre numerique.'
+            return
+        if numeric_value < minimum:
+            field_errors[name] = f'{label} doit etre >= {minimum:g}.'
+            return
+        payload[name] = numeric_value
+
+    _parse_float('recency', 'Recence (jours)', minimum=0.0)
+    _parse_float('frequency', 'Frequence (transactions)', minimum=0.0)
+    _parse_float('monetary_total', 'Depense totale', minimum=0.0)
+    _parse_float('monetary_trend', 'Tendance depense', minimum=0.0)
+    _parse_float('product_diversity', 'Diversite produits', minimum=0.0)
+    _parse_float('channel_diversity', 'Diversite canaux', minimum=0.0)
+    _parse_float('lifetime_days', 'Anciennete (jours)', minimum=0.0)
+    _parse_float('purchase_velocity', 'Vitesse d achat', minimum=0.0)
+    _parse_float('avg_price', 'Prix moyen', minimum=0.0)
+
+    if field_errors:
+        return render_template(
+            'churn.html',
+            churn_result=None,
+            field_errors=field_errors,
+            input_values=input_values,
+            churn_errors=['Veuillez corriger les champs du formulaire.'],
+        )
+
+    churn_result = None
+    error = None
+    try:
+        churn_result, _ = _api_request_churn('/predict', method='POST', payload=payload)
+    except Exception as exc:
+        error = f'La prediction a echoue: {exc}'
+
+    return render_template(
+        'churn.html',
+        churn_result=churn_result,
+        field_errors=field_errors,
+        input_values=input_values,
+        churn_errors=[error] if error else [],
+    )
+
+
+@app.post('/train/churn')
+def train_churn() -> str:
+    train_result = None
+    error = None
+    try:
+        train_result, _ = _api_request_churn(
+            '/predict/train',
+            method='POST',
+            payload={'algorithm': 'logistic_regression', 'n_clusters': 4, 'random_state': 42},
+        )
+    except Exception as exc:
+        error = f"L'entrainement a echoue: {exc}"
+
+    return render_template(
+        'churn.html',
+        churn_result=train_result,
+        field_errors=None,
+        input_values=_default_churn_inputs(),
+        churn_errors=[error] if error else [],
+        is_train_result=True,
+    )
+
+
+@app.get('/pca-plot/churn')
+def pca_plot_churn() -> Any:
+    try:
+        data, _ = _api_request_churn('/predict/pca-plot')
+        if isinstance(data, bytes):
+            from flask import send_file
+            from io import BytesIO
+            return send_file(BytesIO(data), mimetype='image/png')
+    except Exception:
+        pass
+    return {'detail': 'PCA plot not available'}, 404
 
 
 if __name__ == '__main__':

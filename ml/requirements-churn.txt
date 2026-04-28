@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+pandas
+numpy
+scikit-learn
+joblib
+mlflow
+sqlalchemy
+psycopg2-binary
+psycopg[binary]
+matplotlib
+pyarrow

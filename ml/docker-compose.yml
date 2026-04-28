@@ -35,6 +35,32 @@ services:
     depends_on:
       - mlflow
 
+  churn-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.churn
+    command: uvicorn churn_api:app --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    environment:
+      PGHOST: ${PGHOST}
+      PGPORT: ${PGPORT:-5432}
+      PGDATABASE: ${PGDATABASE}
+      PGUSER: ${PGUSER}
+      PGPASSWORD: ${PGPASSWORD}
+      ML_SCHEMA: ${ML_SCHEMA:-data}
+      CHURN_PG_TABLE: ${CHURN_PG_TABLE:-FactVente}
+      CHURN_ARTIFACTS_DIR: ${CHURN_ARTIFACTS_DIR:-/app/churn_artifacts}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      MLFLOW_CHURN_EXPERIMENT: ${MLFLOW_CHURN_EXPERIMENT:-churn-prediction}
+      GIT_PYTHON_REFRESH: quiet
+    volumes:
+      - .:/app
+      - mlruns:/app/mlruns
+      - mlartifacts:/app/mlartifacts
+    depends_on:
+      - mlflow
+
   web:
     build:
       context: .
@@ -44,6 +70,7 @@ services:
       - "3000:3000"
     environment:
       FASTAPI_BASE_URL: http://api:8000
+      CHURN_API_URL: http://churn-api:8001
       FLASK_HOST: 0.0.0.0
       FLASK_PORT: 3000
       PGHOST: ${PGHOST}
@@ -51,10 +78,12 @@ services:
       PGDATABASE: ${PGDATABASE}
       PGUSER: ${PGUSER}
       PGPASSWORD: ${PGPASSWORD}
+      GIT_PYTHON_REFRESH: quiet
     volumes:
       - .:/app
     depends_on:
       - api
+      - churn-api
 
   mlflow:
     build:

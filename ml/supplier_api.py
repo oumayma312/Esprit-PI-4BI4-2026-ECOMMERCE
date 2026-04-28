@@ -17,7 +17,7 @@ from sqlalchemy import create_engine, text
 from api_common import (
     SUPPLIER_MODEL_PATH,
     load_artifact,
-    load_dataset_from_sources,
+    load_ml_dataset_from_db,
     save_versioned_artifact,
     safe_head,
 )
@@ -233,19 +233,18 @@ def _cluster_name_from_id(cluster_id: int) -> str:
     return f"Cluster {cluster_id + 1}"
 
 
-def _default_supplier_seed_dataset() -> pd.DataFrame:
-    return pd.DataFrame(
-        [
-            {"supplier_id": 1, "supplier_name": "Atlas Furnishings", "quantity": 8, "unit_price": 14.5, "total_ht": 116.0, "total_ttc": 138.0, "governorate": "Tunis", "city": "Tunis"},
-            {"supplier_id": 2, "supplier_name": "Carthage Imports", "quantity": 16, "unit_price": 11.2, "total_ht": 179.2, "total_ttc": 213.2, "governorate": "Ariana", "city": "Raoued"},
-            {"supplier_id": 3, "supplier_name": "Djerba Home", "quantity": 28, "unit_price": 6.8, "total_ht": 190.4, "total_ttc": 226.6, "governorate": "Medenine", "city": "Djerba"},
-            {"supplier_id": 4, "supplier_name": "Sahel Office", "quantity": 32, "unit_price": 7.1, "total_ht": 227.2, "total_ttc": 270.4, "governorate": "Sousse", "city": "Sousse"},
-            {"supplier_id": 5, "supplier_name": "Nabeul Trading", "quantity": 11, "unit_price": 19.4, "total_ht": 213.4, "total_ttc": 254.0, "governorate": "Nabeul", "city": "Nabeul"},
-            {"supplier_id": 6, "supplier_name": "Kairouan Retail", "quantity": 24, "unit_price": 9.7, "total_ht": 232.8, "total_ttc": 277.0, "governorate": "Kairouan", "city": "Kairouan"},
-            {"supplier_id": 7, "supplier_name": "Bizerte Source", "quantity": 41, "unit_price": 5.9, "total_ht": 241.9, "total_ttc": 287.9, "governorate": "Bizerte", "city": "Bizerte"},
-            {"supplier_id": 8, "supplier_name": "Sfax Central", "quantity": 37, "unit_price": 8.4, "total_ht": 310.8, "total_ttc": 369.9, "governorate": "Sfax", "city": "Sfax"},
-        ]
-    )
+def _load_supplier_dataset_from_postgres() -> pd.DataFrame:
+    ml_schema = os.getenv("ML_SCHEMA", "ml")
+    dataset = load_ml_dataset_from_db(SUPPLIER_DB_DATASET_TABLE, schema_name=ml_schema)
+    if not isinstance(dataset, pd.DataFrame) or dataset.empty:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No supplier dataset found in PostgreSQL table {ml_schema}.{SUPPLIER_DB_DATASET_TABLE}. "
+                "Populate the table before calling the supplier training endpoints."
+            ),
+        )
+    return dataset
 
 
 def _build_supplier_clusters_frame(dataset: pd.DataFrame, labels) -> pd.DataFrame:
@@ -298,13 +297,7 @@ def ensure_supplier_prediction_artifact() -> dict[str, Any]:
     if isinstance(artifact, dict):
         return artifact
 
-    try:
-        dataset = load_dataset_from_sources(_supplier_prepared_dataset, SUPPLIER_DB_DATASET_TABLE, SUPPLIER_NOTEBOOK_DATASET_PATH)
-    except Exception:
-        dataset = pd.DataFrame()
-
-    if not isinstance(dataset, pd.DataFrame) or dataset.empty or len(dataset) < 2:
-        dataset = _default_supplier_seed_dataset()
+    dataset = _load_supplier_dataset_from_postgres()
 
     artifact, _, _, _ = _train_supplier_artifact(dataset, n_clusters=min(4, len(dataset)), random_state=42)
     save_versioned_artifact(artifact, SUPPLIER_MODEL_PATH)
@@ -440,16 +433,7 @@ def save_supplier_clusters() -> SupplierClusterSaveResponse:
 @router.get("/train/supplier/dataset", response_model=SupplierPrepareDatasetResponse)
 def get_supplier_prepared_dataset(limit: int = 20) -> SupplierPrepareDatasetResponse:
     n = max(1, min(limit, 5000))
-    ds = load_dataset_from_sources(_supplier_prepared_dataset, SUPPLIER_DB_DATASET_TABLE, SUPPLIER_NOTEBOOK_DATASET_PATH)
-    if ds is None or ds.empty:
-        raise HTTPException(
-            status_code=404,
-            detail=(
-                "No prepared supplier dataset found in API memory, PostgreSQL, or notebook snapshot. "
-                "Expected PostgreSQL table ml.supplier or file at SUPPLIER_NOTEBOOK_DATASET_PATH "
-                "(default: supplier_feature_dataset.parquet)."
-            ),
-        )
+    ds = _load_supplier_dataset_from_postgres()
 
     return {
         "rows": int(len(ds)),
@@ -462,12 +446,7 @@ def get_supplier_prepared_dataset(limit: int = 20) -> SupplierPrepareDatasetResp
 def train_supplier_model(n_clusters: int = 4, random_state: int = 42) -> SupplierTrainResponse:
     global _supplier_prepared_dataset, _supplier_train_results
 
-    ds = load_dataset_from_sources(_supplier_prepared_dataset, SUPPLIER_DB_DATASET_TABLE, SUPPLIER_NOTEBOOK_DATASET_PATH)
-    if ds is None or ds.empty:
-        raise HTTPException(
-            status_code=404,
-            detail="No supplier dataset available. Check PostgreSQL table ml.supplier or the snapshot file.",
-        )
+    ds = _load_supplier_dataset_from_postgres()
 
     _supplier_prepared_dataset = ds
 

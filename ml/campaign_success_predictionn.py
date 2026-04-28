@@ -747,7 +747,7 @@ def build_summary(
 
 
 def run_pipeline() -> dict[str, Any]:
-    connection_ok = test_connection(DbConfig())
+    connection_ok = test_connection(DbConfig.from_env())
     if not connection_ok:
         return build_summary(pd.DataFrame(), None, None, None, "connection_failed", default_business_context())
 

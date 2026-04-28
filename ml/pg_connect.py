@@ -9,6 +9,7 @@ Prerequis:
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 
 import pandas as pd
@@ -18,13 +19,17 @@ from psycopg import sql
 
 @dataclass(frozen=True)
 class DbConfig:
-    dbname: str = "pi_bi"
-    user: str = "postgres"
-    password: str = "douraid"
-    host: str = "localhost"
-    port: int = 5432
+    dbname: str = os.getenv("PGDATABASE", "pi_bi")
+    user: str = os.getenv("PGUSER", "postgres")
+    password: str = os.getenv("PGPASSWORD", "04062003")
+    host: str = os.getenv("PGHOST", "localhost")
+    port: int = int(os.getenv("PGPORT", "5432"))
     connect_timeout: int = 10
     sslmode: str = "prefer"
+
+    @classmethod
+    def from_env(cls) -> "DbConfig":
+        return cls()
 
 
 def get_connection(config: DbConfig | None = None) -> psycopg.Connection:

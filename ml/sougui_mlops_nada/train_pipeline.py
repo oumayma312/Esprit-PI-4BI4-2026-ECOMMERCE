@@ -37,7 +37,7 @@ from sklearn.preprocessing import label_binarize
 
 
 warnings.filterwarnings("ignore")
-mlflow.set_tracking_uri("file:./sougui_mlops_nada/mlruns")
+mlflow.set_tracking_uri("../mlruns")
 mlflow.set_experiment("sougui_ml_experiment")
 
 # =============================================================================
@@ -49,7 +49,7 @@ DB_HOST = "localhost"
 DB_PORT = "5432"
 DB_NAME = "sougui_Final"
 
-OUTPUT_DIR = r"C:\Users\Hazem Bouchouicha\Downloads\Sougui_outputs"
+OUTPUT_DIR = "outputs"
 RANDOM_STATE = 42
 API_PORT = 5002
 

@@ -1,0 +1,101 @@
+﻿product,category,avg_price,nb_concurrents,confidence_score,product_score,feat_cat_popularity,feat_concurrent_coverage,niveau_recommandation,cat_score
+a-collier émaillage,bijoux,95.0,1,1.0,0.9506143329126456,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier agate fartattou,bijoux,95.0,1,1.0,0.9506143329126456,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier poisson ambre,bijoux,95.0,1,1.0,0.9506143329126456,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier atika turquoise,bijoux,90.0,1,1.0,0.9501946110841162,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet argent 925,bijoux,90.0,1,1.0,0.9501946110841162,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet argent,bijoux,90.0,1,1.0,0.9501946110841162,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier soie et agate,bijoux,90.0,1,1.0,0.9501946110841162,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier argent agate,bijoux,100.0,1,1.0,0.9481693005810384,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier translucide,bijoux,100.0,1,1.0,0.9481693005810384,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier tribal,bijoux,100.0,1,1.0,0.9481693005810384,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles d'oreille ceramique,bijoux,95.0,1,0.99,0.9481143329126457,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles ciselées,bijoux,95.0,1,0.99,0.9481143329126457,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif khomsa,bijoux,95.0,1,0.99,0.9481143329126457,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif rectangulaire,bijoux,90.0,1,0.99,0.9476946110841162,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet calligraphié,bijoux,90.0,1,0.99,0.9476946110841162,1.0,1.0,Priorite haute,0.8390456193049876
+a-grand bracelet manchette,bijoux,100.0,1,0.99,0.9456693005810385,1.0,1.0,Priorite haute,0.8390456193049876
+a-couronne calligraphiée,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-lunettes rooya,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet khlel,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet serpent,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure ambre,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-bague en argent,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure quartz rouille,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles nâcre,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles glam,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier stylisé contemporain,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-chevalière hommes,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier nacre,bijoux,80.0,1,1.0,0.9456132655658671,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles d'oreille cascades,bijoux,90.0,1,0.98,0.9451946110841163,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif cuivre,bijoux,90.0,1,0.98,0.9451946110841163,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier calligraphié,bijoux,110.0,1,1.0,0.9439460629112914,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure poissons,bijoux,110.0,1,1.0,0.9439460629112914,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier anneaux tunis,bijoux,110.0,1,1.0,0.9439460629112914,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier khlel,bijoux,110.0,1,1.0,0.9439460629112914,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier argent massif,bijoux,110.0,1,1.0,0.9439460629112914,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure ethnic,bijoux,75.0,1,1.0,0.9436326390860057,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles lapis-lazuli,bijoux,75.0,1,1.0,0.9436326390860057,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier torsade,bijoux,75.0,1,1.0,0.9436326390860057,1.0,1.0,Priorite haute,0.8390456193049876
+a-porte-clé argent,bijoux,75.0,1,1.0,0.9436326390860057,1.0,1.0,Priorite haute,0.8390456193049876
+a-bijoux nacrés,bijoux,75.0,1,1.0,0.9436326390860057,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif et boucles d'oreille ambre corail,bijoux,75.0,1,1.0,0.9436326390860057,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet quartz argent,bijoux,75.0,1,1.0,0.9436326390860057,1.0,1.0,Priorite haute,0.8390456193049876
+a-broche lettre,bijoux,86.0,1,0.98,0.9432519250279057,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure poisson,bijoux,85.0,1,0.98,0.9427903389960945,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier floral,bijoux,85.0,1,0.98,0.9427903389960945,1.0,1.0,Priorite haute,0.8390456193049876
+a-bague soleil,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-bague ambre,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-bague verte,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet enfant,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-bague argent fleur,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier crayons,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier estival,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier ras du cou bleu,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier médaillon,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier bleu vert,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif incrusté or,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier pierre jaune,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif filigrane,bijoux,70.0,1,1.0,0.9418230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles argent bois,bijoux,75.0,1,0.99,0.9411326390860058,1.0,1.0,Priorite haute,0.8390456193049876
+a-bijou wasta,bijoux,75.0,1,0.99,0.9411326390860058,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier motif cuivre,bijoux,75.0,1,0.99,0.9411326390860058,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif céramique,bijoux,75.0,1,0.99,0.9411326390860058,1.0,1.0,Priorite haute,0.8390456193049876
+a-sautoir chic,bijoux,75.0,1,0.99,0.9411326390860058,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure florale,bijoux,105.0,1,0.98,0.9409571284692714,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier perles et cuivre,bijoux,95.0,1,0.96,0.9406143329126456,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure cerceau,bijoux,120.0,1,1.0,0.9404266981806364,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif ruche,bijoux,120.0,1,1.0,0.9404266981806364,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier brodé pierres semi précieuses,bijoux,120.0,1,1.0,0.9404266981806364,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier pierre mauve,bijoux,120.0,1,1.0,0.9404266981806364,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier ethno chic,bijoux,120.0,1,1.0,0.9404266981806364,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles d'oreilles bleues,bijoux,120.0,1,1.0,0.9404266981806364,1.0,1.0,Priorite haute,0.8390456193049876
+a-pendentif et boucles d'oreille perles,bijoux,120.0,1,1.0,0.9404266981806364,1.0,1.0,Priorite haute,0.8390456193049876
+a-bague trendy,bijoux,90.0,1,0.96,0.9401946110841162,1.0,1.0,Priorite haute,0.8390456193049876
+a-bague nemli,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure fantaisie,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier macramé,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles gomra,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-broche tanit,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet perle,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-broche flamant,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier éléphant,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles anneaux,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles d'oreille topaze,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure mahboub,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure anneaux,bijoux,65.0,1,1.0,0.9401631721268972,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles d'oreille filigrane,bijoux,70.0,1,0.99,0.9393230179948729,1.0,1.0,Priorite haute,0.8390456193049876
+a-accessoires cheveux,bijoux,110.0,1,0.98,0.9389460629112913,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier plume,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier poisson,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier poisson doré,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles stylisées,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-boucles d'oreille argent,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-bague crayons,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier papillon,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier laine chechias,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier kholkhal fashion,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier anneaux sousse,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-parure bois,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-collier berbère,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876
+a-bracelet bois marbre,bijoux,60.0,1,1.0,0.938635245939061,1.0,1.0,Priorite haute,0.8390456193049876

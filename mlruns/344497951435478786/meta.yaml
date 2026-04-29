@@ -1,0 +1,8 @@
+artifact_location: file:C:/Users/Hazem Bouchouicha/Desktop/sougui_mlops/mlruns/344497951435478786
+creation_time: 1777220530545
+experiment_id: '344497951435478786'
+last_update_time: 1777220530545
+lifecycle_stage: active
+name: sougui_ml_experiment
+trace_location: null
+workspace: default

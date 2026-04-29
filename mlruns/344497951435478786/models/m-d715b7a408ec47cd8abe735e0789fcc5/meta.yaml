@@ -1,0 +1,10 @@
+artifact_location: file:C:/Users/Hazem Bouchouicha/Desktop/sougui_mlops/mlruns/344497951435478786/models/m-d715b7a408ec47cd8abe735e0789fcc5/artifacts
+creation_timestamp: 1777220574933
+experiment_id: '344497951435478786'
+last_updated_timestamp: 1777220586143
+model_id: m-d715b7a408ec47cd8abe735e0789fcc5
+model_type: null
+name: model
+source_run_id: 60a8a769dd6a462ea6cf6cc319800f37
+status: 2
+status_message: null

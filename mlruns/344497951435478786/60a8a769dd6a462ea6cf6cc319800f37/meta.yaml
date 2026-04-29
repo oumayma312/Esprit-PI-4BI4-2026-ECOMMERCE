@@ -1,0 +1,14 @@
+artifact_uri: file:C:/Users/Hazem Bouchouicha/Desktop/sougui_mlops/mlruns/344497951435478786/60a8a769dd6a462ea6cf6cc319800f37/artifacts
+end_time: 1777220586166
+entry_point_name: ''
+experiment_id: '344497951435478786'
+lifecycle_stage: active
+run_id: 60a8a769dd6a462ea6cf6cc319800f37
+run_name: Random Forest
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1777220574734
+status: 3
+tags: []
+user_id: Hazem Bouchouicha

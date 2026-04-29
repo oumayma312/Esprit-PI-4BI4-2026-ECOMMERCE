@@ -1,0 +1,23 @@
+artifact_path: file:C:/Users/Hazem Bouchouicha/Desktop/sougui_mlops/mlruns/344497951435478786/models/m-c0a364b122c24fa7a25cea5d0e8bcdee/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.14.2
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+mlflow_version: 3.11.1
+model_id: m-c0a364b122c24fa7a25cea5d0e8bcdee
+model_size_bytes: 90433
+model_uuid: m-c0a364b122c24fa7a25cea5d0e8bcdee
+prompts: null
+run_id: f38ce2ade7e24d949a1126cbebfe27b5
+utc_time_created: '2026-04-26 16:23:06.410265'

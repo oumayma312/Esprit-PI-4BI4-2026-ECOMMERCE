@@ -38,3 +38,6 @@ Thumbs.db
 mlruns/
 mlartifacts/
 mlops_artifacts/
+
+
+ml/.env

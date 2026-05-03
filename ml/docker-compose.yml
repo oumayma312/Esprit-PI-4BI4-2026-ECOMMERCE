@@ -17,9 +17,9 @@ services:
       ML_SUPPLIER_TABLE: ${ML_SUPPLIER_TABLE:-supplier_clusters}
       ML_SELL_TABLE: ${ML_SELL_TABLE:-best_time_to_sell_monthly}
       ML_PROMOTE_TABLE: ${ML_PROMOTE_TABLE:-best_time_to_promote_monthly}
-      SUPPLIER_MODEL_PATH: ${SUPPLIER_MODEL_PATH:-supplier_clustering_model.pkl}
-      SELL_MODEL_PATH: ${SELL_MODEL_PATH:-best_time_to_sell_model.pkl}
-      PROMOTE_MODEL_PATH: ${PROMOTE_MODEL_PATH:-best_time_to_promote_model.pkl}
+      SUPPLIER_MODEL_PATH: ${SUPPLIER_MODEL_PATH:-models/supplier_clustering_model.pkl}
+      SELL_MODEL_PATH: ${SELL_MODEL_PATH:-models/best_time_to_sell_model.pkl}
+      PROMOTE_MODEL_PATH: ${PROMOTE_MODEL_PATH:-models/best_time_to_promote_model.pkl}
       MLFLOW_TRACKING_URI: http://mlflow:5000
       MLFLOW_EXPERIMENT_NAME: supplier_clustering
       MLFLOW_PROMOTE_EXPERIMENT_NAME: ${MLFLOW_PROMOTE_EXPERIMENT_NAME:-promote-forecasting}
@@ -41,7 +41,7 @@ services:
       dockerfile: Dockerfile
     command: python flask_app.py
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       FASTAPI_BASE_URL: http://api:8000
       FLASK_HOST: 0.0.0.0
@@ -55,6 +55,37 @@ services:
       - .:/app
     depends_on:
       - api
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "localhost:host-gateway"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana-oss:11.1.4
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
 
   mlflow:
     build:
@@ -71,3 +102,5 @@ services:
 volumes:
   mlruns:
   mlartifacts:
+  prometheus-data:
+  grafana-data:

@@ -31,9 +31,9 @@ def _load_local_env_file() -> None:
 _load_local_env_file()
 
 APP_DIR = Path(__file__).resolve().parent
-SUPPLIER_MODEL_PATH = os.getenv("SUPPLIER_MODEL_PATH", "supplier_clustering_model.pkl")
-SELL_MODEL_PATH = os.getenv("SELL_MODEL_PATH", "best_time_to_sell_model.pkl")
-PROMOTE_MODEL_PATH = os.getenv("PROMOTE_MODEL_PATH", "best_time_to_promote_model.pkl")
+SUPPLIER_MODEL_PATH = os.getenv("SUPPLIER_MODEL_PATH", "models/supplier_clustering_model.pkl")
+SELL_MODEL_PATH = os.getenv("SELL_MODEL_PATH", "models/best_time_to_sell_model.pkl")
+PROMOTE_MODEL_PATH = os.getenv("PROMOTE_MODEL_PATH", "models/best_time_to_promote_model.pkl")
 
 
 def _is_valid_identifier(name: str | None) -> bool:

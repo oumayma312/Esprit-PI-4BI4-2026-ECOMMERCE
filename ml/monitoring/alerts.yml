@@ -1,0 +1,38 @@
+groups:
+  - name: sougui-api-alerts
+    rules:
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum by (le, handler) (rate(http_request_duration_seconds_bucket[5m]))) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Endpoint latency above 2 seconds"
+          description: "The 95th percentile latency is above 2 seconds on {{ $labels.handler }}."
+
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / clamp_min(sum(rate(http_requests_total[5m])), 1) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API error rate above 5%"
+          description: "The error rate for the API is above 5% over the last 5 minutes."
+
+      - alert: ModelPrecisionDrop
+        expr: ml_drift_metric_value{model="supplier_clustering",metric="precision_drop_ratio"} > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Supplier model quality dropped"
+          description: "The supplier clustering quality dropped by more than 5%."
+
+      - alert: DriftDetected
+        expr: ml_drift_metric_value{model="supplier_clustering",metric="detected"} == 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Supplier drift detected"
+          description: "The supplier clustering drift checks flagged a drift condition."

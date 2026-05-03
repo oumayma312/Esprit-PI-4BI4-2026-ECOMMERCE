@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import uuid
@@ -23,6 +24,7 @@ from api_common import (
     save_versioned_artifact,
     safe_head,
 )
+from observability import log_event, publish_data_metrics, publish_model_metrics, record_retraining_trigger
 
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
 
@@ -39,7 +41,8 @@ except Exception:
 
 router = APIRouter(tags=["sell"])
 
-SELL_TRAIN_MODEL_PATH = "sell_training_model_api.pkl"
+SELL_MODEL_NAME = "best_time_to_sell"
+SELL_TRAIN_MODEL_PATH = "models/sell_training_model_api.pkl"
 SELL_NOTEBOOK_DATASET_PATH = "sell_feature_dataset.parquet"
 SELL_DB_DATASET_TABLE = "sell"
 _sell_prepared_dataset: pd.DataFrame | None = None
@@ -263,6 +266,8 @@ def get_sell_dataset(limit: int = 20) -> SellPrepareDatasetResponse:
             ),
         )
 
+        publish_data_metrics(SELL_MODEL_NAME, ds, source_path=SELL_NOTEBOOK_DATASET_PATH)
+
     feature_cols = [c for c in ds.columns if c not in ["ds", "y"]]
     return {
         "rows": int(len(ds)),
@@ -283,6 +288,8 @@ def train_sell_model(random_state: int = 42) -> SellTrainResponse:
         )
 
     _sell_prepared_dataset = ds
+    publish_data_metrics(SELL_MODEL_NAME, ds, source_path=SELL_NOTEBOOK_DATASET_PATH)
+    record_retraining_trigger(SELL_MODEL_NAME, "manual_train_endpoint", rows=len(ds), random_state=random_state)
 
     ds = ds.copy().sort_values("ds")
     feature_cols = [c for c in ds.columns if c not in ["ds", "y"]]
@@ -312,6 +319,7 @@ def train_sell_model(random_state: int = 42) -> SellTrainResponse:
     versioned_model_path = save_versioned_artifact({"model": model, "feature_columns": feature_cols, "task": "sell_train_api"}, SELL_TRAIN_MODEL_PATH)
 
     selected_metrics = {"mae": mae, "rmse": rmse, "mape": mape}
+    publish_model_metrics(SELL_MODEL_NAME, selected_metrics)
 
     comparison_model = RandomForestRegressor(n_estimators=comparison_n_estimators, random_state=random_state)
     comparison_model.fit(X_train, y_train)
@@ -356,6 +364,14 @@ def train_sell_model(random_state: int = 42) -> SellTrainResponse:
         "metrics": {"mae": mae, "rmse": rmse, "mape": mape},
     }
 
+    log_event(
+        logging.INFO,
+        "sell_training_completed",
+        rows_train=int(len(train_df)),
+        rows_test=int(len(test_df)),
+        metrics=selected_metrics,
+    )
+
     return {
         "model_path": SELL_TRAIN_MODEL_PATH,
         "versioned_model_path": versioned_model_path,
@@ -380,6 +396,7 @@ def predict_sell(limit: int = 100) -> SellPredictResponse:
 
     rec = compute_sell_recommendation_from_forecast(forecast_df)
     rows = safe_head(forecast_df, n=max(1, min(limit, 5000)))
+    publish_data_metrics(SELL_MODEL_NAME, forecast_df, source_path=SELL_NOTEBOOK_DATASET_PATH)
 
     return {
         "best_model": artifact.get("best_model"),
@@ -459,6 +476,7 @@ def save_sell_monthly() -> SellMonthlySaveResponse:
         if c not in out.columns:
             out[c] = np.nan
     out = out[keep].copy()
+    publish_data_metrics(SELL_MODEL_NAME, out, source_path=SELL_NOTEBOOK_DATASET_PATH)
 
     run_id = str(uuid.uuid4())
     created_at = datetime.now(timezone.utc)

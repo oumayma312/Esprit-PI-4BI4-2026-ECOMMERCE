@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 import uuid
@@ -24,6 +25,7 @@ from api_common import (
     save_versioned_artifact,
     safe_head,
 )
+from observability import log_event, publish_data_metrics, publish_model_metrics, record_retraining_trigger, set_model_metric
 
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
 PROMOTE_EXPERIMENT_NAME = os.getenv("MLFLOW_PROMOTE_EXPERIMENT_NAME", "promote-forecasting")
@@ -43,6 +45,7 @@ except Exception:
 
 router = APIRouter(tags=["promote"])
 
+PROMOTE_MODEL_NAME = "best_time_to_promote"
 PROMOTE_TRAIN_MODEL_PATH = os.getenv("PROMOTE_TRAIN_MODEL_PATH", PROMOTE_MODEL_PATH)
 PROMOTE_NOTEBOOK_DATASET_PATH = os.getenv("PROMOTE_NOTEBOOK_DATASET_PATH", "promote_feature_dataset.parquet")
 PROMOTE_DB_DATASET_TABLE = os.getenv("ML_PROMOTE_DATASET_TABLE", "promote")
@@ -524,6 +527,8 @@ def _train_and_save_promote_artifact(random_state: int = 42) -> tuple[dict[str, 
     global _promote_train_results
 
     ds = _load_promote_training_dataset()
+    publish_data_metrics(PROMOTE_MODEL_NAME, ds, source_path=PROMOTE_NOTEBOOK_DATASET_PATH)
+    record_retraining_trigger(PROMOTE_MODEL_NAME, "manual_train_endpoint", rows=len(ds), random_state=random_state)
     ds = ds.copy().sort_values("ds").reset_index(drop=True)
     feature_cols = [c for c in ds.columns if c not in ["ds", "y"]]
     split_idx = max(14, int(len(ds) * 0.8))
@@ -616,6 +621,15 @@ def _train_and_save_promote_artifact(random_state: int = 42) -> tuple[dict[str, 
     joblib.dump(artifact, resolve_output_path(PROMOTE_MODEL_PATH))
     if PROMOTE_TRAIN_MODEL_PATH != PROMOTE_MODEL_PATH:
         save_versioned_artifact(artifact, PROMOTE_TRAIN_MODEL_PATH)
+    publish_model_metrics(PROMOTE_MODEL_NAME, {**best_metrics, "confidence": _promote_confidence_score(artifact)})
+    log_event(
+        logging.INFO,
+        "promote_training_completed",
+        best_model=best_model_name,
+        rows_train=int(len(train_df)),
+        rows_test=int(len(test_df)),
+        metrics=best_metrics,
+    )
     _promote_train_results = summary
     return artifact, summary
 
@@ -695,6 +709,7 @@ def _build_pg_engine_from_env() -> Any:
 def get_promote_dataset(limit: int = 20) -> PromotePrepareDatasetResponse:
     n = max(1, min(limit, 5000))
     ds = _load_promote_training_dataset()
+    publish_data_metrics(PROMOTE_MODEL_NAME, ds, source_path=PROMOTE_NOTEBOOK_DATASET_PATH)
     feature_cols = [c for c in ds.columns if c not in ["ds", "y"]]
     return {
         "rows": int(len(ds)),
@@ -733,6 +748,7 @@ def predict_promote(limit: int = 100) -> PromotePredictResponse:
         raise HTTPException(status_code=404, detail="No promote forecast available.")
     if not isinstance(promo_plan_2027, pd.DataFrame):
         promo_plan_2027 = pd.DataFrame()
+    publish_data_metrics(PROMOTE_MODEL_NAME, monthly_2027, source_path=PROMOTE_NOTEBOOK_DATASET_PATH)
     return {
         "best_model": artifact.get("best_model"),
         "best_month": artifact.get("best_month"),
@@ -814,6 +830,10 @@ def predict_promote_from_form(payload: PromoteFormPredictRequest) -> PromoteForm
 
     mlflow_info = artifact.get("mlflow") if isinstance(artifact.get("mlflow"), dict) else None
     best_run = mlflow_info.get("best_run") if isinstance(mlflow_info, dict) and isinstance(mlflow_info.get("best_run"), dict) else None
+    confidence_score = float(round(_promote_confidence_score(artifact), 4))
+    publish_model_metrics(PROMOTE_MODEL_NAME, {"confidence": confidence_score, "uplift_pct": uplift_pct})
+    if confidence_score < 0.55:
+        log_event(logging.WARNING, "promote_low_confidence_prediction", confidence=confidence_score)
     return {
         "best_model": artifact.get("best_model"),
         "model_version": str(best_run.get("registered_model_version")) if best_run and best_run.get("registered_model_version") else None,
@@ -824,7 +844,7 @@ def predict_promote_from_form(payload: PromoteFormPredictRequest) -> PromoteForm
         "uplift_pct": float(round(uplift_pct, 4)),
         "recommended_discount_pct": float(round(recommended_discount_pct, 2)),
         "recommended_discount_display": f"{recommended_discount_pct:.1f}%",
-        "confidence_score": float(round(_promote_confidence_score(artifact), 4)),
+        "confidence_score": confidence_score,
         "mlflow": mlflow_info,
         "inputs": {
             "date": payload.date.isoformat(),
@@ -854,6 +874,7 @@ def save_promote_monthly() -> PromoteMonthlySaveResponse:
     monthly_2027 = artifact.get("monthly_2027")
     if not isinstance(monthly_2027, pd.DataFrame) or monthly_2027.empty:
         raise HTTPException(status_code=404, detail="No promote forecast available to save.")
+    publish_data_metrics(PROMOTE_MODEL_NAME, monthly_2027, source_path=PROMOTE_NOTEBOOK_DATASET_PATH)
 
     out = monthly_2027.copy()
     out["month"] = out["month"].astype(str)

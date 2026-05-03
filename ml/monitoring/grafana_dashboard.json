@@ -1,0 +1,118 @@
+{
+  "uid": "sougui-ml-observability",
+  "title": "Sougui ML Observability",
+  "tags": ["sougui", "ml", "prometheus"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "style": "dark",
+  "editable": true,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Traffic by endpoint",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[5m])) by (handler)",
+          "legendFormat": "{{handler}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency p95 by endpoint",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, handler))",
+          "legendFormat": "{{handler}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Error rate",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_total[5m])), 1)",
+          "legendFormat": "5xx rate",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Model health",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "ml_model_metric_value{model=\"supplier_clustering\",metric=\"inertia\"}",
+          "legendFormat": "supplier inertia",
+          "refId": "A"
+        },
+        {
+          "expr": "ml_model_metric_value{model=\"supplier_clustering\",metric=\"silhouette\"}",
+          "legendFormat": "supplier silhouette",
+          "refId": "B"
+        },
+        {
+          "expr": "ml_model_metric_value{model=\"supplier_clustering\",metric=\"confidence\"}",
+          "legendFormat": "supplier confidence",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Data health",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "ml_data_metric_value{metric=\"missing_ratio\"}",
+          "legendFormat": "{{model}} missing ratio",
+          "refId": "A"
+        },
+        {
+          "expr": "ml_data_metric_value{metric=\"freshness_seconds\"}",
+          "legendFormat": "{{model}} freshness (s)",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      }
+    }
+  ]
+}

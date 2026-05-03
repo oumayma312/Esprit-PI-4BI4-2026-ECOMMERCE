@@ -1,6 +1,8 @@
 fastapi
 uvicorn
 flask
+prometheus-fastapi-instrumentator
+httpx
 pandas
 numpy
 scikit-learn

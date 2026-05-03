@@ -1,3 +1,5 @@
+import logging
+import math
 import os
 import re
 import uuid
@@ -6,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 import joblib
+import numpy as np
 import pandas as pd
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -21,6 +24,7 @@ from api_common import (
     save_versioned_artifact,
     safe_head,
 )
+from observability import log_event, publish_data_metrics, publish_drift_metrics, publish_model_metrics, record_retraining_trigger, set_model_metric
 
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
 
@@ -37,6 +41,7 @@ except Exception:
 
 router = APIRouter(tags=["supplier"])
 
+SUPPLIER_MODEL_NAME = "supplier_clustering"
 SUPPLIER_TRAIN_MODEL_PATH = os.getenv("SUPPLIER_TRAIN_MODEL_PATH", SUPPLIER_MODEL_PATH)
 SUPPLIER_NOTEBOOK_DATASET_PATH = os.getenv("SUPPLIER_NOTEBOOK_DATASET_PATH", "supplier_feature_dataset.parquet")
 SUPPLIER_DB_DATASET_TABLE = os.getenv("ML_SUPPLIER_DATASET_TABLE", "supplier")
@@ -88,6 +93,18 @@ class SupplierTrainResponse(BaseModel):
 class SupplierTrainResultsResponse(BaseModel):
     available: bool
     results: dict[str, Any] | None = None
+
+
+class SupplierDriftResponse(BaseModel):
+    drift_detected: bool
+    distribution_shift: float
+    precision_drop_ratio: float
+    confidence_drop_ratio: float
+    baseline_silhouette: float | None = None
+    current_silhouette: float | None = None
+    baseline_confidence: float | None = None
+    current_confidence: float | None = None
+    note: str | None = None
 
 
 class SupplierPredictRequest(BaseModel):
@@ -233,6 +250,61 @@ def _cluster_name_from_id(cluster_id: int) -> str:
     return f"Cluster {cluster_id + 1}"
 
 
+def _align_supplier_feature_frame(features: pd.DataFrame, feature_columns: list[str]) -> pd.DataFrame:
+    aligned = features.copy()
+    for column in feature_columns:
+        if column not in aligned.columns:
+            aligned[column] = 0.0
+    aligned = aligned.reindex(columns=feature_columns, fill_value=0.0).copy()
+    for column in aligned.columns:
+        aligned[column] = pd.to_numeric(aligned[column], errors="coerce").fillna(0.0)
+    return aligned
+
+
+def _supplier_prediction_confidence(model: Any, scaled_features: np.ndarray) -> float:
+    if scaled_features is None or len(scaled_features) == 0:
+        return float("nan")
+    distances = model.transform(scaled_features)
+    if distances is None or len(distances) == 0:
+        return float("nan")
+    min_distances = np.min(distances, axis=1)
+    confidence = 1.0 / (1.0 + min_distances)
+    return float(np.mean(confidence))
+
+
+def _supplier_feature_summary(features: pd.DataFrame) -> dict[str, dict[str, float]]:
+    summary: dict[str, dict[str, float]] = {}
+    for column in features.columns:
+        series = pd.to_numeric(features[column], errors="coerce")
+        summary[column] = {
+            "mean": float(series.mean()) if not series.empty else 0.0,
+            "std": float(series.std(ddof=0)) if not series.empty else 0.0,
+        }
+    return summary
+
+
+def _supplier_distribution_shift(current_features: pd.DataFrame, training_summary: dict[str, Any] | None) -> float:
+    if not isinstance(training_summary, dict) or not training_summary:
+        return float("nan")
+
+    shifts: list[float] = []
+    for column in current_features.columns:
+        current_series = pd.to_numeric(current_features[column], errors="coerce")
+        if current_series.empty:
+            continue
+        baseline = training_summary.get(column)
+        if not isinstance(baseline, dict):
+            continue
+        baseline_mean = float(baseline.get("mean", 0.0))
+        current_mean = float(current_series.mean())
+        reference = max(abs(baseline_mean), 1e-9)
+        shifts.append(abs(current_mean - baseline_mean) / reference)
+
+    if not shifts:
+        return float("nan")
+    return float(np.mean(shifts))
+
+
 def _load_supplier_dataset_from_postgres() -> pd.DataFrame:
     ml_schema = os.getenv("ML_SCHEMA", "ml")
     dataset = load_ml_dataset_from_db(SUPPLIER_DB_DATASET_TABLE, schema_name=ml_schema)
@@ -280,6 +352,14 @@ def _train_supplier_artifact(dataset: pd.DataFrame, n_clusters: int = 4, random_
     X_scaled = scaler.fit_transform(features)
     model = KMeans(n_clusters=n_clusters, random_state=random_state, n_init=10)
     labels = model.fit_predict(X_scaled)
+    silhouette = float("nan")
+    if len(np.unique(labels)) >= 2 and len(X_scaled) > len(np.unique(labels)):
+        try:
+            silhouette = float(silhouette_score(X_scaled, labels))
+        except Exception:
+            silhouette = float("nan")
+
+    baseline_confidence = _supplier_prediction_confidence(model, X_scaled)
     supplier_clusters = _build_supplier_clusters_frame(work, labels)
     artifact = {
         "task": "supplier_train_api",
@@ -288,6 +368,11 @@ def _train_supplier_artifact(dataset: pd.DataFrame, n_clusters: int = 4, random_
         "feature_columns": list(features.columns),
         "n_clusters": int(n_clusters),
         "supplier_clusters": supplier_clusters,
+        "baseline_inertia": float(model.inertia_),
+        "baseline_silhouette": silhouette,
+        "baseline_confidence": baseline_confidence,
+        "training_feature_summary": _supplier_feature_summary(features),
+        "trained_at_utc": datetime.now(timezone.utc).isoformat(),
     }
     return artifact, features, X_scaled, supplier_clusters
 
@@ -434,6 +519,7 @@ def save_supplier_clusters() -> SupplierClusterSaveResponse:
 def get_supplier_prepared_dataset(limit: int = 20) -> SupplierPrepareDatasetResponse:
     n = max(1, min(limit, 5000))
     ds = _load_supplier_dataset_from_postgres()
+    publish_data_metrics(SUPPLIER_MODEL_NAME, ds)
 
     return {
         "rows": int(len(ds)),
@@ -447,6 +533,8 @@ def train_supplier_model(n_clusters: int = 4, random_state: int = 42) -> Supplie
     global _supplier_prepared_dataset, _supplier_train_results
 
     ds = _load_supplier_dataset_from_postgres()
+    publish_data_metrics(SUPPLIER_MODEL_NAME, ds)
+    record_retraining_trigger(SUPPLIER_MODEL_NAME, "manual_train_endpoint", rows=len(ds), n_clusters=n_clusters)
 
     _supplier_prepared_dataset = ds
 
@@ -458,6 +546,25 @@ def train_supplier_model(n_clusters: int = 4, random_state: int = 42) -> Supplie
     versioned_model_path = save_versioned_artifact(artifact, SUPPLIER_MODEL_PATH)
     if SUPPLIER_TRAIN_MODEL_PATH != SUPPLIER_MODEL_PATH:
         save_versioned_artifact(artifact, SUPPLIER_TRAIN_MODEL_PATH)
+
+    publish_model_metrics(
+        SUPPLIER_MODEL_NAME,
+        {
+            "inertia": float(model.inertia_),
+            "silhouette": artifact.get("baseline_silhouette"),
+            "confidence": artifact.get("baseline_confidence"),
+            "quality_drop_ratio": 0.0,
+        },
+    )
+    publish_drift_metrics(
+        SUPPLIER_MODEL_NAME,
+        {
+            "distribution_shift": 0.0,
+            "precision_drop_ratio": 0.0,
+            "confidence_drop_ratio": 0.0,
+            "detected": 0.0,
+        },
+    )
 
     comparison_k = 2 if n_clusters != 2 else 3
     comparison_enabled = len(X) >= comparison_k
@@ -504,6 +611,16 @@ def train_supplier_model(n_clusters: int = 4, random_state: int = 42) -> Supplie
         "cluster_counts": {str(k): int(v) for k, v in label_counts.items()},
     }
 
+    log_event(
+        logging.INFO,
+        "supplier_training_completed",
+        rows=int(len(X)),
+        n_clusters=int(n_clusters),
+        inertia=float(model.inertia_),
+        silhouette=artifact.get("baseline_silhouette"),
+        confidence=artifact.get("baseline_confidence"),
+    )
+
     return {
         "model_path": SUPPLIER_MODEL_PATH,
         "versioned_model_path": versioned_model_path,
@@ -527,15 +644,123 @@ def predict_supplier_cluster(payload: SupplierPredictRequest) -> SupplierPredict
     input_df = _build_supplier_features_from_request(payload, feature_columns)
     scaled = scaler.transform(input_df)
     predicted_cluster_id = int(model.predict(scaled)[0])
+    confidence = _supplier_prediction_confidence(model, scaled)
+    set_model_metric(SUPPLIER_MODEL_NAME, "confidence", confidence)
 
     cluster_map = _supplier_cluster_name_map(artifact.get("supplier_clusters") if isinstance(artifact, dict) else None)
     predicted_cluster_name = cluster_map.get(predicted_cluster_id)
+
+    note = None
+    if not math.isnan(confidence) and confidence < 0.55:
+        note = "Low confidence prediction. Consider retraining or checking data drift."
+        log_event(
+            logging.WARNING,
+            "supplier_low_confidence_prediction",
+            confidence=float(confidence),
+            predicted_cluster_id=predicted_cluster_id,
+        )
 
     return {
         "predicted_cluster_id": predicted_cluster_id,
         "predicted_cluster_name": predicted_cluster_name,
         "model_path": SUPPLIER_MODEL_PATH,
-        "note": None,
+        "note": note,
+    }
+
+
+@router.get("/drift/supplier", response_model=SupplierDriftResponse)
+def detect_supplier_drift() -> SupplierDriftResponse:
+    artifact = ensure_supplier_prediction_artifact()
+    model = artifact.get("model")
+    scaler = artifact.get("scaler")
+    feature_columns = artifact.get("feature_columns")
+    if model is None or scaler is None or not isinstance(feature_columns, list) or not feature_columns:
+        raise HTTPException(status_code=500, detail="Supplier artifact is missing model metadata.")
+
+    ds = _load_supplier_dataset_from_postgres()
+    publish_data_metrics(SUPPLIER_MODEL_NAME, ds)
+
+    features = _prepare_supplier_features(ds)
+    features = _align_supplier_feature_frame(features, feature_columns)
+    scaled = scaler.transform(features)
+    labels = model.predict(scaled)
+
+    baseline_summary = artifact.get("training_feature_summary") if isinstance(artifact.get("training_feature_summary"), dict) else None
+    distribution_shift = _supplier_distribution_shift(features, baseline_summary)
+
+    baseline_silhouette = artifact.get("baseline_silhouette")
+    current_silhouette = float("nan")
+    if len(np.unique(labels)) >= 2 and len(scaled) > len(np.unique(labels)):
+        try:
+            current_silhouette = float(silhouette_score(scaled, labels))
+        except Exception:
+            current_silhouette = float("nan")
+
+    baseline_confidence = artifact.get("baseline_confidence")
+    current_confidence = _supplier_prediction_confidence(model, scaled)
+
+    precision_drop_ratio = 0.0
+    if isinstance(baseline_silhouette, (int, float)) and not math.isnan(float(baseline_silhouette)) and not math.isnan(current_silhouette):
+        baseline_silhouette_value = float(baseline_silhouette)
+        if baseline_silhouette_value != 0.0:
+            precision_drop_ratio = max(0.0, (baseline_silhouette_value - current_silhouette) / abs(baseline_silhouette_value))
+
+    confidence_drop_ratio = 0.0
+    if isinstance(baseline_confidence, (int, float)) and not math.isnan(float(baseline_confidence)) and not math.isnan(current_confidence):
+        baseline_confidence_value = float(baseline_confidence)
+        if baseline_confidence_value != 0.0:
+            confidence_drop_ratio = max(0.0, (baseline_confidence_value - current_confidence) / abs(baseline_confidence_value))
+
+    drift_detected = bool(
+        (not math.isnan(distribution_shift) and distribution_shift > 0.10)
+        or precision_drop_ratio > 0.05
+        or confidence_drop_ratio > 0.10
+    )
+
+    publish_model_metrics(SUPPLIER_MODEL_NAME, {"confidence": current_confidence})
+    publish_drift_metrics(
+        SUPPLIER_MODEL_NAME,
+        {
+            "distribution_shift": distribution_shift,
+            "precision_drop_ratio": precision_drop_ratio,
+            "confidence_drop_ratio": confidence_drop_ratio,
+            "detected": 1.0 if drift_detected else 0.0,
+        },
+    )
+
+    log_event(
+        logging.WARNING if drift_detected else logging.INFO,
+        "supplier_drift_check",
+        drift_detected=drift_detected,
+        distribution_shift=distribution_shift,
+        precision_drop_ratio=precision_drop_ratio,
+        confidence_drop_ratio=confidence_drop_ratio,
+        baseline_silhouette=baseline_silhouette,
+        current_silhouette=current_silhouette,
+        baseline_confidence=baseline_confidence,
+        current_confidence=current_confidence,
+    )
+
+    if drift_detected:
+        log_event(
+            logging.WARNING,
+            "supplier_drift_detected",
+            reason="threshold_exceeded",
+            distribution_shift=distribution_shift,
+            precision_drop_ratio=precision_drop_ratio,
+            confidence_drop_ratio=confidence_drop_ratio,
+        )
+
+    return {
+        "drift_detected": drift_detected,
+        "distribution_shift": float(distribution_shift) if not math.isnan(distribution_shift) else 0.0,
+        "precision_drop_ratio": float(precision_drop_ratio),
+        "confidence_drop_ratio": float(confidence_drop_ratio),
+        "baseline_silhouette": float(baseline_silhouette) if isinstance(baseline_silhouette, (int, float)) and not math.isnan(float(baseline_silhouette)) else None,
+        "current_silhouette": float(current_silhouette) if not math.isnan(current_silhouette) else None,
+        "baseline_confidence": float(baseline_confidence) if isinstance(baseline_confidence, (int, float)) and not math.isnan(float(baseline_confidence)) else None,
+        "current_confidence": float(current_confidence) if not math.isnan(current_confidence) else None,
+        "note": "Drift threshold exceeded." if drift_detected else "No drift detected.",
     }
 
 

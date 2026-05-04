@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% block title %}Promote - ML Dashboard{% endblock %}
+
+{% block content %}
+  <section class="hero reveal" id="promote-section">
+    <div class="logo-box">
+      <img src="{{ url_for('logo') }}" alt="Logo du projet" />
+    </div>
+    <div>
+      <h1>Promote Intelligence</h1>
+      <p>Predisez un scenario de promotion, relisez le forecast 2027 et suivez le modele avec MLflow.</p>
+      <span class="pill">API source: {{ api_base or 'indisponible' }}</span>
+      <span class="pill">Formulaire interactif</span>
+      <span class="pill">Tracking MLflow</span>
+      <div class="actions mt-16">
+        <a class="button primary" href="#promote-form">Predire ce scenario</a>
+        <form class="inline-form" method="post" action="{{ url_for('promote_train') }}">
+          <button class="button secondary" type="submit">Reentrainer le modele</button>
+        </form>
+        <form class="inline-form" method="post" action="{{ url_for('promote_run') }}">
+          <button class="button secondary" type="submit">Rafraichir le forecast</button>
+        </form>
+        <a class="button secondary" href="{{ url_for('promote') }}" data-nav="true">Reinitialiser</a>
+      </div>
+    </div>
+  </section>
+
+  {% if errors %}
+    {% for error_item in errors %}
+      <div class="alert reveal">{{ error_item }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="layout">
+    <section class="card reveal" id="promote-form">
+      <h2>Formulaire Promote</h2>
+      <p class="muted">Saisissez votre contexte commercial pour obtenir une recommandation de promotion plus logique et plus fine.</p>
+
+      <form class="form-grid" method="post" action="{{ url_for('promote_predict') }}">
+        <div class="row-2">
+          <div>
+            <label for="date">Date cible</label>
+            <input
+              id="date"
+              name="date"
+              type="date"
+              value="{{ input_values.get('date', '') }}"
+              class="{{ 'input-error' if field_errors.get('date') else '' }}"
+              required
+            />
+            {% if field_errors.get('date') %}
+              <small class="field-error">{{ field_errors.get('date') }}</small>
+            {% endif %}
+          </div>
+          <div>
+            <label for="planned_discount_pct">Remise planifiee (%)</label>
+            <input
+              id="planned_discount_pct"
+              name="planned_discount_pct"
+              type="number"
+              step="0.1"
+              min="0"
+              max="90"
+              value="{{ input_values.get('planned_discount_pct', '') }}"
+              class="{{ 'input-error' if field_errors.get('planned_discount_pct') else '' }}"
+              required
+            />
+            {% if field_errors.get('planned_discount_pct') %}
+              <small class="field-error">{{ field_errors.get('planned_discount_pct') }}</small>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label for="last_day_revenue">CA dernier jour</label>
+            <input
+              id="last_day_revenue"
+              name="last_day_revenue"
+              type="number"
+              step="0.01"
+              min="0"
+              value="{{ input_values.get('last_day_revenue', '') }}"
+              class="{{ 'input-error' if field_errors.get('last_day_revenue') else '' }}"
+              required
+            />
+            {% if field_errors.get('last_day_revenue') %}
+              <small class="field-error">{{ field_errors.get('last_day_revenue') }}</small>
+            {% endif %}
+          </div>
+          <div>
+            <label for="rolling_7d_revenue">Moyenne mobile 7 jours</label>
+            <input
+              id="rolling_7d_revenue"
+              name="rolling_7d_revenue"
+              type="number"
+              step="0.01"
+              min="0"
+              value="{{ input_values.get('rolling_7d_revenue', '') }}"
+              class="{{ 'input-error' if field_errors.get('rolling_7d_revenue') else '' }}"
+              required
+            />
+            {% if field_errors.get('rolling_7d_revenue') %}
+              <small class="field-error">{{ field_errors.get('rolling_7d_revenue') }}</small>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label for="last_week_revenue">CA semaine precedente</label>
+            <input
+              id="last_week_revenue"
+              name="last_week_revenue"
+              type="number"
+              step="0.01"
+              min="0"
+              value="{{ input_values.get('last_week_revenue', '') }}"
+              class="{{ 'input-error' if field_errors.get('last_week_revenue') else '' }}"
+              required
+            />
+            {% if field_errors.get('last_week_revenue') %}
+              <small class="field-error">{{ field_errors.get('last_week_revenue') }}</small>
+            {% endif %}
+          </div>
+          <div>
+            <label for="two_weeks_revenue">CA deux semaines avant</label>
+            <input
+              id="two_weeks_revenue"
+              name="two_weeks_revenue"
+              type="number"
+              step="0.01"
+              min="0"
+              value="{{ input_values.get('two_weeks_revenue', '') }}"
+              class="{{ 'input-error' if field_errors.get('two_weeks_revenue') else '' }}"
+              required
+            />
+            {% if field_errors.get('two_weeks_revenue') %}
+              <small class="field-error">{{ field_errors.get('two_weeks_revenue') }}</small>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label for="ramadan_days">Jours Ramadan restants</label>
+            <input
+              id="ramadan_days"
+              name="ramadan_days"
+              type="number"
+              step="1"
+              min="0"
+              max="30"
+              value="{{ input_values.get('ramadan_days', '') }}"
+              class="{{ 'input-error' if field_errors.get('ramadan_days') else '' }}"
+              required
+            />
+            {% if field_errors.get('ramadan_days') %}
+              <small class="field-error">{{ field_errors.get('ramadan_days') }}</small>
+            {% endif %}
+          </div>
+          <div>
+            <label for="eid_window_days">Jours de fenetre Eid</label>
+            <input
+              id="eid_window_days"
+              name="eid_window_days"
+              type="number"
+              step="1"
+              min="0"
+              max="10"
+              value="{{ input_values.get('eid_window_days', '') }}"
+              class="{{ 'input-error' if field_errors.get('eid_window_days') else '' }}"
+              required
+            />
+            {% if field_errors.get('eid_window_days') %}
+              <small class="field-error">{{ field_errors.get('eid_window_days') }}</small>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="button primary" type="submit">Envoyer vers l'API</button>
+        </div>
+      </form>
+
+      {% if form_result %}
+        <div class="result-box result-panel">
+          <h3>Prediction du scenario</h3>
+          <div class="grid mt-10">
+            <div class="metric"><small>Decision</small><strong>{{ form_result.decision }}</strong></div>
+            <div class="metric"><small>Niveau de demande</small><strong>{{ form_result.demand_level }}</strong></div>
+            <div class="metric"><small>CA projete</small><strong>{{ '%.2f'|format(form_result.predicted_revenue) }}</strong></div>
+            <div class="metric"><small>Base de reference</small><strong>{{ '%.2f'|format(form_result.baseline_revenue) }}</strong></div>
+            <div class="metric"><small>Uplift</small><strong>{{ '%.2f'|format(form_result.uplift_pct * 100) }}%</strong></div>
+            <div class="metric"><small>Remise recommandee</small><strong>{{ form_result.recommended_discount_display }}</strong></div>
+            <div class="metric"><small>Confiance</small><strong>{{ '%.2f'|format(form_result.confidence_score * 100) }}%</strong></div>
+            <div class="metric"><small>Modele</small><strong>{{ form_result.best_model or 'n/a' }}</strong></div>
+          </div>
+
+          {% if form_result.reasoning %}
+            <ul class="reason-list">
+              {% for reason in form_result.reasoning %}
+                <li>{{ reason }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% else %}
+        <div class="metric mt-16">
+          <small>Scenario</small>
+          <strong>Le resultat de la prediction apparaitra ici apres l'envoi du formulaire.</strong>
+        </div>
+      {% endif %}
+    </section>
+
+    <aside class="card reveal">
+      <h2>Tracking du modele</h2>
+      <p class="muted">Suivi du service FastAPI, des performances du modele et des metadonnees MLflow.</p>
+
+      <div class="status-list">
+        <div class="status-item">
+          <div>
+            <strong>API health</strong><br />
+            <span>{{ health.status if health else 'indisponible' }}</span>
+          </div>
+          <div><span class="dot {{ 'ok' if health else 'bad' }}"></span></div>
+        </div>
+
+        {% if models and models.promote %}
+          <div class="status-item">
+            <div>
+              <strong>Promote model</strong><br />
+              <span>{{ models.promote.path }}</span>
+            </div>
+            <div><span class="dot {{ 'ok' if models.promote.exists else 'bad' }}"></span></div>
+          </div>
+        {% endif %}
+      </div>
+
+      <h3 class="mt-16">Performances</h3>
+      <div class="grid">
+        <div class="metric"><small>Best model</small><strong>{{ train_result.best_model if train_result else 'n/a' }}</strong></div>
+        <div class="metric"><small>Rows train</small><strong>{{ train_result.rows_train if train_result else 'n/a' }}</strong></div>
+        <div class="metric"><small>Rows test</small><strong>{{ train_result.rows_test if train_result else 'n/a' }}</strong></div>
+        <div class="metric"><small>MAE</small><strong>{{ '%.2f'|format(train_result.metrics.mae) if train_result and train_result.metrics and train_result.metrics.mae is defined else 'n/a' }}</strong></div>
+        <div class="metric"><small>RMSE</small><strong>{{ '%.2f'|format(train_result.metrics.rmse) if train_result and train_result.metrics and train_result.metrics.rmse is defined else 'n/a' }}</strong></div>
+        <div class="metric"><small>MAPE</small><strong>{{ '%.2f'|format(train_result.metrics.mape) if train_result and train_result.metrics and train_result.metrics.mape is defined else 'n/a' }}%</strong></div>
+      </div>
+
+      {% if train_result and train_result.mlflow %}
+        <h3 class="mt-16">MLflow</h3>
+        <div class="detail-list">
+          <div class="detail-item">
+            <small>Experiment</small>
+            <strong>{{ train_result.mlflow.experiment_name or 'n/a' }}</strong>
+          </div>
+          <div class="detail-item">
+            <small>Tracking URI</small>
+            <strong>{{ train_result.mlflow.tracking_uri or 'n/a' }}</strong>
+          </div>
+          <div class="detail-item">
+            <small>Run ID</small>
+            <strong>{{ train_result.mlflow.best_run.run_id if train_result.mlflow.best_run else 'n/a' }}</strong>
+          </div>
+          <div class="detail-item">
+            <small>Registered model</small>
+            <strong>{{ train_result.mlflow.best_run.registered_model_name if train_result.mlflow.best_run and train_result.mlflow.best_run.registered_model_name else 'non disponible localement' }}</strong>
+          </div>
+          <div class="detail-item">
+            <small>Model version</small>
+            <strong>{{ train_result.mlflow.best_run.registered_model_version if train_result.mlflow.best_run and train_result.mlflow.best_run.registered_model_version else 'n/a' }}</strong>
+          </div>
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+
+  <section class="card mt-16 reveal">
+    <h2>Forecast Promote 2027</h2>
+    <p class="muted">Projection globale du modele pour identifier les mois qui meritent le plus une action promotionnelle.</p>
+
+    {% if result %}
+      <div class="grid mt-16">
+        <div class="metric"><small>Best model</small><strong>{{ result.best_model if result.best_model is defined else 'n/a' }}</strong></div>
+        <div class="metric"><small>Best month</small><strong>{{ result.best_month if result.best_month is defined else 'n/a' }}</strong></div>
+        <div class="metric"><small>Best day</small><strong>{{ result.best_day if result.best_day is defined else 'n/a' }}</strong></div>
+        <div class="metric"><small>Best day value</small><strong>{{ result.best_day_value if result.best_day_value is defined else 'n/a' }}</strong></div>
+      </div>
+      {% include 'partials/_result_payload.html' %}
+    {% else %}
+      <div class="metric mt-16">
+        <small>Forecast</small>
+        <strong>Le forecast global Promote sera affiche ici des qu'il est disponible.</strong>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

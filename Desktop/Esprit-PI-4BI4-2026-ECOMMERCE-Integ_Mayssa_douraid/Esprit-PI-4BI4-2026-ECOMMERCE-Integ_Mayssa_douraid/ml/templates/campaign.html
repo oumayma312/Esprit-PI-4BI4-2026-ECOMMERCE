@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Campaign - ML Dashboard{% endblock %}
+
+{% block content %}
+  <section class="hero reveal">
+    <div class="logo-box">
+      <img src="{{ url_for('logo') }}" alt="Logo du projet" />
+    </div>
+    <div>
+      <h1>Campaign Prediction</h1>
+      <p>Interface dediee a la prediction campaign avec validation des donnees, controle de coherence et ajustements selon le contexte metier.</p>
+      <span class="pill">{{ summary.dataset.rows if summary and summary.dataset else 0 }} lignes</span>
+      <span class="pill">{{ summary.target_rule if summary else 'n/a' }}</span>
+      <form class="actions mt-16" method="post" action="{{ url_for('campaign_run') }}">
+        <button class="button secondary" type="submit">Rafraichir pipeline</button>
+      </form>
+    </div>
+  </section>
+
+  {% if error %}
+    <div class="alert reveal">{{ error }}</div>
+  {% endif %}
+
+  <div class="layout">
+    <section class="card reveal" id="campaign-section">
+      <h2>Formulaire Campaign</h2>
+      <p class="muted">
+        Saisissez les variables metier pour obtenir une prediction contextualisee. Les incoherences entre reach, impressions, frequence, resultat et cout sont verifiees avant le scoring.
+      </p>
+
+      <form class="form-grid" method="post" action="{{ url_for('campaign_predict') }}">
+        <div class="row-2">
+          <div>
+            <label for="reach">Reach</label>
+            <input id="reach" name="reach" type="number" step="0.01" value="{{ input_values.get('reach', '0') }}" class="{{ 'input-error' if field_errors.get('reach') else '' }}" required />
+            {% if field_errors.get('reach') %}<span class="field-error">{{ field_errors.get('reach') }}</span>{% endif %}
+          </div>
+          <div>
+            <label for="impressions">Impressions</label>
+            <input id="impressions" name="impressions" type="number" step="0.01" value="{{ input_values.get('impressions', '0') }}" class="{{ 'input-error' if field_errors.get('impressions') else '' }}" required />
+            {% if field_errors.get('impressions') %}<span class="field-error">{{ field_errors.get('impressions') }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="row-2">
+          <div>
+            <label for="frequency">Frequency</label>
+            <input id="frequency" name="frequency" type="number" step="0.01" value="{{ input_values.get('frequency', '0') }}" class="{{ 'input-error' if field_errors.get('frequency') else '' }}" required />
+            {% if field_errors.get('frequency') %}<span class="field-error">{{ field_errors.get('frequency') }}</span>{% endif %}
+          </div>
+          <div>
+            <label for="result">Result</label>
+            <input id="result" name="result" type="number" step="0.01" value="{{ input_values.get('result', '0') }}" class="{{ 'input-error' if field_errors.get('result') else '' }}" required />
+            {% if field_errors.get('result') %}<span class="field-error">{{ field_errors.get('result') }}</span>{% endif %}
+          </div>
+        </div>
+        <div class="row-2">
+          <div>
+            <label for="views">Views</label>
+            <input id="views" name="views" type="number" step="0.01" value="{{ input_values.get('views', '0') }}" class="{{ 'input-error' if field_errors.get('views') else '' }}" required />
+            {% if field_errors.get('views') %}<span class="field-error">{{ field_errors.get('views') }}</span>{% endif %}
+          </div>
+          <div>
+            <label for="price">Price</label>
+            <input id="price" name="price" type="number" step="0.01" value="{{ input_values.get('price', '0') }}" class="{{ 'input-error' if field_errors.get('price') else '' }}" required />
+            {% if field_errors.get('price') %}<span class="field-error">{{ field_errors.get('price') }}</span>{% endif %}
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="button primary" type="submit">Predire</button>
+          <a class="button secondary" href="{{ url_for('campaign') }}" data-nav="true">Reinitialiser</a>
+        </div>
+      </form>
+
+      {% if predict_result %}
+        {% set derived_metrics = predict_result.get('derived_metrics', {}) %}
+        {% set highlights = predict_result.get('highlights', []) %}
+        {% set warnings = predict_result.get('warnings', []) %}
+        <div class="result-box result-panel">
+          <h3>Resultat de prediction</h3>
+          <div class="grid mt-10">
+            <div class="metric"><small>Decision</small><strong>{{ predict_result.decision }}</strong></div>
+            <div class="metric"><small>Probability</small><strong>{{ '%.2f'|format((predict_result.probability or 0) * 100) }}%</strong></div>
+            <div class="metric"><small>Score metier</small><strong>{{ '%.2f'|format(predict_result.get('score', 0) or 0) }}</strong></div>
+            <div class="metric"><small>Strategy</small><strong>{{ predict_result.get('strategy', 'rule-based') }}</strong></div>
+            <div class="metric"><small>Model ref</small><strong>{{ predict_result.model_reference or 'rule-based' }}</strong></div>
+            <div class="metric"><small>Frequence attendue</small><strong>{{ '%.2f'|format(derived_metrics.get('expected_frequency', 0) or 0) }}</strong></div>
+            <div class="metric"><small>Cout / resultat</small><strong>{{ '%.2f'|format(derived_metrics.get('cost_per_result')) if derived_metrics.get('cost_per_result') is not none else 'n/a' }}</strong></div>
+            <div class="metric"><small>Cout / 1000 imp.</small><strong>{{ '%.2f'|format(derived_metrics.get('cost_per_mille')) if derived_metrics.get('cost_per_mille') is not none else 'n/a' }}</strong></div>
+            <div class="metric"><small>Seuil de succes</small><strong>{{ '%.2f'|format(derived_metrics.get('success_threshold', 0) or 0) }}</strong></div>
+          </div>
+
+          {% if highlights %}
+            <div class="note-panel mt-14">
+              <h4>Points forts</h4>
+              <ul class="reason-list">
+                {% for item in highlights %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          {% if warnings %}
+            <div class="warning-panel mt-14">
+              <h4>Points de vigilance</h4>
+              <ul class="warning-list">
+                {% for item in warnings %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </section>
+
+    <aside class="card reveal">
+      <h2>Campaign Summary</h2>
+      <p class="muted">Apercu des metadonnees et de l'etat du modele campaign.</p>
+      <div class="grid">
+        <div class="metric"><small>Rows</small><strong>{{ summary.dataset.rows if summary and summary.dataset else 'n/a' }}</strong></div>
+        <div class="metric"><small>Target rule</small><strong>{{ summary.target_rule if summary else 'n/a' }}</strong></div>
+        <div class="metric"><small>Regression</small><strong>{{ summary.regression.best_model if summary and summary.regression else 'n/a' }}</strong></div>
+        <div class="metric"><small>Best K</small><strong>{{ summary.clustering.best_k if summary and summary.clustering else 'n/a' }}</strong></div>
+      </div>
+
+      {% if train_result %}
+        <h3 class="mt-16">Derniere execution</h3>
+        <div class="grid">
+          <div class="metric"><small>Rows</small><strong>{{ train_result.rows if train_result.rows is defined else 'n/a' }}</strong></div>
+          <div class="metric"><small>Target rule</small><strong>{{ train_result.target_rule if train_result.target_rule is defined else 'n/a' }}</strong></div>
+          <div class="metric"><small>Classification</small><strong>{{ train_result.classification_best_model if train_result.classification_best_model is defined else 'n/a' }}</strong></div>
+          <div class="metric"><small>Regression</small><strong>{{ train_result.regression_best_model if train_result.regression_best_model is defined else 'n/a' }}</strong></div>
+          <div class="metric"><small>Best K</small><strong>{{ train_result.clustering_best_k if train_result.clustering_best_k is defined else 'n/a' }}</strong></div>
+          <div class="metric"><small>Summary path</small><strong>{{ train_result.summary_path if train_result.summary_path is defined else 'n/a' }}</strong></div>
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+{% endblock %}

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sougui Recommendations Dashboard</title>
+  <style>
+    :root {
+      --bg: #f8f5f1;
+      --card: #ffffff;
+      --text: #2f2a26;
+      --muted: #7b6f66;
+      --accent: #b86f4c;
+      --accent-soft: #f2e2d8;
+      --success: #2f7d4a;
+      --warning: #9b6a1d;
+      --danger: #b5483d;
+      --border: #eadfd6;
+      --shadow: 0 10px 30px rgba(76, 53, 38, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #fbf8f5 0%, #f5efe9 100%);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff 0%, #f7ece5 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 1000px;
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    button:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      min-width: 220px;
+      font-size: 14px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .panel h3 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 700px;
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+      background: white;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #fbf6f2;
+      z-index: 1;
+      text-align: left;
+      font-size: 13px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+    }
+
+    tbody td {
+      padding: 12px;
+      border-bottom: 1px solid #f1e8e1;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    tbody tr:hover { background: #fcf8f4; }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-high {
+      background: #dff4e6;
+      color: var(--success);
+    }
+
+    .badge-medium {
+      background: #fff2df;
+      color: var(--warning);
+    }
+
+    .badge-low {
+      background: #f7e7e4;
+      color: var(--danger);
+    }
+
+    .badge-cat-strong {
+      background: #e7f6ec;
+      color: var(--success);
+    }
+
+    .badge-cat-watch {
+      background: #fff2df;
+      color: var(--warning);
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .list-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fffdfa;
+    }
+
+    .list-item-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .tiny { font-size: 12px; color: var(--muted); }
+
+
+
+    .predict-box {
+      margin-top: 18px;
+      background: #fffdfa;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .predict-box h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .predict-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .predict-form input {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      min-width: 220px;
+      font-size: 14px;
+    }
+
+    .predict-result {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      color: var(--text);
+      font-size: 14px;
+      display: none;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar input,
+      .toolbar select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Sougui Recommendations Dashboard</h1>
+      <p>
+        This dashboard displays the output of the competitor product classification model and the recommendation engine.
+        It highlights the predicted category, model confidence, top recommended products, and the most strategic categories for Sougui.
+      </p>
+
+      <div class="actions">
+        <button class="primary" onclick="loadAllData()">Load ML Results</button>
+      </div>
+
+      <div id="status" class="status">Ready.</div>
+
+      <div class="predict-box">
+        <h3>Real-time Prediction (FastAPI)</h3>
+        <p class="muted">Test the deployed ML model by sending a product to the FastAPI <strong>/predict</strong> endpoint.</p>
+        <div class="predict-form">
+          <input id="productInput" type="text" placeholder="Product name, e.g. collier argent" />
+          <input id="priceInput" type="number" step="0.01" placeholder="Average price, e.g. 90" />
+          <button class="secondary" onclick="predictProduct()">Predict Category</button>
+        </div>
+        <div id="predictionResult" class="predict-result"></div>
+      </div>
+
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <div class="card-title">Total Predicted Products</div>
+        <div id="totalProducts" class="card-value">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Priority High Products</div>
+        <div id="totalPriorityHigh" class="card-value">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Recommended Categories</div>
+        <div id="totalCategories" class="card-value">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top Category</div>
+        <div id="topCategory" class="card-value" style="font-size:20px;">-</div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <div class="toolbar">
+          <input id="searchInput" type="text" placeholder="Search by product name..." oninput="renderProductsTable()" />
+          <select id="categoryFilter" onchange="renderProductsTable()">
+            <option value="All">All categories</option>
+          </select>
+          <select id="actionFilter" onchange="renderProductsTable()">
+            <option value="All">All recommendation levels</option>
+            <option value="Priorite haute">Priorite haute</option>
+            <option value="Priorite moyenne">Priorite moyenne</option>
+            <option value="Priorite basse">Priorite basse</option>
+            <option value="A surveiller">A surveiller</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Original Category</th>
+                <th>Predicted Category</th>
+                <th>Confidence</th>
+                <th>Suggested Action</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody">
+              <tr>
+                <td colspan="5" class="muted">No data loaded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:grid; gap:18px;">
+        <div class="panel">
+          <h3>Top Recommended Categories</h3>
+          <div id="categoriesList" class="list">
+            <div class="muted">No category data loaded yet.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Top Recommended Products</h3>
+          <div id="topProductsList" class="list">
+            <div class="muted">No product recommendation data loaded yet.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let allPredictions = [];
+    let allCategories = [];
+    let allTopProducts = [];
+
+    function setStatus(message) {
+      document.getElementById("status").textContent = message;
+    }
+
+    async function predictProduct() {
+      const product = document.getElementById("productInput").value.trim();
+      const price = parseFloat(document.getElementById("priceInput").value);
+      const resultBox = document.getElementById("predictionResult");
+
+      if (!product || isNaN(price)) {
+        resultBox.style.display = "block";
+        resultBox.innerHTML = "Please enter a product name and a valid price.";
+        return;
+      }
+
+      resultBox.style.display = "block";
+      resultBox.innerHTML = "Prediction in progress...";
+
+      try {
+        const response = await fetch("http://127.0.0.1:8000/predict", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            product: product,
+            avg_price: price,
+            feat_cat_popularity: 0.5,
+            feat_price_distance: 0.1,
+            feat_occurrence_score: 1,
+            feat_concurrent_coverage: 1
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          resultBox.innerHTML = "API error: " + JSON.stringify(data);
+          return;
+        }
+
+        resultBox.innerHTML = `
+          <strong>Product:</strong> ${data.product}<br>
+          <strong>Predicted category:</strong> ${data.predicted_category}<br>
+          <strong>Confidence:</strong> ${Number(data.confidence).toFixed(3)}<br>
+          <strong>Model:</strong> ${data.model}
+        `;
+      } catch (error) {
+        console.error(error);
+        resultBox.innerHTML = "Failed to call FastAPI. Make sure the API is running on http://127.0.0.1:8000";
+      }
+    }
+
+
+    function badgeClassForLevel(level) {
+      if (!level) return "badge-medium";
+      const value = String(level).toLowerCase();
+      if (value.includes("haute") || value.includes("fortement")) return "badge-high";
+      if (value.includes("moyenne") || value.includes("recommandee")) return "badge-medium";
+      return "badge-low";
+    }
+
+    function updateCards() {
+      const total = allPredictions.length;
+      const priorityHigh = allPredictions.filter(r => String(r.suggested_action) === "Priorite haute").length;
+      const totalCategories = allCategories.length;
+      const topCategory = totalCategories > 0 ? (allCategories[0].category || "-") : "-";
+
+      document.getElementById("totalProducts").textContent = total;
+      document.getElementById("totalPriorityHigh").textContent = priorityHigh;
+      document.getElementById("totalCategories").textContent = totalCategories;
+      document.getElementById("topCategory").textContent = topCategory;
+    }
+
+    function fillCategoryFilter() {
+      const select = document.getElementById("categoryFilter");
+      const categories = [...new Set(allPredictions.map(r => r.predicted_category).filter(Boolean))].sort();
+      select.innerHTML = '<option value="All">All categories</option>' +
+        categories.map(cat => `<option value="${cat}">${cat}</option>`).join("");
+    }
+
+    function renderProductsTable() {
+      const body = document.getElementById("productsBody");
+      const search = document.getElementById("searchInput").value.toLowerCase().trim();
+      const categoryFilter = document.getElementById("categoryFilter").value;
+      const actionFilter = document.getElementById("actionFilter").value;
+
+      const filtered = allPredictions.filter(row => {
+        const matchesSearch = !search || (row.product || "").toLowerCase().includes(search);
+        const matchesCategory = categoryFilter === "All" || row.predicted_category === categoryFilter;
+        const matchesAction = actionFilter === "All" || row.suggested_action === actionFilter;
+        return matchesSearch && matchesCategory && matchesAction;
+      });
+
+      if (filtered.length === 0) {
+        body.innerHTML = `
+          <tr>
+            <td colspan="5" class="muted">No matching rows.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      body.innerHTML = filtered.map(row => `
+        <tr>
+          <td>${row.product ?? ""}</td>
+          <td>${row.category ?? ""}</td>
+          <td>${row.predicted_category ?? ""}</td>
+          <td>${typeof row.confidence === "number" ? row.confidence.toFixed(3) : (row.confidence ?? "")}</td>
+          <td>
+            <span class="badge ${badgeClassForLevel(row.suggested_action)}">
+              ${row.suggested_action ?? ""}
+            </span>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderCategoriesList() {
+      const container = document.getElementById("categoriesList");
+
+      if (!allCategories.length) {
+        container.innerHTML = `<div class="muted">No category data available.</div>`;
+        return;
+      }
+
+      container.innerHTML = allCategories.slice(0, 10).map(row => `
+        <div class="list-item">
+          <div class="list-item-title">${row.category ?? ""}</div>
+          <div class="tiny">Score: ${row.recommendation_score != null ? Number(row.recommendation_score).toFixed(3) : "-"}</div>
+          <div class="tiny">Products at competitors: ${row.nb_produits_conc ?? "-"}</div>
+          <div style="margin-top:8px;">
+            <span class="badge ${badgeClassForLevel(row.niveau_recommandation)}">
+              ${row.niveau_recommandation ?? ""}
+            </span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderTopProductsList() {
+      const container = document.getElementById("topProductsList");
+
+      if (!allTopProducts.length) {
+        container.innerHTML = `<div class="muted">No top product data available.</div>`;
+        return;
+      }
+
+      container.innerHTML = allTopProducts.slice(0, 10).map(row => `
+        <div class="list-item">
+          <div class="list-item-title">${row.product ?? ""}</div>
+          <div class="tiny">Category: ${row.category ?? ""}</div>
+          <div class="tiny">Score: ${row.product_score != null ? Number(row.product_score).toFixed(3) : "-"}</div>
+          <div style="margin-top:8px;">
+            <span class="badge ${badgeClassForLevel(row.niveau_recommandation)}">
+              ${row.niveau_recommandation ?? ""}
+            </span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function loadAllData() {
+      setStatus("Loading ML results...");
+      try {
+        const [predRes, topRes, catRes] = await Promise.all([
+          fetch("/api/predict"),
+          fetch("/api/top-products"),
+          fetch("/api/categories")
+        ]);
+
+        const predData = await predRes.json();
+        const topData = await topRes.json();
+        const catData = await catRes.json();
+
+        allPredictions = predData.predictions || [];
+        allTopProducts = topData.data || [];
+        allCategories = catData.data || [];
+
+        fillCategoryFilter();
+        updateCards();
+        renderProductsTable();
+        renderCategoriesList();
+        renderTopProductsList();
+
+        setStatus(`Loaded ${allPredictions.length} predicted products, ${allCategories.length} categories, and ${allTopProducts.length} top products.`);
+      } catch (error) {
+        console.error(error);
+        setStatus("Failed to load dashboard data.");
+      }
+    }
+
+    loadAllData();
+  </script>
+</body>
+</html>

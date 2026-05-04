@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block title %}Sougui - ML Dashboard{% endblock %}
+
+{% block content %}
+  <section class="hero reveal">
+    <div class="logo-box">
+      <img src="{{ url_for('logo') }}" alt="Logo du projet" />
+    </div>
+    <div>
+      <span class="pill">Sougui MLOps</span>
+      <h1>Sougui Recommendations</h1>
+      <p>
+        Cette section utilise directement l'API unifiee pour executer les predictions Sougui sans lancer de service Flask separe.
+      </p>
+      {% if sougui_health and sougui_health.status == 'ok' %}
+        <div class="status">Modele Sougui disponible via {{ api_base }}</div>
+      {% else %}
+        <div class="status">Etat Sougui: {{ sougui_health.status if sougui_health else 'inconnu' }}</div>
+      {% endif %}
+    </div>
+  </section>
+
+  {% if errors %}
+    <section class="card reveal mt-16">
+      <h2>Etat API</h2>
+      <ul class="status-list mt-14">
+        {% for error in errors %}
+          <li class="status-item"><strong>Erreur:</strong> {{ error }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  <section class="grid mt-16">
+    <article class="metric reveal">
+      <small>Predictions chargees</small>
+      <strong>{{ predictions|length }}</strong>
+    </article>
+    <article class="metric reveal">
+      <small>Top produits</small>
+      <strong>{{ top_products|length }}</strong>
+    </article>
+    <article class="metric reveal">
+      <small>Categories</small>
+      <strong>{{ categories|length }}</strong>
+    </article>
+    <article class="metric reveal">
+      <small>Modele charge</small>
+      <strong>{{ 'oui' if sougui_health and sougui_health.model_loaded else 'non' }}</strong>
+    </article>
+  </section>
+
+  <section class="layout">
+    <article class="card reveal">
+      <h2>Prediction Sougui</h2>
+      <p class="helper">Renseigne un produit puis lance la prediction de categorie.</p>
+
+      <form method="post" action="{{ url_for('sougui_predict') }}" class="form-grid mt-14">
+        <div>
+          <label for="sougui-product">Produit</label>
+          <input id="sougui-product" name="product" value="{{ input_values.product }}" class="{{ 'input-error' if field_errors.get('product') else '' }}" />
+          {% if field_errors.get('product') %}<small class="field-error">{{ field_errors.get('product') }}</small>{% endif %}
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label for="sougui-price">Prix moyen</label>
+            <input id="sougui-price" name="avg_price" value="{{ input_values.avg_price }}" class="{{ 'input-error' if field_errors.get('avg_price') else '' }}" />
+            {% if field_errors.get('avg_price') %}<small class="field-error">{{ field_errors.get('avg_price') }}</small>{% endif %}
+          </div>
+          <div>
+            <label for="sougui-pop">Popularite categorie</label>
+            <input id="sougui-pop" name="feat_cat_popularity" value="{{ input_values.feat_cat_popularity }}" class="{{ 'input-error' if field_errors.get('feat_cat_popularity') else '' }}" />
+            {% if field_errors.get('feat_cat_popularity') %}<small class="field-error">{{ field_errors.get('feat_cat_popularity') }}</small>{% endif %}
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div>
+            <label for="sougui-distance">Distance prix</label>
+            <input id="sougui-distance" name="feat_price_distance" value="{{ input_values.feat_price_distance }}" class="{{ 'input-error' if field_errors.get('feat_price_distance') else '' }}" />
+            {% if field_errors.get('feat_price_distance') %}<small class="field-error">{{ field_errors.get('feat_price_distance') }}</small>{% endif %}
+          </div>
+          <div>
+            <label for="sougui-occ">Occurrence</label>
+            <input id="sougui-occ" name="feat_occurrence_score" value="{{ input_values.feat_occurrence_score }}" class="{{ 'input-error' if field_errors.get('feat_occurrence_score') else '' }}" />
+            {% if field_errors.get('feat_occurrence_score') %}<small class="field-error">{{ field_errors.get('feat_occurrence_score') }}</small>{% endif %}
+          </div>
+        </div>
+
+        <div>
+          <label for="sougui-cov">Couverture concurrentielle</label>
+          <input id="sougui-cov" name="feat_concurrent_coverage" value="{{ input_values.feat_concurrent_coverage }}" class="{{ 'input-error' if field_errors.get('feat_concurrent_coverage') else '' }}" />
+          {% if field_errors.get('feat_concurrent_coverage') %}<small class="field-error">{{ field_errors.get('feat_concurrent_coverage') }}</small>{% endif %}
+        </div>
+
+        <div class="actions">
+          <button class="button primary" type="submit">Predire</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="card reveal">
+      <h2>Resultat</h2>
+      {% if result %}
+        <div class="result-panel mt-14">
+          <div class="grid">
+            <div class="metric">
+              <small>Produit</small>
+              <strong>{{ result.product }}</strong>
+            </div>
+            <div class="metric">
+              <small>Categorie predite</small>
+              <strong>{{ result.predicted_category }}</strong>
+            </div>
+            <div class="metric">
+              <small>Confiance</small>
+              <strong>{{ '%.3f'|format(result.confidence) }}</strong>
+            </div>
+            <div class="metric">
+              <small>Modele</small>
+              <strong>{{ result.model }}</strong>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <p class="helper mt-14">Aucun resultat pour le moment. Lance une prediction pour afficher la categorie cible.</p>
+      {% endif %}
+    </article>
+  </section>
+
+  <section class="card reveal mt-16">
+    <div class="section-heading">
+      <div>
+        <h2>Predictions Produits</h2>
+        <p class="helper">Equivalent de l'endpoint original /api/predict du module Sougui.</p>
+      </div>
+    </div>
+    {% if predictions %}
+      <div class="table-wrap mt-14">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Categorie origine</th>
+              <th>Categorie predite</th>
+              <th>Confiance</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in predictions[:25] %}
+              <tr>
+                <td>{{ row.product or '-' }}</td>
+                <td>{{ row.category or '-' }}</td>
+                <td>{{ row.predicted_category or '-' }}</td>
+                <td>{{ '%.3f'|format(row.confidence) if row.confidence is number else (row.confidence or '-') }}</td>
+                <td>{{ row.niveau_recommandation or row.suggested_action or '-' }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="helper mt-14">Aucune prediction tabulaire disponible. Ajoute les fichiers CSV Sougui dans ml/sougui_mlops/outputs.</p>
+    {% endif %}
+  </section>
+
+  <section class="layout mt-16">
+    <article class="card reveal">
+      <h2>Top Produits Recommandes</h2>
+      {% if top_products %}
+        <div class="table-wrap mt-14">
+          <table>
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Categorie</th>
+                <th>Score produit</th>
+                <th>Niveau</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in top_products[:20] %}
+                <tr>
+                  <td>{{ row.product or '-' }}</td>
+                  <td>{{ row.category or '-' }}</td>
+                  <td>{{ '%.3f'|format(row.product_score) if row.product_score is number else (row.product_score or '-') }}</td>
+                  <td>{{ row.niveau_recommandation or '-' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="helper mt-14">Aucun top produit disponible.</p>
+      {% endif %}
+    </article>
+
+    <article class="card reveal">
+      <h2>Opportunites Categories</h2>
+      {% if categories %}
+        <div class="table-wrap mt-14">
+          <table>
+            <thead>
+              <tr>
+                <th>Categorie</th>
+                <th>Coverage ratio</th>
+                <th>Score opportunite</th>
+                <th>Niveau</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in categories[:20] %}
+                <tr>
+                  <td>{{ row.category or '-' }}</td>
+                  <td>{{ '%.3f'|format(row.coverage_ratio) if row.coverage_ratio is number else (row.coverage_ratio or '-') }}</td>
+                  <td>{{ '%.3f'|format(row.opportunity_score) if row.opportunity_score is number else (row.opportunity_score or '-') }}</td>
+                  <td>{{ row.niveau_opportunite or '-' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="helper mt-14">Aucune categorie recommandee disponible.</p>
+      {% endif %}
+    </article>
+  </section>
+
+  <section class="card reveal mt-16">
+    <div class="section-heading">
+      <div>
+        <h2>Etat d'integration</h2>
+        <p class="helper">Le flux Sougui passe maintenant par l'API FastAPI unifiee.</p>
+      </div>
+    </div>
+    <div class="grid mt-14">
+      <div class="metric">
+        <small>Sante API</small>
+        <strong>{{ health.status if health else 'indisponible' }}</strong>
+      </div>
+      <div class="metric">
+        <small>Modele Sougui</small>
+        <strong>{{ 'present' if models and models.get('sougui') and models.get('sougui').get('exists') else 'absent' }}</strong>
+      </div>
+      <div class="metric">
+        <small>Endpoint prediction</small>
+        <strong>/predict/sougui</strong>
+      </div>
+      <div class="metric">
+        <small>Endpoint sante</small>
+        <strong>/health/sougui</strong>
+      </div>
+      <div class="metric">
+        <small>Endpoint predictions</small>
+        <strong>/predict/sougui/products</strong>
+      </div>
+      <div class="metric">
+        <small>Endpoint top produits</small>
+        <strong>/top-products/sougui</strong>
+      </div>
+      <div class="metric">
+        <small>Endpoint categories</small>
+        <strong>/categories/sougui</strong>
+      </div>
+    </div>
+  </section>
+{% endblock %}

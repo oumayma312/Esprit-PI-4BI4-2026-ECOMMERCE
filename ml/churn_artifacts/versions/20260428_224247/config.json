@@ -1,0 +1,43 @@
+{
+  "reference_date": "2026-04-28",
+  "global_floor": 90,
+  "decision_threshold": 0.5,
+  "decision_metric": "f1",
+  "log_features": [
+    "monetary_total",
+    "quantity_total",
+    "lifetime_days",
+    "monetary_std",
+    "purchase_velocity",
+    "avg_price"
+  ],
+  "churn_feature_columns": [
+    "frequency",
+    "monetary_total_log",
+    "monetary_trend",
+    "product_diversity",
+    "channel_diversity",
+    "lifetime_days_log",
+    "purchase_velocity_log",
+    "avg_price_log"
+  ],
+  "churn_base_numeric_features": [
+    "frequency",
+    "monetary_total_log",
+    "monetary_trend",
+    "product_diversity",
+    "channel_diversity",
+    "lifetime_days_log",
+    "purchase_velocity_log",
+    "avg_price_log"
+  ],
+  "churn_channel_dummy_columns": [],
+  "segmentation_feature_columns": [
+    "recency",
+    "frequency",
+    "monetary_total_log",
+    "product_diversity",
+    "purchase_velocity_log"
+  ],
+  "segment_count": 4
+}

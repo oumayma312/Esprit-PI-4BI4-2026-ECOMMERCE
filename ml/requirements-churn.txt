@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+prometheus-fastapi-instrumentator
+pandas
+numpy
+scikit-learn
+joblib
+mlflow
+sqlalchemy
+psycopg2-binary
+psycopg[binary]
+matplotlib
+pyarrow

@@ -1,0 +1,88 @@
+{% if result %}
+  {% set scalar_items = [] %}
+  {% for key, value in result.items() %}
+    {% if key != 'rows' and key != 'monthly_2027' and key != 'promo_plan_2027' %}
+      {% set _ = scalar_items.append((key, value)) %}
+    {% endif %}
+  {% endfor %}
+
+  {% if scalar_items %}
+    <div class="result-grid result-panel">
+      {% for key, value in scalar_items %}
+        <div class="metric">
+          <small>{{ key.replace('_', ' ') }}</small>
+          <strong>{{ value }}</strong>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if result.rows %}
+    <div class="table-wrap result-panel">
+      <table>
+        <thead>
+          <tr>
+            {% for column_name in result.rows[0].keys() %}
+              <th>{{ column_name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in result.rows[:8] %}
+            <tr>
+              {% for value in row.values() %}
+                <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  {% if result.monthly_2027 %}
+    <div class="table-wrap result-panel">
+      <table>
+        <thead>
+          <tr>
+            {% for column_name in result.monthly_2027[0].keys() %}
+              <th>{{ column_name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in result.monthly_2027[:8] %}
+            <tr>
+              {% for value in row.values() %}
+                <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  {% if result.promo_plan_2027 %}
+    <div class="table-wrap result-panel">
+      <table>
+        <thead>
+          <tr>
+            {% for column_name in result.promo_plan_2027[0].keys() %}
+              <th>{{ column_name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in result.promo_plan_2027[:8] %}
+            <tr>
+              {% for value in row.values() %}
+                <td>{{ value }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endif %}

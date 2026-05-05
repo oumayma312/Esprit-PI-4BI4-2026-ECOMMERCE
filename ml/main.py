@@ -15,6 +15,7 @@ from promote_api import ensure_promote_prediction_artifact, router as promote_ro
 from sell_api import ensure_sell_prediction_artifact, router as sell_router
 from sougui_api import router as sougui_router
 from supplier_api import ensure_supplier_prediction_artifact, router as supplier_router
+from ouma.api import router as ouma_router
 
 
 app = FastAPI(title="Unified ML API", version="2.0.0")
@@ -25,6 +26,7 @@ app.include_router(sell_router)
 app.include_router(promote_router)
 app.include_router(campaign_router)
 app.include_router(sougui_router)
+app.include_router(ouma_router)
 
 setup_metrics(app)
 
@@ -77,4 +79,8 @@ def models_status() -> dict[str, dict[str, str | bool]]:
         "promote": {"path": artifact_display_path(PROMOTE_MODEL_PATH), "exists": artifact_exists(PROMOTE_MODEL_PATH)},
         "campaign": {"path": str(Path(CAMPAIGN_SUMMARY_PATH)), "exists": os.path.exists(CAMPAIGN_SUMMARY_PATH)},
         "sougui": {"path": str(SOUGUI_MODEL_PATH), "exists": SOUGUI_MODEL_PATH.exists()},
+         "ouma": {
+            "path": str(Path("ouma/models/product_model.pkl")),
+            "exists": os.path.exists("ouma/models/product_model.pkl"),
+        },
     }

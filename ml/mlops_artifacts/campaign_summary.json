@@ -1,0 +1,77 @@
+{
+  "dataset": {
+    "rows": 0,
+    "columns": [],
+    "missing_columns": []
+  },
+  "target_rule": "connection_failed",
+  "classification": null,
+  "regression": null,
+  "clustering": null,
+  "business_context": {
+    "rules_version": "campaign_business_v2",
+    "metrics": {
+      "reach": {
+        "median": 1073.0,
+        "p75": 1695.0,
+        "p90": 2182.0,
+        "max": 4694.0
+      },
+      "impressions": {
+        "median": 1109.0,
+        "p75": 1858.0,
+        "p90": 2262.0,
+        "max": 5649.0
+      },
+      "frequency": {
+        "median": 1.03,
+        "p75": 1.05,
+        "p90": 1.12,
+        "max": 1.27
+      },
+      "result": {
+        "median": 1.0,
+        "p75": 2.0,
+        "p90": 3.0,
+        "max": 10.0
+      },
+      "views": {
+        "median": 43.48,
+        "p75": 53.85,
+        "p90": 68.18,
+        "max": 100.0
+      },
+      "price": {
+        "median": 1.02,
+        "p75": 1.86,
+        "p90": 18.0,
+        "max": 300.0
+      }
+    },
+    "efficiency": {
+      "cost_per_result": {
+        "p75": 0.95,
+        "p90": 1.63
+      },
+      "cost_per_mille": {
+        "p75": 0.61,
+        "p90": 0.92
+      }
+    },
+    "frequency_rules": {
+      "ideal_min": 0.9,
+      "ideal_max": 1.15,
+      "warning_max": 1.25
+    },
+    "success_score_threshold": 3.8
+  },
+  "mlflow": {
+    "tracking_uri": "http://mlflow:5000",
+    "experiment_name": "campaign-analytics",
+    "available": true,
+    "classification": null,
+    "regression": null,
+    "clustering": null,
+    "pipeline": null
+  }
+}

@@ -1,0 +1,8 @@
+flask
+pandas
+sqlalchemy
+psycopg2-binary
+scikit-learn
+mlflow
+joblib
+requests

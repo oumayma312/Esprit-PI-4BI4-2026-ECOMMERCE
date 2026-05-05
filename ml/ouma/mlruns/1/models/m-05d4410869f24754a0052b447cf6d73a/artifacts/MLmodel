@@ -1,0 +1,23 @@
+artifact_path: file:C:/Users/GMI/Desktop/mlops_ouma/mlruns/1/models/m-05d4410869f24754a0052b447cf6d73a/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.7
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.2
+    skops_trusted_types: null
+mlflow_version: 3.11.1
+model_id: m-05d4410869f24754a0052b447cf6d73a
+model_size_bytes: 15872
+model_uuid: m-05d4410869f24754a0052b447cf6d73a
+prompts: null
+run_id: bfcf3394efeb44c2b5b2e1667bfbfffa
+utc_time_created: '2026-04-28 21:50:14.905788'

@@ -1,0 +1,230 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 100vh;
+  padding: 22px;
+  background:
+    radial-gradient(circle at top left, rgba(133, 220, 255, 0.12), transparent 26%),
+    linear-gradient(180deg, #081a40 0%, #0a214f 44%, #0e2e67 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 18px 0 40px rgba(5, 16, 44, 0.16);
+  position: sticky;
+  top: 0;
+}
+
+.brand-panel,
+.user-pill {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.brand-panel {
+  padding: 18px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  min-height: 128px;
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.12), transparent 55%),
+    linear-gradient(180deg, rgba(4, 14, 35, 0.92), rgba(8, 28, 70, 0.84));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.brand-mark img {
+  width: 100%;
+  max-width: 138px;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  transform: scale(1.14);
+  filter: drop-shadow(0 16px 30px rgba(119, 209, 255, 0.16));
+}
+
+.brand-copy {
+  margin-top: 16px;
+}
+
+.brand-kicker,
+.nav-section h5 {
+  color: rgba(220, 235, 255, 0.62);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.brand-copy h4 {
+  margin: 10px 0 8px;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.38rem;
+  letter-spacing: -0.03em;
+}
+
+.brand-copy p,
+.user-pill small,
+.nav-copy small {
+  color: rgba(221, 233, 249, 0.72);
+  line-height: 1.55;
+}
+
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.user-status {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4de3af;
+  box-shadow: 0 0 0 6px rgba(77, 227, 175, 0.16);
+  animation: pulse 1.9s ease-in-out infinite;
+}
+
+.user-pill strong {
+  display: block;
+  color: #ffffff;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+}
+
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.nav-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav-section a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  color: #eff5ff;
+  text-decoration: none;
+  transition: transform 0.24s ease, background 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease;
+}
+
+.nav-section a:hover {
+  transform: translateX(4px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-section a.active {
+  background: linear-gradient(135deg, rgba(121, 220, 255, 0.16), rgba(65, 119, 255, 0.2));
+  border-color: rgba(144, 221, 255, 0.24);
+  box-shadow: 0 18px 30px rgba(5, 13, 39, 0.18);
+}
+
+.nav-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.24s ease, transform 0.24s ease;
+}
+
+.nav-section a:hover .nav-icon,
+.nav-section a.active .nav-icon {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.nav-icon svg,
+.logout svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.nav-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.nav-copy strong {
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.logout {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.24s ease, background 0.24s ease, border-color 0.24s ease;
+}
+
+.logout:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+@media (max-width: 1080px) {
+  .sidebar {
+    position: static;
+    min-height: auto;
+  }
+
+  .sidebar-nav {
+    gap: 18px;
+  }
+
+  .nav-section ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    padding: 16px;
+  }
+
+  .brand-panel,
+  .user-pill {
+    border-radius: 22px;
+  }
+
+  .nav-section ul {
+    grid-template-columns: 1fr;
+  }
+}

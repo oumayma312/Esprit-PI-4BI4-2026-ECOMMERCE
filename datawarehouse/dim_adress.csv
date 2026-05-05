@@ -1,0 +1,468 @@
+adressPK,postCode,adress,city,governorate
+21,2023,"Kram, Rue foire kram",Kram,Kram
+66,1003,cite el khadra,tunis,tunis
+77,1002,avenue de palestine,Tunis,Tunis
+96,1002,"21 rue Jérusalem، SANA Business Center, Tunis 1002, SANA Business Center",Tunis,Tunis
+97,1002,"21 rue Jérusalem، SANA Business Center, bâtiement",Tunis,tunis
+98,1002,SANA Business Center/21 Rue Jérusalem,Tunis,Tunis
+99,2041,18 rue Mokhtar Attaia,Ariana,Cité ettadhamen
+100,2086,rue salah khemisi 54,Manouba,daouar hicher
+102,1008,10 avenue darghouth pecha,Tunis,Tunis
+103,5050,28 rue Tareb ibn zied,Moknine,Monastir
+104,1002,"21 rue Jérusalem، SANA Business Center، Tunis 1002, Tunisia",Tunis,Mohamed 5
+105,2063,Nouvelle medina rue al hussaynin,Ben arous,Tunis
+106,1135,rue de maghreb N 45,naassen,ben arous
+107,4116,Midoun djerba,Medenine,Avenue farhat hached midoun djerba
+108,2074,11 rue ezzouhour,Mourouj 1,ben arous
+109,1002,"Everience Tunisia SANA Business Center - 21 rue Jérusalem, 1002 Tunis",Tunis,Tunis
+110,1002,"Rue de Palestine, SANA BUSSINESS",Tunis,Tunis
+111,2076,"Rue El Imam Malek Ibn Anas, 45",marsa,cité des juges
+112,2076,8 rue marco polo jbal khaoui,Marsa,Tunis
+113,2000,69 Avenue Habib Bougatfa,Tunis,Bardo
+114,2000,50 biss avenue 20 mars bardo,Tunis,bardo
+115,2037,"Av ere nouvelle , res les emeraudes 3 , App 1, ennasr 1",Ariana,ennasr 1
+116,2021,8 rue ahmed tlil,ouedlil,mannouba
+117,8080,Tui Blue El manar,Mrezgua,Nabeul
+118,1095,Cité mrade sidi hssine Tunis,Tunis,Tunis
+119,1002,"21 rue Jérusalem, 1002 Tunis, SANA Business Center",Tunis,Tunisie
+120,1002,rue Jerusalem,Tunis,Belvédère
+121,1053,"Rue lac biwa, Sofrecom Tunisie",Tunis,Lac 1
+122,2034,"57094536, Everience, tunisie a coté de bélvedere",Tunisia,Marsa
+123,8140,Rue De La République Fernnena,Fernnena,Jendouba
+124,7030,Mateur Bizerte,Mateur,BIZERTE
+125,5090,Rue farhat hached,Bekalta,Monastir
+126,1002,21 Rue jérusalem 1002 Belvédère,Tunis,TUNIS
+127,1002,"21 rue jerusalem, immeuble business sana center",tunis,place pasteur
+128,1002,"21 rue Jérusalem، SANA Business Center, Everience",Tunis,TUNIS
+129,1002,"21 rue de Jérusalem, SANA Buisness Center",Tunis,Tunis
+130,1003,"Belvedére ,Everience tunisie , Tunis, batiment sana busniss center",tunis,tunis
+132,2080,8 rue mallorca cite riadh elandalous Ariana,Ariana,Ariana
+133,2034,N°22 rue Bizerte ang AV. H. Bourguiba,Ezzahra,Ben arous
+134,1002,"21 rue Jérusalem, SANA Business Center, a coté de mosquée el kods",Tunis,Tunis
+135,1002,"SANA Business Center - 21 rue Jérusalem, 1002 Tunis",Tunis,Tunis
+136,2080,"Rue Rabaa el adaouia El Menzah 7, Résidence el Hana",Ariana,Ariana
+137,1002,belvedere,tunis,sana business center
+138,4051,"Novation City : Technopole, Bâtiment 6000, Sousse 4051",sousse,hay riadh
+139,2052,23 RUE 4137 2052 SOMRANE,TUNIS,SOMRANE
+140,2013,44 el esken 1,Ben Arous,Ben Arous
+141,2041,rue oman,ariana,cite ettadhamen
+142,1006,Rue de palestine Près du mosquée al qods place Pasteur,Tunis,Tunis
+143,2000,"Rue el kods, A cote de la Mosquée el kods, fin rue palestine. Lafayette",Tunis,Tunis centre ville
+144,1164,11 rue de tunis Belvedere,Tunis,TUNIS
+145,2040,Rue El Baraka Radès plage,Ben Arous,Radès plage
+146,8020,4 nrue chat el arab borj cedria,nabeul,soliman
+147,1002,"SANA Business Center - 21 rue Jérusalem, 1002 Tunis, SANA Business Cente",tunis,tunis
+148,7060,Rue de Carthage,Utique,Bizerte
+149,2010,"3 Rue Haroun Errachid, Appartement",Manouba,Manouba
+150,2051,5 rue 4428,Ezzahrouni,Tunis
+151,2000,Rue Skanes,tunis,Bardo
+152,1069,Rue Palestine Tunis,Tunis,Tunis
+153,5140,السواسي 5140,السواسي,السواسي
+154,1002,"21 rue Jérusalem, Sana business centre , tunis 1002",tunis,tunis
+155,1002,"21 Rue Al Qods, Le Belvédère, Tunis",tunis,Belvédère
+156,1053,Rue du lac Huron 1053 Tunisie 1053 Tunis,Tunis,Lac 1
+157,2045,Ain zaghouen à coté de la municipalité,Tunis,Tunis
+158,2094,3 Rue Iraq Cité Rafaha,Mnihla,Ariana
+159,1002,"19 rue Jérusalem belvédère Tunis, sana busines center",Tunis,Tunis
+160,1002,"Rue de palestine, 21 rue Jérusalem، SANA Business Center, Tunis 1002",tunis,tunis
+161,1008,"20 rue du fleuve, Maakel ezzaïm",Tunis,Bab mnara
+162,2056,31 rue bir bouragba,ariana,Raoued
+163,41063,Lindenstraße 135,Mönchengladbach,Rhénanie-du-Nord-Westphalie
+164,2017,"6 rue errahma khaznadar bardo, bardo",Tunis,le bardo
+165,7021,21 cité erraje Bizerte tunis,Bizerte,Jarzouna
+166,2094,"Rue du nil résidence mercure App C32, Jardin d’el menzah2",Ariana,Mnihla
+167,1000,"23 rue Jérusalem, Sana business centre",Tunis,Lafayette
+168,1002,"21 rue jérusalem, sana business center centre ville tunis",tunis,tunis
+169,1080,"Ennasr2, 20",Ariana,Ennasr2
+170,9070,medjez el beb,beja,beja
+171,1002,"21 rue Jérusalem Tunis, SANA busines center",Tunis,place pasteur
+172,1002,"Cameroon center. 5 rue de Cameron ,1002 tunis",Tunis,Tunis
+173,1000,"place pasteur, Sana business center",Tunis,tunis
+174,1100,"Rue palestine, Sana business center",Tunis,Tunis
+175,1002,15 avenue jugurtha mutuelleville belvedere,Tunis,Tunis
+176,2010,10 rue de pistache citée des oranges manouba,LA MANOUBA,LA MANOUBA
+177,1091,7 bis Rue zeweyet Ammar,TUNIS omran superieur,tunis
+178,7050,rue taher ben achour cité la révolution,Menzel Bourguiba,Bizerte
+179,1003,Cite Elkhadra,Tunis,Tunis
+180,1095,Cité Mrad sidi hsin,tunis,sidi hsin
+181,1002,"21 rue de jerusalem, immeuble Sana Business Center / Appartement B4",Tunis,Tunis
+25,2074,Taraji store rue 20 Mars Mourouj 4,Mourouj 4,Ben Arous
+81,1130,rue d'Algérie,tebourba,manouba
+182,1091,place pasteur à coté du mosquée qods,tunis,tunis
+183,2010,"5, Rue ibn arafa, manouba centre",Manouba,Manouba
+184,1003,rue Jérusalem à coté de la mosquée el Kodes Jean d'arc,Tunis,Tunis
+185,2011,9 rue Jugurtha Denden artisanat,Denden,Tunis
+186,1082,13 rue ali bach hamba,tunis,menzah 4
+187,2096,34 rue ksour essef,yesminette route randa,ben arous
+188,3002,"Route Nationale Tunis, Ras Jedir",Sfax,Sfax
+189,5080,Bâtiment,Teboulba,Rue Taher maaref tebolba 5080
+190,1181,Rue mosquée erroudha,Soukra,Soukra
+191,1002,54 rue Palestine,Tunis,Belvédère
+192,5016,"Ola Ksar Hellal, AVENUE HABIB BOURGUIBA, BENPLAST",Ksar Helal,Monastir
+193,1002,3 rue imam sahnoun,Tunis,Tunis
+194,1002,"sana business center - rue jérusalem - belvédere, Everience tunisia",Tunis,Belvédère
+195,8170,a coté de cimetière bouchagara,Bou Salem,jandouba
+196,2011,"3, rue Abbou Kacem Chebbi",Denden,Manouba
+197,1002,"rue Palestine a coté du mosquée el quods, bâtiment Sana Bisness",tunis,tunis
+198,8010,avenue 14 janvier,"Menzel Bouzelfa, Nabeul",Menzel Bouzelfa
+199,1000,33 rue mongi slim-beb bhar,tunis,tunis
+200,1002,"21 rue Jérusalem, SANA Business Center, Tunis 1002",Tunis,Tunis
+201,2045,"Rue de zid jardin laouina residence la perle B, b22",Tunisia,tunisia
+202,1002,"place pasteur, everience tunisia a coté mosqué kods",tunis,tunis
+203,2033,Sidi bousaid,Sidi bousaid,Tunis
+204,1002,"21 rue Jérusalem,, SANA Business Center",tunis,place pasteur
+205,10002,Rue de palestine,Tunis,Tunis
+206,2051,22 RUE 42301 Cité el Warda Ezzahrouni,Tunis,Tunis
+207,2074,"rue makther, el mourouj 5, résidence zahret el mourouj",El mourouj 5,Ben arous
+208,1000,47 rue du lac Léman Lac 1,Tunis,Tunis
+209,1003,"rue Jérusalem à coté du mosquée el Kodes Jean d'arc, à coté du mosquée el Kodes Jean d'arc",Tunis,tunis
+210,1001,"19, rue de l'artisanat, tunis, mosquée elkods",tunis,tunis
+211,1001,le belvedère Tunis,tunis,tunis
+212,1002,"everience tunisie 21 rue jerusalem, Immeuble sana business center",tunis,tunisie
+213,1002,"Everience Tunisie , Rue Jerusalem, sana business cener",tunis,tunis
+214,1002,21 rue jerusalem tunis,tunis,tunis
+215,1002,21 rue jérusalem sana business center tunis 1002,tunis,tunis
+218,2050,40 rue Charles Nicoles,Hammam-Lif,Ben Arous
+219,1095,144 riadh ezitoun te,tunis,sidi hsin
+220,1045,":21 rue Jérusalem، SANA Business Center, Tunis 1002",Tunis,tunis
+221,1002,Rue de la liberté,Tunis,Tunis
+222,2080,"25, rue abou el bakaa el randi ariana superieur, ariana",Ariana,Ariana superieur
+223,2074,"26, Avenue de Tchétch4nie, Mourouj 4, Maison",El Mourouj 4,Ben Arous
+224,1002,21 rue Jerusalem,Tunis,Tunis
+225,2074,11 rue Bouficha,Mourouj 5,Ben Arous
+226,1000,"Rue Palestine, Everience tunis immeuble sana",Tunis,Tunis
+227,1003,Cité el khadhra,Tunis,Tunis
+228,1002,place pasteur,"21 rue Jérusalem، SANA Business Center,",tunis
+229,1002,"El Qods 1002 Tunis Belvédère, SANA Bisness",Tunis,Tunis
+230,2011,"tunis, denden",denden,Tunis
+231,2010,El battan Manouba,Manouba,Manouba
+232,5070,Cité erriadh 1 ksar hellal,Ksar Hellal,Monastir
+233,4070,Avenue de l'environnement prés de Graiet,Msaken,Sousse
+234,2041,"Rue Halab numéro 19, cité Ettadhamen",Ariana,Tunis
+235,1002,"21 rue Jérusalem، SANA Business Center, Tunis 1002, 21 rue Jérusalem، SANA Business Center, Tunis 1002",Tunis,Tunis
+236,5070,Kssar Hlel,Kssar Hlel,Monastir
+237,2011,Denden Mg Maxi,Tunis,Tunis Denden
+238,1002,16 rue Jérusalem,Tunis,Tunis
+239,1005,53 rue 61010 cité oliviers DJ.lahmar,Tunis,Tunis
+240,2098,"Rades, Résidence maxulla zoher 2",Rades mélien,ben arous
+241,8090,Rue Abou Naoues Cité El Ksiba Kelibia,Kelibia,Nabeul
+242,2080,Jardins d'Elmenzah,Ariana,Ariana
+243,1002,"21 rue Jérusalem، SANA Business Center, Tunis 1002, 21",tunis,tunis
+244,1110,"Bouragba, Mornaguia",Mornaguia,Mornaguia Tunis
+245,4180,Prés de Carrefour Market Houmet Essouk Djerba,Medenine,Medenine
+246,2037,9 RUE MEDINET EL YAMAMA,Ariana,Ennasr 1
+247,2063,Nouvelle medina ben arous,Nouvelle medina,Ben arous
+248,2094,Résidence l'Elysée jardins menzah 2,Ariana,Mnihla
+249,2080,"Attijari Bank , Centre urbain nord",Ariana,Tunis
+250,2043,mourouj 6,Ben Arous,Ben Arous
+251,1002,Rue de JerusalemTunis,tunis,tunis
+252,2000,Place pasteur Tunis,Tunis,tunis
+253,1002,"- 21 rue Jérusalem, 1002 Tunis",Everience Tunisia SANA Business Center,tunis
+254,1095,"8 rue fouchena, Maison",tunis,sidi hssine sidjoumi cité 25 juillet
+255,2040,"cité olympique Radés, bloc 37 , appartement 648",Rades,ben arous
+256,2040,"Rades, 8",Rades,ben arous
+257,2016,Cité Mohamed ALI,Carthage,Tunis
+258,1057,Gammarth village - la marsa,La marsa,Tunis
+259,2000,24 rue des bosquets,Tunis,Bardo
+260,2037,"Rue abderazek chraibi, Résidence cavis 2",Ariena,Menzah 7
+261,5170,"rue de maghreb, cité elWahab",Mahdia,Chebba
+262,1002,"21 rue Jérusalem, everience Tunisie",tunis,belvédère
+263,2092,Avenue de la liberté menzah 5,Menzah5,Ariana
+264,2060,rue tayeb mhiri,tunis,aouina
+266,2042,42 rue mohamed touibi,cite ettahrir,tunis
+267,2046,34 rue de l'uranium la marsa,Marsa,Marsa
+268,2033,18 Rue Mokhtar Attia cité Elhana Megrine Ben Arous,Megrine,Benarous
+269,1002,"rue du sénégal, Jeanne d'arc",place pasteur,Tunis
+270,2000,52 rue d’habib bougatfa bardo 2000,tunis,tunis
+26,2041,17 Nahj el Aghadir,Ettadhamen,Ariana
+27,1002,"21 RUE DE JERUSALEM, SANA BUSINESS CENTRE",TUNIS,BELVEDERE
+82,2121,"rue baghded lalla, legsar",gafsa,Gafsa
+72,1091,7 rue 6261 Omrane supérieur à coté de Aziza devant mosquée Essalem,Tunis,Omrane supérieur
+271,1053,"Rue du Lac Constance, Imm El Majd B1 1053 - Les Berges du Lac, à coté de la BTK",Tunis,Les berges du lac
+272,1001,"Tunis, Lafayettes",Tunis,Lafayettes
+273,1002,"12 rue IRAK, Lafayette, Bâtiment en face cafe mio mondo 3eme étage à droite",Tunis,Tunis
+274,1000,omran supérieur tunis,Tunis,Tunis
+275,1002,"Rue Jerusalem, Sana business center",Tunis,Tunis
+276,1000,rue jerusalem place pasteur,tunis,Tunis
+277,1000,Lac 2 devant ben yaghlen shop,Tunis,Tunis
+278,8000,"Avenue environnement, rue sakiet Sidi Youssef Bouargoub Nabeul",Nabeul,Nabeul
+279,7100,"el KEf, n°6, rue de madagascar, cité el ons , le Kef",el Kef,le kef
+280,8020,devant carrefour market,Slimen,Riadh
+281,2026,"44 Rue Amal, c'est une maison","Sidi Bou Saïd, Amilcar",Carthage
+283,2094,8 rue Abdallah Ibn Abi rouaha,Ariana,Cite ennasr 2 mnihla
+284,2060,21 rue rosveltte la goulette,Tunisie,La goulette
+285,2063,"yesminette, les jardins de la medina yesminet",ben arous,ben arous
+286,4000,immeuble résidence el bassatine sousse beb gharbi,sousse ville,souse beb gharbi
+287,2091,"Residence le Belvedere, immeuble Jasmin3, appartement num 6",Menzah6,Ariana
+288,1000,"8 rue teimour menzah1, 1",Tunis,Tunis
+289,3050,Skhira Sfax,Skhira,Sfax
+290,4180,houmt essouk djerba,djerba,Mednine
+291,31000,Ben Arous,Nouvelle médian 3,Ben arous
+292,1053,devant 716 Lac,Lac 1,Tunis
+293,4283,Centre Ville,kebili,kebili
+294,1057,32 rue de la patience,Gammarth,la Marsa
+295,2009,Rue korba num 7,Bardo,Tunis
+296,4030,"Enfidha sousse, Enfidha pres de Bank amen",Enfidha,Soussa Enfidha
+297,2082,"Rue Saleh Din Ayoubi, 4 Rue De Ben Arous",Fouchana,BEN AROUS
+298,2001,"Résidence Les Tulipes, Ennasr2",Ariana,TUNISIE
+299,1090,Jardins de Carthage,Tunis,Jardins de carthage
+300,2074,67 rue el yemen,Mourouj 3,Ben arous
+301,8100,Jendouba 8100 Place de la république,Jendouba,Jendouba
+302,4000,sahloul,sousse,sousse
+303,2080,33 rue des entrepreneurs Charguia 2,Ariana,Ariana
+304,2045,5 rue des marguerites,Aïn Zaghouan,Tunis
+305,2045,"Jardin laaouina, Tunis, Résidence Narjes 1 dérrière crêpes Factory",Tunis,tunis
+306,1002,"21 rue Jérusalem, Tunis everience",Tunis,Borj cedria al riadh
+310,2066,Ibn Sina carrefour market centre Lawand,Tunis,Tunis
+311,4000,Sousse Kantaoui,Sousse,Sousse
+312,1091,Omrane superieur,Omrane,Tunis
+313,6041,Gabes chneni,Chneni,Gabes
+314,4011,Hammam soussa,Hammam soussa,Soussa
+315,1009,Mohamed ali,Ouerdia,Tunis
+316,2074,Prêt de Hamadi Abid,Mourouj 1,Ben arous
+317,3000,Route tanyour km 5 sfax,Sfax,Sfax
+318,5000,Monastir centre,Monastir centre,Monastir
+319,2100,cité enour,Gafsa,Gafsa
+320,2037,avenue hedi nouira,Ennaser,Ariana
+321,2087,Zahrouni Tunis,El hrairia,Tunis
+322,1145,Mhamdia Ben arous,Mhamdia,Ben arous
+323,3000,Rte de Tunis km 5.5 9assas chehia immeuble amen devant shopping club sfax,Sfax,Sfax
+324,2080,Menzah 8 Ariana,Ariana,Ariana
+325,1000,Cité el Ouahat Laaouina,Tunis,Tunis
+326,4070,Msaken 4070 route 30,Msaken,Sousse
+327,1000,Résidence Anis L'aouina Tunis,Tunis,Tunis
+328,1000,"21 rue Jarusalem immeuble Sana pace pasteur, Immeuble Sana",Tunis,Tunis
+329,7015,Rafraf Bizerte,Rafraf,Bizerte
+330,2033,Rue de paris megrine ben arous société sanofi côté de sagem,Megrine,ben arous
+331,3100,04 rue yethreb cité ennaceur,Kairouan Tunisie,kairouan
+332,2037,nahj kadhma,Cité ennaser,Ariana
+333,4000,Bahtha dar il mosenin f wed genim,Wed genim,Soussa
+334,6052,29 rue Habib thamer,oudref,Gabes
+335,7070,Ecole privée al majd,Ras jebel,Bizerte
+336,2015,"24, rue des usines - Zone industrielle Kram, Best Africa",Tunis,Gouvernorat de Tunis
+337,2037,"Rue somaani cité ennassim, Ariana avant borj louzir",Ariana,Ariana
+338,3040,souk bir ali ben khlifa,bir ali ben khlifa,Sfax
+339,8070,rue Haffouz Korba Nabeul,Korba,Nabeul
+340,1000,Immeuble Belvédère centre Rue Alkhartoum Tunis,Tunis,Tunis
+341,1002,place pasteur à coté du mosquée el Kods,Tunis,tunis
+342,2020,"Technopole elghazela kromberg & schubert, Ariana",Ariana,ARIANA
+343,6061,Chatt esalem,Gabes,Gabes
+344,2050,77 RUE MONDES FRANCE,Hammam lif,Ben Arous
+345,2097,5 rue 9 avril boumhal,Boumhal,Ben arous
+346,1002,"rue Palastine, everience Tunisia (Sana business center)",tunis,tunis
+347,1002,"Everience, IMMEUBLE SANA , 21 RUE JERUSALEM",TUNIS,Tunis
+348,5000,R4 Rue mohamed el jedi N 113 Monastir 5000 Monastir Tunisie,Monastir,Monastir
+349,1002,"Place pasteur Nahej el KODES, Sana BUSSINESS CENTER, Everience Tunisia",Tunis,Tunis
+350,1170,"22 rue pour Nabeul, Borj cedria zone touristique",Borj cedria cité Riadh,Borj cedria al riadh
+351,4071,RUE AL HOULAL ESSOUNDOUSSIA,SOUSSE,SOUSSE
+352,1005,15 rue habib masrouki,tunis,el omrane
+353,1002,"21 rue Jérusalem sana business center 1002 Tunis belvédère Tunisie, sana business center 1002 Tunis belvédère Tunisie",Tunis,Tunis belvédère
+354,2024,"cité el hadika, bloc a app 4",tunis,cite ettahrir
+370,3041,Route Taniour km 5.5 (Kassas Gargouri),Sfax,Sfax
+371,2035,"Rue De L'uma, Sokra, Tunis, RÉsidence Florence 2",Tunis Carthage,ARIANA
+372,2080,"Borj louzir ariana, Borj louzir ariana",ARIANA,TUNISIE
+373,1008,"4 rue du liseur, Tunis 1008",Tunis,Beb Mnara
+58,1002,21 Rue Jérusalem -Immeuble Sana Business Center,tunis,place pasteur
+67,1005,"21 rue jerusalem, immeuble Sana",tunis,place pasteur
+68,1005,"Rue Jérusalem, Sana business Pres du mosqué El qods",Tunis,tunis
+69,1002,"rue Jérusalem place pasteur, immeuble Sana",tunis,tunis place pasteur
+71,2097,"1, rue okba ibn nefaa",boumhal,ben arous
+73,2051,"diar ben mahmoud, residence les jasmins",el agba,tunis
+74,1002,"Rue Jerusalem , place pasteur, Sana Business, everience",Tunis,Tunis
+75,1002,"21 rue Jérusalem، SANA Business Center, Tunis 1002",TUNIS,"21 rue Jérusalem، SANA Business Center, Tunis 1002"
+76,1002,"21 rue Jérusalem، SANA Business Center, Tunis 1002, SANA Business Center, Tunis 1002",tunis,Tunis
+78,1005,26 rue 6320 ,Tunis,El Omrane 
+79,1002,place pasteur prés du mosquée el Kods,tunis,tunis
+83,1007,09 Avril 1938,Tunis,Tunis
+84,1003,"Appartement 4a bloc 7 cité olympique, Près du kiosque agil",Tunis,Cité olympique
+85,1002,"21 rue Jérusalem, SANA Business",Tunis,Tunis
+86,2045,2 rue nabeul cité taib el mhiri l'aouina,tunis,l'aouina
+87,2040,17 rue chedli ben ghalba,rades,ben arous
+88,2045,"18, rue de Mahres, Jardins l'Aouina",Tunis,"L'aouina, Tunis"
+89,1005,15 rue des musulman,tunis,el omran
+90,1002,rue jérusalem,Belvédère,Tunis
+91,1005,"8 rue Ahmed chawki Omrane France ville, 8",Tunis,Tunis
+92,1002,"1002, sana business center",Tunis,"Place Pasteur, Belvédère"
+93,5090,نهج ابو الطيب المتنبي,البقالطة,Monastir
+94,1003,"77 avenue echeikh mohamed belkadhi, 77",TUNIS,cite el khadra
+95,1002,"Tunis 21 rue Jérusalem، SANA Business Center, Tunis 1002, SANA Business Center",Tunis,Tunis
+374,6100,"Cite ons siliana, Pres de garderie el ons",Siliana,Siliana
+375,2024,Tunis l'Aouina prés l'église,Tunis,l'aouina
+376,1069,"A cote de maison Ford les berges du lac 1, Centre daffaires Amen Bank",Tunis,Tunis
+377,8121,Cité 17 decembre babouch aindrahem,Aindrahem,Jendouba
+378,2081,X-level ariena soghra,Ariena,Ariena soghra
+379,4000,Hammam Sousse,Sousse,Sousse
+380,1001,"8, place Sidi el Bahri",Tunis,Tunis
+381,3000,Route Ain Km 8,Sfax,Sfax
+382,2015,208 avenue habib bourguiba,Le kram,Tunis
+383,8020,02 Rue Marrakech,Soliman,Nabeul
+396,2036,"18 rue 18 عىن الصفصاف سيدي سالح سكرة اريانة en face du, 18 عىن الصفصاف سيدي سالح سكرة اريانة",سيدي سالح سكرة اريانة,سيدي سالح سكرة اريانة en Face du mosqueé
+399,2000,"58277944, 52 rue d’habib bougatfa bardo 2000",tunis,tunis
+401,2070,La Marsa,La Marsa,Tunis
+402,1000,Tunis,Tunis,Tunis
+403,4000,Sousse,Sousse,Sousse
+404,8030,Grombalia Nabeul,Grombalia,Nabeul
+405,8130,Ain Draham,Ain Draham,Jendouba
+406,1053,Berges du Lac Tunis,Berges du Lac,Tunis
+407,1009,Tunis Ouardia 1,Ouardia 1,Tunis
+408,2033,MEGRINE,MEGRINE,Ben Arous
+409,6000,Gabes,Gabes,Gabes
+410,0,Unknown,Unknown,Unknown
+411,1053,Les Berges du Lac 1,Les Berges du Lac 1,Tunis
+412,2037,Menzah 7,Menzah 7,Ariana
+413,1002,Lafayette,Lafayette,Tunis
+417,3000,Sfax,Sfax,Sfax
+462,1053,"Rue du Lac Turkana , Tunis 1053",Les Berges du Lac,Tunis
+463,9000,Béja,Béja,Béja
+464,1053,"Rue du Lac Constance, Imm El Majd B1 1053 Les Berges du Lac",Les Berges du Lac,Tunis
+465,2080,2 R/Etoiles IM CHAMS Cité Romana 2000,Ariana,Ariana
+466,2035,"16 Rue des entrepreneurs , Charguia 2 , 2035",Charguia 2,Tunis
+467,2040,Lot n 41 ZI rades tunis,Rades,Ben Arous
+28,1002,"21 de la rue de juresalem, Sana Business centre",t'unis,tunis
+30,4000,"14 rue docteur moreau pres de café Roma, Immeuble essayes",Sousse,Sousse
+31,1075,21 rue Jérusalem، SANA Business Center,Tunis,Tunis
+32,8000,5 5ue ibn charaf,nabeul,Nabeul
+33,2098,Rue haifa rades,Rades,Ben arous
+34,1001,Rue d'Alger,Tunis,Tunis
+35,1001,"21 rue Jérusalem Sana busines center, Sana busines center",tunis,Tunis
+36,1002,SANA Business Center/21 Rue Jérusalem Tunis 1002,Tunis,Tunis centre ville
+37,1002,"21 rue Jérusalem، SANA Business Center,",Place pasteur,Tunis
+38,1002,Place Pasteur agence Amen BANK,Tunis,Tunis Belvédère
+39,2034,"RUE MOUFIDA BOURGUIBA, Résidence les vagues",ezzahra,ben arous
+40,2052,Khaznadar,Tunis,Bardo
+41,1002,"21 rue Jerusalem Sana SANA Business Center - 1002 - Tunis, SANA Business Center",tunis,tunis
+42,1002,"Adresse : 21 rue Jérusalem، SANA Business Center, Tunis 1002, SANA Business Center, Tunis",Tunis,Tunis
+43,2042,cité hadika 2,Tunis,"Cité Hadika, près du lycée Hadika"
+44,2009,Ksar said 2 bardo,Tunis,Bardo
+45,1002,"SANA Business Center, 21 rue Jérusalem",TUNIS,tunis
+46,1005,EVERIENCE,TUNIS,TUNIS
+47,1095,cité 20 mars sidi hssine,Tunis,tunis
+48,1002,"21 rue Jérusalem، SANA Business Center, Tunisie, Sana business center",tunis,Tunis
+49,20250,"10, Rue de l'indépendance Hammam-Lif",Hammam Lif,Hammam lif
+50,2010,LA MANNOUBA SOPROLOS BLOC 19 APPART 0-5,LA MANNOUBA,la mannouba
+51,1002,"21 rue Jérusalem, SANA Business Center, Belvédère., everience",tunis,tunis
+52,1234,1 rue casablanca ryadh borj cedria,tunis,tunis
+53,1001,"Rue jerusalam, everience",tunis,"Adresse : SANA Business Center, 21 Rue Jérusalem, Tunis"
+54,1002,"21 rue Jérusalem Tunis 1002, Tunisie, SANA Business Center",tunis,tunis
+55,1002,"147 AVENUE DE LA LIBERTE, TUNIS VILLE",Tunis,Tunis
+56,1002,"21 Rue Jérusalem Tunis 1002, SANA Business Center",tunis,tunis
+57,1002,"21 Rue Jerusalem, Sana busnis center",Tunis,Tunis
+59,1002,"21 rue Jérusalem, ، SANA Business Center, Tunis 1002",Tunis,Tunis
+60,1002,"Belvédère gps : https://maps.iapp.goo.gl/YL7ehynxW1pFZ5mJ8?g_st=ic, EVERIENCE - le SANA Business Center, 21 rue Jérusalem, à Tunis 1002, Tunisie",Tunis,Belvedere
+61,2036,"56 262 952 /18 rue 18 عىن الصفصاف سيدي سالح سكرة اريانة en face du, 18 عىن الصفصاف سيدي سالح سكرة اريانة",سيدي سالح سكرة اريانة,سيدي سالح سكرة اريانة en Face du mosqueé
+62,1002,1 RUE JERUSALEM IMMEUBLE SANA,Tunis,1 RUE JERUSALEM IMMEUBLE SANA
+63,1075,Hedi chaker,Tunis,beb el khadhra
+64,6000,Rue el Maarfa gabes en face de l'école primaire Béchir jaziri gabes,Gabes Medina,Gabès
+65,2042,"Cité Ettahrir, Résidence el Hadika Bloc U",Tunis,Cité Ettahrir
+80,2011,"9 rue Ons Den Den, 9",La manouba,Den Den
+1,1080,"siége ONT à coté siége CNAM Montplaisir, Montplaisir",tunis,tunis
+2,1002,"21 rue Jérusalem, SANA Business Center",Tunis,Tunis
+3,2097,"05 Rue l'indépendance Boumhel el Bassatine , Ben arous, 05 Rue l'indépendance Boumhel el Bassatine , Ben arous",Boumhel,Ben Arous
+4,1002,"21 rue Jérusalem، SANA Business Center, Tunis 1002, sana business",Tunis,tunis
+5,1002,"21 rue jerusalem, Sana business center",Tunis,tunis
+6,1074,24 rue verdier Mourouj2,Tunis,Mourouj2 Tunis
+7,1002,21 Rue Jérusalem,Tunis,Place Pasteur
+8,1002,"Rue Jerusalem, Tunis Belvédère, Près de la mosquée Al Qods",Tunis,Tunis
+9,2000,Av habib bourguiba bardo en face oreedoo,Tunis,Tunis
+10,1005,Rue tantaoui jawhari france ville el omran tunis,Tunis,Tunis
+11,2046,"Rue ibn rochd, Résidence les mimosas",Sidi daoued,La marsa
+12,2013,Av de france ben arous,BEN AROUS,Ben arous
+13,3002,"Complexe Medical Dar Attabib, Route De Tunis Km 3",Sfax,Sfax
+14,2074,"residence nejma, mourouj 1, BLOC C APP C3",MOUROUJ1,BEN AROUS
+15,2080,Residence salambo,ennaser 1,Ariana
+16,1002,"21 rue Jérusalem، SANA Business Center, Tunis 1002, Everience TUNISIA، 21 rue Jérusalem، SANA Business Center, Tunis 1002",Tunis,Tunis
+17,1002,"21 rue Jérusalem،, SANA Business Center,",jean d'arc Tunis 1002,Tunis
+18,2074,"rue de l'aigle maison numéro 10 mourouj 2, Maison numéro 10",Mourouj 2,Ben arous
+19,2033,18 Rue Mokhtar Attia Chouchet Rades,Rades,Benarouss
+20,9070,cité professeur mjez bab,mjez bab,beja
+22,6001,37 rue karawen cité Mohamed Ali Gabes,Gabès,Gabès Medina
+23,1002,21 rue jerusalem -sanabusiness center 1002 tunis belvedere,Tunis,Tunis centre ville
+24,2083,15 rue enkhilette,Ariana,Ariana
+29,10026,"rue Jérusalem Belvédère, Sana Center",Tunis,Tunis
+70,1003,rue 8261,Tunis,Tunis
+101,1000,"rue jerusalem tunis, Everience",Tunis,Tunis
+131,3033,Tui blue manar,hammamet,Nabeul
+216,2045,4,Tunis,Ain zaghouan
+217,9070,"23 Cité Yasmine, Medjez EL Bab, Près Usine SICAM",Medjez El Bab,Beja
+265,2015,"61 rue amilcar, maison",kram,tunis
+282,1164,71,Ben arous,Ezzahra
+307,1002,"amen banque , rue de la liberté tunis, amen banque , rue de la liberté tunis","Tunis, Tunisie","amen banque , rue de la liberté tunis"
+308,2091,"Rue de Mehdia, dvant l'ecole pardais school",menzah 5,arriana
+309,1002,"21, Rue Jerusalem, SANA BUSINESS CENTER",Tunis,Tunis Belvedere
+355,1002,"21 rue Jérusalem،, SANA Business Center, Tunis 1002",Tunis,Place pasteur
+356,1001,Rue palastibe,TUNIS,belvedere
+357,2086,05 rue ghomrassen,Manouba,Cité Chabeb
+358,1001,21 rue Jérusalem tunis,Tunis,Tunis
+359,1000,21 rue jerusalem à coté de musquée al quods tunis,Tunis,Tunis
+360,1002,"21 rue Jérusalem، SANA Business Center,, a coté mosquée el 9odes",rue liberté,tunis
+361,4011,Hamam sousse,Sousse,Sousse
+362,1000,Résidence Montazah El Marsa Avenue Osman Bahri Ain Zaghouan Nord,Tunis,Tunis
+363,8000,Avenue maghreb arabe,Nabeul,Nabeul
+364,1005,14 rue Khaled Ben Saiid,Omran,Jbal lahmer
+365,2054,"21 rue jeruselem, Immeuble sana",Tunis,Tunis
+366,2036,Khan younes,Tunis,Soukra chotrana 3
+367,5000,"monastir, C1",monastir,Monastir
+368,5100,"262 Rue Bechir Sfar, Avenue Rabat Sidi Alouen",Mahdia,Mahdia
+369,3116,"Route abaydia, Chrarda",Kairouan,Batouma
+384,4000,"Slim centre bloc E, Slim centre bloc E",Sousse,Khzema
+385,8090,2 rue taher sfar elbosten kelibia,Kelibia,Nabeul
+386,2052,10 rue 4775 immeuble 2 appartement 15,Ezzouhour,Tunis
+387,1130,20 rue Farhat hached Tebourba,Tebourba,Tebourba
+388,1002,63 avenue Mohamed V Tunis,Tunis,Tunis
+389,8090,rue de Marseille,Kelibia,Kelibia
+390,2132,cité magroun,métlaoui,Gafsa
+391,1053,Lac 1 près de l'ambassade de almagne,Les berges du lac,Tunis
+392,5100,Av. Habib Bourguiba en face de la grande poste Mahdia,Mahdia,Mahdia
+393,2045,Rue jaloul fersi en face du kiosque agile ennasser1,Ennasser 1,Ariana
+394,2070,Tanit centre derrière carrefour la Marsa,Tunis,sidi daoued
+395,1091,37 rue 6980,Tunis,Omran sup
+397,2034,"Everience, tunisie a coté de bélvedere",Tunisia,Marsa
+398,2046,"57094536, 34 rue de l'uranium la marsa",Marsa,Marsa
+400,2081,"58750511, X-level ariena soghra",Ariena,Ariena soghra
+414,2063,Nouvelle Medina,Nouvelle Medina,Ben Arous
+415,2060,La Goulette,La Goulette,Tunis
+416,1110,Mornagia,Mornagia,Manouba
+418,2036,Soukra,Soukra,Ariana
+419,2010,Manouba,Manouba,Manouba
+454,3000,"Rue Mohamed Moalla la Poudrière , champ de course Sfax",Sfax,Sfax
+455,4000,AG BAB JEDID AV habib thameur bab jedid sousse,Sousse,Sousse
+456,4180,"Immeuble Sun Médical Centre, rue de la municipalité 4180 Houmet Souk - Djerba",Houmet Souk,Medenine
+457,2013,Angle avenue de France GP1 Ben Arous,Ben Arous,Ben Arous
+459,2000,avenue 20 mars le bardo (ou agence 075),Bardo,Tunis
+460,2092,"Avenue Taher B,Ammar cité Essada 2 , 1092, Manar 2 , Tunis",Manar 2,Tunis
+461,7000,"Zone Industrielle El Azib Km9 , 7026 Bizerte",Bizerte,Bizerte
+420,2046,Ain Zaghouan,Ain Zaghouan,Tunis
+421,8000,Nabeul,Nabeul,Nabeul
+422,1000,"Street Lac Ontario les Berges du lacLa Marsa Tunis,Tunisia",Street Lac Ontario les Berges du lacLa Marsa Tunis,Tunis
+423,2092,046 centre alyssa Manar 1,046 centre alyssa Manar 1,Tunis
+424,8000,zone industrielle Nabeul,zone industrielle,Nabeul
+425,2092,manar2,manar2,Tunis
+426,1000,"24 Av Hedi Karray, Tunis 1080",Tunis,Tunis
+427,1000,"Rue Lac d'Annecy , les Berges du Lac, 1059, Tunis",Tunis,Tunis
+428,1000,"Route de sousse km14, Hamman-Lif, Tunisia",Tunis,Tunis
+429,1053,"Zone D'activités Kheireddine, Les Berges du Lac III 2015 Kram",Les Berges du Lac,Tunis
+430,0,63 Rue Ibn Rachiq Avenue Mohamed 5,Unknown,Unknown
+431,1000,"2 Rue d'Argentine , Tunis Belvédère , Tunis 1002 Tunisie",Tunis,Tunis
+432,1000,"Z.I Chotrana II, Ariana 2036, Ariana, Tunisia",Tunis,Tunis
+433,2050,"152 Avenue 2 Mars GP1 KH 14 , Hammam Lif 2050",Hammam Lif,Ben Arous
+434,1082,"Rue Safia Chamia, Immobilière Khairi, 5ème étage Centre Urbain nord",Centre Urbain Nord,Tunis
+435,1000,"5 Rue de l'énergie éolienne ZI Charguia 1 , Tunis Carthage 2035",Tunis,Tunis
+436,1000,"Rue du Lac d'Annecy , Tunis 1053",Tunis,Tunis
+437,1000,"40 Rue Ali Ben Ghedhehem 1er étage , 1001 Tunis",Tunis,Tunis
+438,2036,"Groupe Alyssa, Soukra (côté agence Soukra 114)",Soukra,Ariana
+439,7000,Bureau 406 Bloc B Immeuble Business Center Avenue Hassen NOURI 7000 Bizerte,Bizerte,Bizerte
+440,1000,Avenue de Paris (Mezzanine),Tunis,Tunis
+441,8000,27 av habib thameur nabeul,Nabeul,Nabeul
+442,4000,Centre d affaires av habib Bourguiba sousse,Sousse,Sousse
+443,4000,IMM Diamond bleu route touristique Sousse,Sousse,Sousse
+444,2100,Attijari Bank Gafsa Place du marché 2100,Gafsa,Gafsa
+445,3100,AGENCE KAIROUAN près ABI ZAMAA EL BELAOUI kairouan,Kairouan,Kairouan
+446,4100,"AVENUE HABIB BOURGUIBA - MEDENINE, 4100",Medenine,Medenine
+447,6000,Avenue Habib Bourguiba Attijari Bank Gabes 6000,Gabes,Gabes
+448,2037,Ennasr (à l'étage de agence Ennasr 107),Ennasr,Ariana
+449,2037,10 Avenue charles Nicole menzah 1 (ou agence 162),Menzah 1,Ariana
+450,1000,Avenue de Paris 5ème étage,Tunis,Tunis
+451,1000,Région de Tunis Menzeh 5 SMR,Tunis,Tunis
+452,5000,AGENCE MONASTIR IMM Star AV HABIB BOURGUIBA Monastir,Monastir,Monastir
+453,8100,Agence 062 : Rue habib thameur Jendouba 8100,Jendouba,Jendouba
+458,2035,CA 080 : rue 8600 Z.I charguia I,Charguia,Tunis

@@ -1,0 +1,21 @@
+<div class="layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="content">
+    <div class="dashboard-shell">
+      <section class="main-panel">
+        <div class="panel-head">
+          <div class="panel-copy">
+            <p class="panel-label">{{ viewModel.label }}</p>
+            <h1>{{ viewModel.title }}</h1>
+            <p class="panel-description">{{ viewModel.description }}</p>
+          </div>
+        </div>
+
+        <div class="pbframe" [innerHTML]="iframeHtml"></div>
+      </section>
+    </div>
+
+    <app-chatbot-widget></app-chatbot-widget>
+  </main>
+</div>

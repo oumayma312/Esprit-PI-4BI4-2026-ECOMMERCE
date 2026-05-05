@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap');
+
+:root {
+  --font-body: 'Manrope', 'Segoe UI', sans-serif;
+  --font-display: 'Sora', 'Segoe UI', sans-serif;
+  --app-canvas: #eff6ff;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-strong: #ffffff;
+  --surface-muted: rgba(233, 243, 255, 0.82);
+  --surface-dark: rgba(6, 20, 52, 0.56);
+  --line: rgba(137, 180, 223, 0.4);
+  --line-strong: rgba(82, 130, 195, 0.28);
+  --text-primary: #0f2340;
+  --text-secondary: #5b6f8c;
+  --text-soft: #7f92ac;
+  --brand-50: #eef8ff;
+  --brand-200: #90d6ff;
+  --brand-400: #4ca6ff;
+  --brand-500: #2d7ff9;
+  --brand-700: #1545a6;
+  --brand-900: #081f4d;
+  --cyan-glow: rgba(122, 214, 255, 0.44);
+  --success-bg: rgba(14, 182, 132, 0.14);
+  --success-text: #0f8f68;
+  --danger-bg: rgba(217, 78, 107, 0.12);
+  --danger-text: #a52c49;
+  --shadow-sm: 0 12px 24px rgba(13, 39, 84, 0.08);
+  --shadow-md: 0 20px 50px rgba(15, 47, 96, 0.14);
+  --shadow-lg: 0 28px 70px rgba(7, 24, 63, 0.18);
+  --radius-sm: 16px;
+  --radius-md: 24px;
+  --radius-lg: 32px;
+  --sidebar-width: 300px;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+app-root {
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background:
+    radial-gradient(circle at top left, rgba(155, 224, 255, 0.34), transparent 28%),
+    radial-gradient(circle at top right, rgba(76, 166, 255, 0.18), transparent 24%),
+    linear-gradient(180deg, #f9fbff 0%, #edf5ff 48%, #eaf2ff 100%);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+::selection {
+  background: rgba(45, 127, 249, 0.18);
+  color: var(--text-primary);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

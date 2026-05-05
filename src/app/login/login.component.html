@@ -1,0 +1,112 @@
+<section class="login-shell">
+  <div class="login-topbar">
+    <a class="back-home" routerLink="/">
+      <span class="back-home__arrow" aria-hidden="true"></span>
+      <span>Retour au site</span>
+    </a>
+  </div>
+
+  <div class="login-grid">
+    <section class="login-hero">
+      <div class="hero-brand">
+        <div class="hero-logo-shell">
+          <img src="/logo.png" alt="Logo Story" class="hero-logo" />
+        </div>
+        <div class="hero-copy">
+          <span class="eyebrow">Project Story x Power BI</span>
+          <h1>Access a clear, fast, decision-ready analytics workspace.</h1>
+          <p>
+            Sign in to explore the Project Story dashboards, monitor business performance,
+            and keep CEO, Sales, and Finance analysis in one polished workspace.
+          </p>
+        </div>
+      </div>
+
+      <div class="hero-features">
+        <article class="feature-card">
+          <span class="feature-icon">01</span>
+          <div>
+            <strong>Structured oversight</strong>
+            <p>A direct path to the most useful Power BI views for the project.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <span class="feature-icon">02</span>
+          <div>
+            <strong>Smooth experience</strong>
+            <p>Subtle transitions modernize the interface without slowing people down.</p>
+          </div>
+        </article>
+        <article class="feature-card">
+          <span class="feature-icon">03</span>
+          <div>
+            <strong>Secure access</strong>
+            <p>Use standard sign-in or biometrics from one unified entry point.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="login-panel">
+      <div class="login-card">
+        <div class="card-head">
+          <div class="logo-frame">
+            <img src="/logo.png" alt="Logo Story" class="logo" />
+          </div>
+          <div>
+            <span class="eyebrow eyebrow-dark">Welcome</span>
+            <h2>Secure sign in</h2>
+            <p>Identify yourself to open your analytics workspace.</p>
+          </div>
+        </div>
+
+        <form class="login-form" (ngSubmit)="submit()">
+          <div class="field">
+            <label for="emailInput">Email</label>
+            <input
+              type="email"
+              id="emailInput"
+              [(ngModel)]="email"
+              name="email"
+              autocomplete="email"
+              placeholder="ceo@gmail.com"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="passwordInput">Password</label>
+            <input
+              type="password"
+              id="passwordInput"
+              [(ngModel)]="password"
+              name="password"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          <button class="submit-btn" type="submit">Sign in</button>
+
+          <div class="error" *ngIf="error">{{ error }}</div>
+        </form>
+
+        <div class="divider">
+          <span>or</span>
+        </div>
+
+        <section class="face-card">
+          <div class="face-card-head">
+            <div>
+              <h3>Biometric sign in</h3>
+              <p>Start the camera to recognize an enrolled face profile.</p>
+            </div>
+            <span class="face-chip">Face ID</span>
+          </div>
+          <app-face-id></app-face-id>
+        </section>
+      </div>
+    </section>
+  </div>
+</section>

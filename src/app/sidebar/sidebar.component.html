@@ -1,0 +1,106 @@
+<aside class="sidebar">
+  <div class="brand-panel">
+    <div class="brand-mark">
+      <img src="/logo.png" alt="Logo Story" />
+    </div>
+    <div class="brand-copy">
+      <span class="brand-kicker">Project Story</span>
+      <h4>Story workspace</h4>
+      <p>Power BI command center for the CEO, Sales, and Finance areas of the project.</p>
+    </div>
+  </div>
+
+  <div class="user-pill" *ngIf="currentUser as user">
+    <span class="user-status"></span>
+    <div>
+      <strong>{{ user.role | uppercase }}</strong>
+      <small>{{ user.email }}</small>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <h5>Dashboards</h5>
+      <ul>
+        <li *ngIf="canAccessDashboard('ceo')">
+          <a routerLink="/dashboard/ceo" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 17.5V9.5L12 4l8 5.5v8L12 23l-8-5.5Z" />
+                <path d="M9 12h6M12 9v6" />
+              </svg>
+            </span>
+            <span class="nav-copy">
+              <strong>CEO</strong>
+              <small>Strategic view</small>
+            </span>
+          </a>
+        </li>
+        <li *ngIf="canAccessDashboard('sales')">
+          <a routerLink="/dashboard/sales" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M5 19h14" />
+                <path d="M7 16V9" />
+                <path d="M12 16V5" />
+                <path d="M17 16v-4" />
+              </svg>
+            </span>
+            <span class="nav-copy">
+              <strong>Sales</strong>
+              <small>Commercial tracking</small>
+            </span>
+          </a>
+        </li>
+        <li *ngIf="canAccessDashboard('finance')">
+          <a routerLink="/dashboard/finance" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 18h16" />
+                <path d="M7 14.5L10 11l3 2 4-5" />
+                <path d="M16 8h2v2" />
+              </svg>
+            </span>
+            <span class="nav-copy">
+              <strong>Finance</strong>
+              <small>Budget and margin</small>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <h5>Machine Learning</h5>
+      <ul>
+        <li>
+          <a routerLink="/ml" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <span class="nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M6 17V7" />
+                <path d="M12 20V4" />
+                <path d="M18 15V9" />
+                <path d="M4 12h4" />
+                <path d="M10 9h4" />
+                <path d="M16 12h4" />
+              </svg>
+            </span>
+            <span class="nav-copy">
+              <strong>ML Console</strong>
+              <small>Tools and experiments</small>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <button class="logout" (click)="logout()">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10 7V5a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-2" />
+      <path d="M15 12H4" />
+      <path d="m8 8-4 4 4 4" />
+    </svg>
+    <span>Sign out</span>
+  </button>
+</aside>

@@ -1,0 +1,59 @@
+<div class="face-wrap">
+  <div class="controls">
+    <button type="button" (click)="start()" *ngIf="!capturing">Start camera</button>
+    <button type="button" (click)="stop()" *ngIf="capturing">Stop</button>
+  </div>
+
+  <div class="camera-stage" #stage>
+    <video #video autoplay muted playsInline></video>
+
+    <div class="camera-overlay">
+      <div class="guide-frame"></div>
+
+      <div
+        class="face-box"
+        *ngIf="overlayBox"
+        [class.success]="messageTone === 'success'"
+        [class.warning]="messageTone === 'warning'"
+        [class.error]="messageTone === 'error'"
+        [style.left.px]="overlayBox.left"
+        [style.top.px]="overlayBox.top"
+        [style.width.px]="overlayBox.width"
+        [style.height.px]="overlayBox.height"
+      ></div>
+    </div>
+  </div>
+
+  <canvas #canvas class="hidden-canvas"></canvas>
+
+  <div class="enroll">
+    <select [(ngModel)]="selectedEmail" name="faceProfileEmail" aria-label="Face profile account">
+      <option *ngFor="let account of accounts" [ngValue]="account.email">
+        {{ account.role | uppercase }} - {{ account.email }}
+      </option>
+    </select>
+
+    <button
+      type="button"
+      (click)="enroll(selectedEmail)"
+      [disabled]="!capturing || enrollInProgress || !selectedEmail"
+    >
+      {{ enrollInProgress ? 'Saving...' : 'Save face profile' }}
+    </button>
+  </div>
+
+  <div
+    class="msg"
+    [class.success]="messageTone === 'success'"
+    [class.warning]="messageTone === 'warning'"
+    [class.error]="messageTone === 'error'"
+  >
+    {{ message }}
+  </div>
+
+
+
+  <ng-template #emptyProfiles>
+    <div class="profiles empty">No face profiles have been saved yet.</div>
+  </ng-template>
+</div>

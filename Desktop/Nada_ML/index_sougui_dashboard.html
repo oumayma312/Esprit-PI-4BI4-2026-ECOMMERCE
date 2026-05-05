@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sougui Competitive Intelligence Dashboard</title>
+  <style>
+    :root {
+      --bg: #f8f5f1;
+      --card: #ffffff;
+      --text: #2f2a26;
+      --muted: #7b6f66;
+      --accent: #b86f4c;
+      --accent-dark: #9b5c3d;
+      --accent-soft: #f2e2d8;
+      --success: #2f7d4a;
+      --warning: #9b6a1d;
+      --danger: #b5483d;
+      --info: #355c9a;
+      --border: #eadfd6;
+      --shadow: 0 10px 30px rgba(76, 53, 38, 0.08);
+      --shadow-soft: 0 6px 18px rgba(76, 53, 38, 0.06);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #fbf8f5 0%, #f5efe9 100%);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff 0%, #f7ece5 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 1050px;
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      min-width: 220px;
+      font-size: 14px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .panel h3 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 720px;
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+      background: white;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #fbf6f2;
+      z-index: 1;
+      text-align: left;
+      font-size: 13px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+    }
+
+    tbody td {
+      padding: 12px;
+      border-bottom: 1px solid #f1e8e1;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: #fcf8f4;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-high {
+      background: #dff4e6;
+      color: var(--success);
+    }
+
+    .badge-medium {
+      background: #fff2df;
+      color: var(--warning);
+    }
+
+    .badge-low {
+      background: #f7e7e4;
+      color: var(--danger);
+    }
+
+    .badge-info {
+      background: #e4eefc;
+      color: var(--info);
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .list-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fffdfa;
+    }
+
+    .list-item-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .section-note {
+      margin-top: 6px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ===== NEW IMPROVED STRATEGIC CATEGORIES DESIGN ===== */
+    .strategic-panel {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .strategic-header {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: white;
+      padding: 18px 18px 16px;
+    }
+
+    .strategic-header h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: white;
+    }
+
+    .strategic-header p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.85);
+    }
+
+    .strategic-body {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+      max-height: 760px;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #fff 0%, #fffaf6 100%);
+    }
+
+    .strategic-card {
+      position: relative;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .strategic-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(76, 53, 38, 0.10);
+    }
+
+    .strategic-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .strategic-name {
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin: 0;
+      text-transform: lowercase;
+    }
+
+    .strategic-score-circle {
+      min-width: 58px;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fff3eb 0%, #f2e2d8 100%);
+      border: 1px solid #ecd4c5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+      flex-shrink: 0;
+    }
+
+    .strategic-score-circle .score-label {
+      font-size: 9px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .strategic-score-circle .score-value {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--accent-dark);
+      line-height: 1;
+    }
+
+    .strategic-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .strategic-stat {
+      background: #fcf7f3;
+      border: 1px solid #f1e4d9;
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .strategic-stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .strategic-stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .strategic-footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .strategic-empty {
+      padding: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar input,
+      .toolbar select {
+        width: 100%;
+      }
+
+      .strategic-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .strategic-top {
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Sougui Competitive Intelligence Dashboard</h1>
+      <p>
+        This dashboard presents the results of a competitor product classification and business benchmarking pipeline.
+        It helps compare Sougui against competitors by category coverage, identify strategic opportunity categories,
+        and highlight high-priority competitor products for assortment analysis.
+      </p>
+
+      <div class="actions">
+        <button class="primary" onclick="loadAllData()">Load Benchmark Results</button>
+      </div>
+
+      <div id="status" class="status">Ready.</div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <div class="card-title">Total Classified Competitor Products</div>
+        <div id="totalProducts" class="card-value">0</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">High Opportunity Products</div>
+        <div id="totalPriorityHigh" class="card-value">0</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Strategic Categories</div>
+        <div id="totalCategories" class="card-value">0</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Top Opportunity Category</div>
+        <div id="topCategory" class="card-value" style="font-size:20px;">-</div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <h3>Competitor Products & Opportunity Scoring</h3>
+        <div class="section-note">
+          Explore competitor products classified by category, confidence level, and product opportunity score.
+        </div>
+
+        <div class="toolbar">
+          <input id="searchInput" type="text" placeholder="Search by product name..." oninput="renderProductsTable()" />
+
+          <select id="categoryFilter" onchange="renderProductsTable()">
+            <option value="All">All categories</option>
+          </select>
+
+          <select id="actionFilter" onchange="renderProductsTable()">
+            <option value="All">All opportunity levels</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Predicted Category</th>
+                <th>Confidence</th>
+                <th>Avg Price</th>
+                <th>Nb Competitors</th>
+                <th>Product Score</th>
+                <th>Opportunity Level</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody">
+              <tr>
+                <td colspan="8" class="muted">No data loaded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:grid; gap:18px;">
+        <div class="panel strategic-panel">
+          <div class="strategic-header">
+            <h3>Top Strategic Categories</h3>
+            <p>
+              Most attractive categories based on benchmark opportunity score, coverage ratio,
+              and competitor weight.
+            </p>
+          </div>
+
+          <div id="categoriesList" class="strategic-body">
+            <div class="strategic-empty">No category data loaded yet.</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Top Opportunity Products</h3>
+          <div class="section-note">
+            High-priority competitor products that stand out in strategic categories.
+          </div>
+          <div id="topProductsList" class="list">
+            <div class="muted">No product opportunity data loaded yet.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let allPredictions = [];
+    let allCategories = [];
+    let allTopProducts = [];
+    let mergedRows = [];
+
+    function setStatus(message) {
+      document.getElementById("status").textContent = message;
+    }
+
+    function badgeClassForLevel(level) {
+      if (!level) return "badge-medium";
+
+      const value = String(level).toLowerCase();
+
+      if (value.includes("haute") || value.includes("fortement")) return "badge-high";
+      if (value.includes("moyenne") || value.includes("recommandee")) return "badge-medium";
+      if (value.includes("faible") || value.includes("watch") || value.includes("surveiller") || value.includes("basse")) return "badge-low";
+      if (value.includes("fort") || value.includes("equivalent")) return "badge-info";
+
+      return "badge-medium";
+    }
+
+    function numberOrDash(value, decimals = 3) {
+      if (value === null || value === undefined || value === "") return "-";
+      const n = Number(value);
+      if (Number.isNaN(n)) return "-";
+      return n.toFixed(decimals);
+    }
+
+    function buildMergedRows() {
+      const topProductMap = new Map();
+
+      allTopProducts.forEach(item => {
+        const key = `${item.product || ""}|||${item.category || ""}`;
+        topProductMap.set(key, item);
+      });
+
+      mergedRows = allPredictions.map(row => {
+        const key = `${row.product || ""}|||${row.category || ""}`;
+        const extra = topProductMap.get(key) || {};
+
+        return {
+          ...row,
+          avg_price: row.avg_price ?? extra.avg_price ?? null,
+          nb_concurrents: row.nb_concurrents ?? extra.nb_concurrents ?? null,
+          product_score: row.product_score ?? extra.product_score ?? null,
+          niveau_recommandation: row.niveau_recommandation ?? extra.niveau_recommandation ?? "A surveiller"
+        };
+      });
+    }
+
+    function updateCards() {
+      const total = mergedRows.length;
+      const priorityHigh = mergedRows.filter(r => String(r.niveau_recommandation) === "Priorite haute").length;
+      const totalCategories = allCategories.length;
+      const topCategory = totalCategories > 0 ? (allCategories[0].category || "-") : "-";
+
+      document.getElementById("totalProducts").textContent = total;
+      document.getElementById("totalPriorityHigh").textContent = priorityHigh;
+      document.getElementById("totalCategories").textContent = totalCategories;
+      document.getElementById("topCategory").textContent = topCategory;
+    }
+
+    function fillCategoryFilter() {
+      const select = document.getElementById("categoryFilter");
+
+      const categories = [
+        ...new Set(
+          mergedRows
+            .map(r => r.category)
+            .filter(Boolean)
+        )
+      ].sort();
+
+      select.innerHTML =
+        '<option value="All">All categories</option>' +
+        categories.map(cat => `<option value="${cat}">${cat}</option>`).join("");
+    }
+
+    function fillActionFilter() {
+      const select = document.getElementById("actionFilter");
+
+      const values = [
+        ...new Set(
+          mergedRows
+            .map(r => r.niveau_recommandation)
+            .filter(Boolean)
+        )
+      ];
+
+      const preferredOrder = ["Priorite haute", "Priorite moyenne", "Priorite basse", "A surveiller"];
+      const ordered = preferredOrder.filter(v => values.includes(v));
+      const remaining = values.filter(v => !preferredOrder.includes(v)).sort();
+
+      const finalValues = [...ordered, ...remaining];
+
+      select.innerHTML =
+        '<option value="All">All opportunity levels</option>' +
+        finalValues.map(v => `<option value="${v}">${v}</option>`).join("");
+    }
+
+    function renderProductsTable() {
+      const body = document.getElementById("productsBody");
+      const search = document.getElementById("searchInput").value.toLowerCase().trim();
+      const categoryFilter = document.getElementById("categoryFilter").value;
+      const actionFilter = document.getElementById("actionFilter").value;
+
+      const filtered = mergedRows.filter(row => {
+        const matchesSearch = !search || (row.product || "").toLowerCase().includes(search);
+        const matchesCategory = categoryFilter === "All" || row.category === categoryFilter;
+        const matchesAction = actionFilter === "All" || row.niveau_recommandation === actionFilter;
+        return matchesSearch && matchesCategory && matchesAction;
+      });
+
+      if (filtered.length === 0) {
+        body.innerHTML = `
+          <tr>
+            <td colspan="8" class="muted">No matching rows.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      body.innerHTML = filtered.map(row => `
+        <tr>
+          <td>${row.product ?? ""}</td>
+          <td>${row.category ?? ""}</td>
+          <td>${row.predicted_category ?? ""}</td>
+          <td>${typeof row.confidence === "number" ? row.confidence.toFixed(3) : (row.confidence ?? "-")}</td>
+          <td>${numberOrDash(row.avg_price, 2)}</td>
+          <td>${row.nb_concurrents ?? "-"}</td>
+          <td>${numberOrDash(row.product_score, 3)}</td>
+          <td>
+            <span class="badge ${badgeClassForLevel(row.niveau_recommandation)}">
+              ${row.niveau_recommandation ?? "A surveiller"}
+            </span>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderCategoriesList() {
+      const container = document.getElementById("categoriesList");
+
+      if (!allCategories.length) {
+        container.innerHTML = `<div class="strategic-empty">No category data loaded yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = allCategories.slice(0, 10).map(row => `
+        <div class="strategic-card">
+          <div class="strategic-top">
+            <h4 class="strategic-name">${row.category ?? ""}</h4>
+            <div class="strategic-score-circle">
+              <div class="score-label">Score</div>
+              <div class="score-value">${numberOrDash(row.opportunity_score, 2)}</div>
+            </div>
+          </div>
+
+          <div class="strategic-stats">
+            <div class="strategic-stat">
+              <div class="strategic-stat-label">Competitor products</div>
+              <div class="strategic-stat-value">${row.nb_produits_conc ?? "-"}</div>
+            </div>
+
+            <div class="strategic-stat">
+              <div class="strategic-stat-label">Sougui products</div>
+              <div class="strategic-stat-value">${row.nb_produits_sougui ?? "-"}</div>
+            </div>
+
+            <div class="strategic-stat">
+              <div class="strategic-stat-label">Coverage ratio</div>
+              <div class="strategic-stat-value">${numberOrDash(row.coverage_ratio, 2)}</div>
+            </div>
+
+            <div class="strategic-stat">
+              <div class="strategic-stat-label">Position</div>
+              <div class="strategic-stat-value">${row.positionnement_couverture ?? "-"}</div>
+            </div>
+          </div>
+
+          <div class="strategic-footer">
+            <span class="badge ${badgeClassForLevel(row.niveau_opportunite)}">
+              ${row.niveau_opportunite ?? ""}
+            </span>
+            <span class="badge badge-info">
+              ${row.positionnement_couverture ?? ""}
+            </span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderTopProductsList() {
+      const container = document.getElementById("topProductsList");
+
+      if (!allTopProducts.length) {
+        container.innerHTML = `<div class="muted">No top product data available.</div>`;
+        return;
+      }
+
+      container.innerHTML = allTopProducts.slice(0, 10).map(row => `
+        <div class="list-item">
+          <div class="list-item-title">${row.product ?? ""}</div>
+          <div class="tiny">Category: ${row.category ?? ""}</div>
+          <div class="tiny">Avg price: ${numberOrDash(row.avg_price, 2)}</div>
+          <div class="tiny">Nb competitors: ${row.nb_concurrents ?? "-"}</div>
+          <div class="tiny">Score: ${numberOrDash(row.product_score, 3)}</div>
+          <div style="margin-top:8px;">
+            <span class="badge ${badgeClassForLevel(row.niveau_recommandation)}">
+              ${row.niveau_recommandation ?? ""}
+            </span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function loadAllData() {
+      setStatus("Loading benchmark results...");
+
+      try {
+        const [predRes, topRes, catRes] = await Promise.all([
+          fetch("/api/predict"),
+          fetch("/api/top-products"),
+          fetch("/api/categories")
+        ]);
+
+        const predData = await predRes.json();
+        const topData = await topRes.json();
+        const catData = await catRes.json();
+
+        allPredictions = predData.predictions || [];
+        allTopProducts = topData.data || [];
+        allCategories = catData.data || [];
+
+        buildMergedRows();
+        fillCategoryFilter();
+        fillActionFilter();
+        updateCards();
+        renderProductsTable();
+        renderCategoriesList();
+        renderTopProductsList();
+
+        setStatus(
+          `Loaded benchmark: ${mergedRows.length} classified competitor products, ${allCategories.length} strategic categories, and ${allTopProducts.length} product opportunities.`
+        );
+      } catch (error) {
+        console.error(error);
+        setStatus("Failed to load dashboard data.");
+      }
+    }
+
+    loadAllData();
+  </script>
+</body>
+</html>

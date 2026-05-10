@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from time import perf_counter
 from typing import Literal
@@ -49,7 +50,13 @@ config = AppConfig.from_env()
 chatbot = MarketingChatbot(config)
 face_registry = FaceRegistry(config.root_dir / "faces")
 
-app = FastAPI(title="Story AI Chatbot API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    dss_startup()
+    yield
+
+
+app = FastAPI(title="Story AI Chatbot API", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=list(config.allowed_origins) or ["*"],
@@ -59,7 +66,6 @@ app.add_middleware(
 )
 app.include_router(build_ml_router(config))
 app.include_router(dss_app.router, prefix="/api")
-app.add_event_handler("startup", dss_startup)
 
 sougui_assets_dir = config.root_dir / "sougui_photos"
 if sougui_assets_dir.is_dir():

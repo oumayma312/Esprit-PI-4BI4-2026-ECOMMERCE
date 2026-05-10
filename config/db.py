@@ -5,7 +5,7 @@ DB_CONFIG = {
     "host":     "localhost",
     "database": "pi_bi",
     "user":     "postgres",
-    "password": "04062003",
+    "password": "douraid",
     "port":     5432
 }
 

@@ -1,0 +1,526 @@
+categoryPK,category
+1,Parfum d'ambiance
+2,Articles en Cuivre
+3,Carafes et bouteilles
+4,Art de table
+5,Vases et pots
+6,élement de déco
+7,Jeux
+8,Shop
+9,Shop > Déco > Bougeoirs
+10,Shop > Arts de la table > Cuivres
+11,Shop > Arts de la table > Cuivres
+12, Shop > Arts de la table > Verres
+13,Shop > Arts de la table > Céramiques
+14,Shop > Arts de la table > Céramiques
+15, Shop > Déco > Vases
+16,Shop > Déco
+17,Shop > Gifts > Esprit Romance
+18,Shop > Arts de la table
+19, Shop > Arts de la table > Verres
+20,Shop > Arts de la table > Verres
+21,Shop > Déco > Sculptures
+22,Shop > Déco > Luminaires
+23,Shop > Déco > Sculptures
+24, Shop > Déco > Vases
+25,Shop > Déco > Vases
+26,Shop > Arts de la table > Bois d'olivier
+27, Shop > Gifts
+28, Jeux
+29,Shop > Arts de la table > Céramiques
+30, Shop > Gifts > Esprit Romance
+31,Shop > Arts de la table
+32, Shop > Arts de la table > Bois d'olivier
+33,Shop > Arts de la table > Service de Table
+34,Shop > Arts de la table > Céramiques
+35, Shop > Arts de la table > Service de Table
+36,Shop > Arts de la table > Service de Table
+37, Shop > Arts de la table > Verres
+38,Shop > Arts de la table > Cuivres
+39, Shop > Déco
+40, Shop > Arts de la table > Verres
+41,Shop > Arts de la table
+42, Shop > Arts de la table > Céramiques
+43,Shop > Arts de la table
+44, Shop > Arts de la table > Nattes
+45,Shop > Arts de la table
+46, Shop > Arts de la table > Céramiques
+47, Shop > Gifts > Esprit Romance
+48,Shop > Déco > Bougeoirs
+49, Shop > Déco > Luminaires
+50,Shop > Couffins & Foutas
+51, Shop > Gifts > Esprit Romance
+52, Shop > Gifts
+53,Shop > Couffins & Foutas
+54, Shop > Gifts
+55,Shop > Couffins & Foutas
+56,Shop > Déco
+57, Shop > Déco > Sculptures
+58,Shop > Déco
+59, Shop > Gifts
+60,Shop > Arts de la table > Bois d'olivier
+61, Shop > Déco
+62,Shop > Arts de la table > Céramiques
+63, Shop > Gifts > Esprit Romance
+64, Shop > Gifts
+65,Shop
+66, Tableaux d’art
+67,Shop > Arts de la table
+68,Shop > Arts de la table > Bois d'olivier
+69,Shop > Gifts
+70,Tableaux d’art
+71,Shop > Arts de la table > Nattes
+72,Artisanat tunisien
+73,Art de la table
+74,artisanat
+75,pièce unique
+76,décoration intérieure
+77,décoration artisanale
+78,Décoration de table
+79,Cadeau original
+80,SOUGUI
+81,fait main
+82,motifs ottomans
+83,motifs andalous
+84,Verre soufflé
+85,cadeau artisanal
+86,Céramique
+87,bleu et blanc
+88,bouteille en céramique
+89,cuisine méditerranéenne
+90,élégance intemporelle
+91,rangement élégant
+92,Cadeau raffiné
+93,Set céramique
+94,cadeau romantique
+95,décoration chaleureuse
+96,boîte en céramique
+97,poterie traditionnelle
+98,huile d'olive
+99,Raku
+100,Fibres végétales
+101,Décoration élégante
+102,Décoration minimaliste
+103,Céramique artisanale
+104,décoration table
+105,accessoires de table
+106,décoration murale
+107,calligraphie arabe
+108,service à thé
+109,décoration
+110,Service de table
+111,Cadeau élégant
+112,Saint-Valentin
+113,Tasse artisanale
+114,Fleurs séchées
+115,service à café
+116,Ensemble décoratif
+117,métal martelé
+118,Carafe artisanale
+119,cadeau.
+120,décoration méditerranéenne
+121,Fer
+122,Décoration naturelle
+123,objet déco
+124,Lampe artisanale
+125,vaisselle tunisienne
+126,Tableau
+127,Base en bois
+128,zellige
+129,Zayneb Abidi
+130,mug en céramique
+131,peinture
+132,élégance
+133,Résine marbrée
+134,œuvre originale
+135,Tunisie.
+136,cuivre martelé
+137,art tunisien
+138,Handdrawn Collection
+139,accessoire cuisine
+140,Sougui Art
+141,Éclairage d'ambiance
+142,Verres artisanaux
+143,Cadeau unique
+144,Art équestre
+145,Verre Craquelé
+146,Set de 6 verres
+147,vaisselle artisanale
+148,mug avec plateau
+149,Design épuré
+150,gobelets en grès
+151,service à eau
+152,Émaillée
+153,Design naturel
+154,céramique tunisienne
+155,Pack céramique artisanale
+156,service apéritif
+157,Planche en céramique
+158,Sous-plat céramique
+159,déco orientale
+160,bouteille décorative
+161,fabriqué en Tunisie
+162,objet décoratif
+163,poterie tunisienne
+164,design méditerranéen
+165,Accessoires modernes
+166,Vase décoratif
+167,khamsa
+168,objet mural
+169,dessous de plat
+170,artisanat d'art
+171,Tasses à café
+172,Verres à thé
+173,Théière martelée
+174,Lampe design
+175,Éclairage mural
+176,bois d’olivier
+177,Action
+178,accessoires élégants
+179,motifs géométriques
+180,carafe élégante
+181,carafe en verre
+182,toile acrylique
+183,tableau encadré
+184,Cuivre argenté
+185,plateau design
+186,sac artisanal
+187,accessoires de cuisine
+188,architecture tunisienne
+189,préparation traditionnelle
+190,art contemporain tunisien
+191,fibre végétale
+192,cruche en céramique
+193,Couffin
+194,Style martelé
+195,peinture sur toile
+196,vérité
+197,plateau rond
+198,verre transparent
+199,sac plage
+200,verre ébène
+201,bouchon liège
+202,tote bag
+203,sac réutilisable
+204,souvenir tunisien
+205,verre miel
+206,bouteille artisanale
+207,sac design tunisien
+208,sac en toile
+209,cruche céramique
+210,sous-tasse
+211,design tunisien
+212,planche Khamsa
+213,produit artisanal tunisien
+214,bouteilles artisanales
+215,objet artisanal
+216,cruche design
+217,céramique circulaire
+218,sac écologique
+219,sac artisanal tunisien
+220,sac cadeau
+221,sac canvas coton
+222,design arabe
+223,sac coton naturel
+224,pot déco
+225,bouteille huile
+226,pot en verre
+227,Carafe
+228,objet raffiné
+229,déco de table
+230,boissons pétillantes
+231,médina
+232,set vaisselle bicolore
+233,set de table élégant
+234,grès céramique
+235,céramique pâte blanche
+236,assiettes en céramique
+237,peinture colorée
+238,Verres à vin
+239,art méditerranéen
+240,à eau
+241,à cocktail
+242,Djerba
+243,vaisselle minimaliste
+244,peinture acrylique
+245,cocktails
+246,Flûtes à champagne
+247,jus
+248,verre soufflé à la main
+249,art fait main
+250,bonbonnière artisanale
+251,mug bohème
+252,accessoire déco
+253,verrerie artisanale
+254,tableau paysage
+255,pack carafe
+256,carafe avec verres
+257,carafe transparente
+258,Carafe Tanit
+259,carafe premium
+260,carafe haut de gamme
+261,carafe design
+262,carafe bleue
+263,bonbonnière
+264,vide-poches
+265,planche décorative
+266,céramique peinte
+267,boîte motifs géométriques
+268,boîte fait main Tunisie
+269,boîte en céramique bleue
+270,décoration épurée
+271,boîte de rangement décorative
+272,sac d’été
+273,accessoire tunisien
+274,cabas
+275,cuir
+276,boîte artisanale
+277,fouta offerte
+278,boîte à sucre céramique
+279,sac de plage
+280,coton
+281,boîte à bijoux artisanale
+282,rosace
+283,produit variable
+284,boîte orientale
+285,sac bohème
+286,coffret céramique décoratif
+287,Ambiance
+288,maison
+289,carafe médina
+290,décoration tunisienne
+291,collection Sidi Bou
+292,accessoire artisanal
+293,bougie parfumée
+294,mode tunisienne
+295,panier
+296,coffret cadeau
+297,thé
+298,soucoupe
+299,café
+300,panier déco
+301,panier cœur
+302,corbeille pain
+303,corbeille en nattes
+304,huile ou vinaigre
+305,forme personnalisée
+306,calligraphie géométrique
+307,cocktail
+308,mobilier enfant
+309,planche céramique
+310,mouton à bascule
+311,champagne
+312,motif géométrique
+313,fait main Tunisie
+314,bleu et turquoise
+315,seau à glace
+316,jouet artisanal
+317,objet de table
+318,vin
+319,décoration orientale
+320,peint à la main
+321,porte tunisienne
+322,photophore
+323,planche fromages
+324,jouet en bois
+325,artisanat du Maghreb
+326,bouteille céramique
+327,serviette coton
+328,déco maison
+329,motif zellige
+330,céramique rosace
+331,boîte ronde 13 cm
+332,boîte céramique
+333,fouta
+334,hammam
+335,serviette plage
+336,décoration chambre enfant
+337,spa
+338,boîte à sucre
+339,poisson céramique
+340,rosace orientale
+341,pièce décorative
+342,cadeau naissance
+343,motif andalou
+344,grès blanc
+345,vase en résine
+346,vaisselle authentique
+347,couvercle en métal martelé
+348,boîte blanche
+349,vases en céramique
+350,vases bleus
+351,motifs berbères
+352,art berbère
+353,moderne
+354,élégant
+355,design minimaliste
+356,blanc
+357,porte-serviettes
+358,motifs floraux
+359,accessoire de table
+360,motifs traditionnels
+361,décoration de cuisine
+362,bouchon en liège
+363,tasse à café
+364,support en métal martelé
+365,soucoupe élégante
+366,design raffiné
+367,rangement décoratif
+368,cruche décorative
+369,décor circulaire
+370,design unique
+371,Coffret diffuseur et bougie
+372,Bien-être
+373,Mouton décoratif
+374,Laine naturelle
+375,Bois et laine.
+376,Tasse orange
+377,Tasse Halloween
+378,Tasse citrouille
+379,Lilas
+380,déco marine
+381,Vert nature
+382,handmade
+383,déco méditerranéenne
+384,design élégant
+385,boîte de rangement
+386,vase en céramique
+387,vase coloré
+388,motifs de poissons
+389,décoration raffinée
+390,boîte en verre
+391,parfum d'intérieur
+392,accessoires déco
+393,manche en laiton
+394,style oriental
+395,encensoir
+396,cadeau traditionnel
+397,aromathérapie
+398,mathred
+399,Coupe à pied
+400,Boîte décorative
+401,Design ethnique
+402,Bougeoir
+403,منامة عروسيّة
+404,شوفلي حلّ
+405,الخطّاب على الباب
+406,TUNISIEN
+407,l'archive
+408,khottab aal beb
+409,Jeu
+410,choufli 7all
+411,tounsi
+412,ustensile de café
+413,Zazwa
+414,café pour deux
+415,base métal
+416,service raffiné
+417,plateau profond
+418,nhass
+419,CUIVRE
+420,verre en verre
+421,verre design
+422,service table
+423,décoration maison
+424,service élégant
+425,Petite Zazwa
+426,plateau métal
+427,accessoires maison
+428,théière métal
+429,théière élégante
+430,théière design
+431,vaisselle design
+432,accessoire maison
+433,ustensile de cuisine
+434,Jasmin Noir
+435,Silex
+436,grès naturel
+437,jeu d’échecs bois
+438,vaisselle faite main
+439,tasse cœur
+440,boîte à bijoux
+441,accessoire de cuisine
+442,boîte ronde
+443,bouteille ovale
+444,bouteille plate
+445,sous-plat décoratif
+446,Set céramique calligraphie
+447,motifs calligraphiques
+448,art arabe
+449,vase visage
+450,Vase design
+451,sculpture moderne
+452,art contemporain
+453,rangement déco
+454,boîte à épices
+455,bouteille carrée
+456,table élégante
+457,cadeau Saint-Valentin
+458,mugs romantiques
+459,plateau en céramique
+460,mug avec inscription
+461,Vaisselle >Grès >ServiceDeTable >Céramique >Artisanat >DesignBlanc >TableÉpurée >OffreSpéciale >Séa >ArtDeLaTable >Sougui
+462,Vaisselle >Grès >ServiceDeTable >Céramique >Artisanat >DesignNoir >TableÉlégante >OffreSpéciale >Séli >ArtDeLaTable >Sougui
+463,Vaisselle >Artisanat >Céramique >PâteBlanche >ServiceDeTable >DesignOrganique >Décoration >ArtDeLaTable >OffreSpéciale >Sougui
+464,Vaisselle >Grès >ServiceDeTable >Céramique >Artisanat >DesignÉpuré >TableÉlégante >Promotion >ArtDeLaTable >Olivéa >Sougui
+465,Vaisselle >HuileEtVinaigre >BouteillesEnGrès >Artisanat >DesignÉpuré >ArtDeLaTable >CuisineÉlégante >FaitMain >Sougui
+466,Moaï >Artisanat >ÎledePâques >BétonBrut >DécorationEthnique >ObjetsDAventure >DesignUnique >Handmade
+467,Luminaire >Béton >DesignMinimaliste >DécorationModerne >ÉclairageArtisanal >Handmade >AmbianceChaleureuse
+468,Bouddha >Artisanat >Béton >DécorationZen >Méditation >Sérénité >Handmade >DécoMinimaliste
+469,sous tasse céramique
+470,cœur rouge en relief
+471,Sous tasse Bois d'olivier
+472,rangement épices bois
+473,porte-épices en bois d’olivier
+474,boîte à épices artisanale
+475,Plateau en bois d’olivier
+476,Plateau artisanal
+477,vaisselle fait main
+478,mug vert artisanal
+479,jeu traditionnel
+480,échiquier sculpté
+481,Carafe Didon
+482,Échiquier artisanal
+483,Applique murale
+484,Veilleuse diamant
+485,Veilleuse citrouille
+486,Design organique
+487,Veilleuse coquille
+488,Sculpture cheval
+489,Base élégante
+490,Sculpture poisson
+491,Décoration marine
+492,Art de la mer.
+493,Vase sculptural
+494,Vase floral
+495,Vase buste
+496,Élégance classique
+497,Sculpture hibou
+498,Sagesse
+499,Sculpture tête de cheval
+500,Verre soufflé artisanal
+501,Collection Didon
+502,Diamant
+503,Applique marabout
+504,Moment de thé.
+505,Plateau moderne
+506,cadeau d’exception
+507,Pot géométrique
+508,Ensemble compact
+509,Vase géométrique
+510,Résine blanche
+511,Pot décoratif
+512,Plateau minimaliste
+513,Décoration scandinave
+514,Accessoires design
+515,Plateau
+516,Vase et accessoires
+517,Plateau décoratif.
+518,Bougie design
+519,Service à café oriental
+520,Plateau martelé
+521,cafetière en cuivre
+522,Intérieur en céramique
+523,Accessoires café
+524,tableau femme
+525,unknown

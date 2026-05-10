@@ -1,0 +1,31 @@
+{
+  "CEO": {
+    "ca_croissance_cible_pct": 10,
+    "ca_seuil_alerte_pct": 3,
+    "dependance_fourn_max_pct": 40,
+    "produits_manquants_max_pct": 10,
+    "roi_campagne_min": 1.5
+  },
+  "Finance": {
+    "ratio_depenses_revenus_max_pct": 60,
+    "ratio_depenses_revenus_alerte_pct": 80,
+    "variation_depenses_max_pct": 5,
+    "variation_depenses_alerte_pct": 10,
+    "indice_diversification_min": 0.7
+  },
+  "Sales": {
+    "taux_conversion_ventes_min_pct": 20,
+    "taux_conversion_devis_min_pct": 30,
+    "churn_max_pct": 10,
+    "churn_alerte_pct": 15,
+    "ecart_prix_concurrent_pct": 5,
+    "roi_campagne_min_pct": 150,
+    "taux_promotion_min_pct": 30,
+    "frequence_achat_min": 5
+  },
+  "global": {
+    "croissance_produit_min_pct": 8,
+    "baisse_alerte_pct": 10,
+    "augmentation_alerte_pct": 10
+  }
+}

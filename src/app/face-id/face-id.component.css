@@ -1,0 +1,218 @@
+.face-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.controls button,
+.enroll button,
+.enroll select {
+  border: 1px solid rgba(100, 145, 204, 0.22);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text-primary);
+  font-weight: 700;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.controls button,
+.enroll button {
+  cursor: pointer;
+}
+
+.controls button {
+  padding: 12px 14px;
+}
+
+.controls button:hover,
+.enroll button:hover,
+.enroll select:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+  border-color: rgba(45, 127, 249, 0.34);
+  box-shadow: 0 14px 26px rgba(22, 66, 133, 0.1);
+}
+
+.controls button:active,
+.enroll button:active {
+  transform: translateY(0);
+}
+
+.camera-stage {
+  position: relative;
+  width: 100%;
+  min-height: 260px;
+  aspect-ratio: 4 / 3;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(109, 151, 204, 0.22);
+  background:
+    radial-gradient(circle at top, rgba(44, 126, 249, 0.18), transparent 38%),
+    linear-gradient(180deg, #0a1f46 0%, #07142f 100%);
+  box-shadow: var(--shadow-sm);
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.camera-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.guide-frame {
+  position: absolute;
+  inset: 14%;
+  border-radius: 24px;
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(45, 127, 249, 0.14);
+}
+
+.face-box {
+  position: absolute;
+  border-radius: 20px;
+  border: 3px solid rgba(255, 196, 87, 0.98);
+  box-shadow:
+    0 0 0 999px rgba(7, 20, 47, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.24);
+  transition:
+    left 0.18s ease,
+    top 0.18s ease,
+    width 0.18s ease,
+    height 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.face-box.success {
+  border-color: rgba(64, 194, 123, 0.98);
+}
+
+.face-box.warning {
+  border-color: rgba(255, 196, 87, 0.98);
+}
+
+.face-box.error {
+  border-color: rgba(226, 85, 85, 0.98);
+}
+
+.enroll {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  width: 100%;
+}
+
+.enroll select {
+  min-width: 0;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.enroll select:focus {
+  outline: none;
+  border-color: rgba(45, 127, 249, 0.42);
+  box-shadow: 0 0 0 4px rgba(45, 127, 249, 0.12);
+  background: #ffffff;
+}
+
+.enroll button {
+  padding: 12px 16px;
+}
+
+.enroll button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.msg {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(45, 127, 249, 0.08);
+  color: var(--brand-700);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.msg.success {
+  background: rgba(64, 194, 123, 0.14);
+  color: #157247;
+}
+
+.msg.warning {
+  background: rgba(255, 196, 87, 0.18);
+  color: #8a5a00;
+}
+
+.msg.error {
+  background: rgba(226, 85, 85, 0.14);
+  color: #9b2424;
+}
+
+.profiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(109, 151, 204, 0.16);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.profiles.empty {
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+.profiles-title {
+  flex-basis: 100%;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.profile-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(45, 127, 249, 0.09);
+  color: var(--brand-700);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.hidden-canvas {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .controls,
+  .enroll {
+    grid-template-columns: 1fr;
+  }
+
+  .camera-stage {
+    min-height: 220px;
+  }
+}

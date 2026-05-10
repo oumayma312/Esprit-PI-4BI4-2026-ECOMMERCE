@@ -1,0 +1,452 @@
+<div class="ml-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="ml-shell">
+    <section class="ml-hero">
+      <div class="hero-copy">
+        <div class="hero-chips">
+          <span class="hero-chip">
+            {{ overview?.databaseStatus?.connected ? 'PostgreSQL live' : 'CSV fallback' }}
+          </span>
+          <span class="hero-chip muted">
+            {{ overview?.databaseStatus?.schema || 'datawarehouse' }}
+          </span>
+        </div>
+        <h1>ML Consoles</h1>
+        <p>
+          Regroupez tous les modeles de prediction, de classification et de forecast dans un seul
+          espace de travail, incluant desormais le churn prediction aux cotes des autres consoles ML.
+        </p>
+      </div>
+
+      <div class="hero-side" *ngIf="!loadingOverview && overview as currentOverview">
+        <div class="source-card" [class.offline]="!currentOverview.databaseStatus.connected">
+          <span class="source-dot"></span>
+          <div>
+            <strong>
+              {{ currentOverview.databaseStatus.connected ? 'Connecte a PostgreSQL' : 'Mode snapshots CSV' }}
+            </strong>
+            <p>{{ currentOverview.databaseStatus.message }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="overview-strip" *ngIf="!loadingOverview && overview as currentOverview">
+      <article class="overview-card" *ngFor="let metric of currentOverview.metrics">
+        <span>{{ metric.label }}</span>
+        <strong>{{ metric.value }}</strong>
+        <small>{{ metric.hint }}</small>
+      </article>
+    </section>
+
+    <section class="overview-state" *ngIf="loadingOverview">
+      <div class="state-loader">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <p>Chargement des metadonnees ML et des sources de prediction...</p>
+    </section>
+
+    <section class="overview-state error" *ngIf="!loadingOverview && overviewError">
+      <strong>Le Studio ML ne peut pas charger ses metadonnees.</strong>
+      <p>{{ overviewError }}</p>
+    </section>
+
+    <section class="studio-grid">
+      <aside class="workflow-rail">
+        <button
+          type="button"
+          class="workflow-tile"
+          *ngFor="let workflow of workflows"
+          [class.active]="workflow.id === activeWorkflowId"
+          (click)="setActiveWorkflow(workflow.id)"
+        >
+          <span class="workflow-code">{{ workflow.shortCode }}</span>
+          <div class="workflow-copy">
+            <small>{{ workflow.kicker }}</small>
+            <strong>{{ workflow.title }}</strong>
+            <p>{{ workflow.subtitle }}</p>
+          </div>
+        </button>
+      </aside>
+
+      <section class="studio-stage">
+        <header class="stage-head">
+          <div>
+            <span class="stage-label">{{ activeWorkflow.kicker }}</span>
+            <h2>{{ activeWorkflow.title }}</h2>
+            <p>{{ activeWorkflow.subtitle }}</p>
+          </div>
+
+          <div class="stage-badge" *ngIf="resultFor(activeWorkflowId) as lastResult">
+            <span>{{ (lastResult.confidence * 100) | number: '1.0-0' }}%</span>
+            <small>confidence</small>
+          </div>
+        </header>
+
+        <form class="studio-form" [formGroup]="currentForm" (ngSubmit)="submitActiveWorkflow()">
+          <div class="form-grid" [ngSwitch]="activeWorkflowId">
+            <ng-container *ngSwitchCase="'competitorClassification'">
+              <label class="field full" [class.invalid]="showInvalid(competitorForm, 'productName')">
+                <span>Product name</span>
+                <input formControlName="productName" type="text" placeholder="Ex: Lampe artisanale" />
+                <small>{{ controlMessage(competitorForm, 'productName', 'Le nom du produit') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(competitorForm, 'averagePrice')">
+                <span>Average price (TND)</span>
+                <input formControlName="averagePrice" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(competitorForm, 'averagePrice', 'Le prix moyen') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(competitorForm, 'competitorCount')">
+                <span>Observed competitors</span>
+                <input formControlName="competitorCount" type="number" min="0" step="1" />
+                <small>{{ controlMessage(competitorForm, 'competitorCount', 'Le nombre de concurrents') }}</small>
+              </label>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'campaignSuccess'">
+              <label class="field" [class.invalid]="showInvalid(campaignForm, 'reach')">
+                <span>Reach</span>
+                <input formControlName="reach" type="number" min="0" step="1" />
+                <small>{{ controlMessage(campaignForm, 'reach', 'Le reach') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(campaignForm, 'impressions')">
+                <span>Impressions</span>
+                <input formControlName="impressions" type="number" min="0" step="1" />
+                <small>{{ controlMessage(campaignForm, 'impressions', 'Les impressions') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(campaignForm, 'frequency')">
+                <span>Frequency</span>
+                <input formControlName="frequency" type="number" min="0" step="0.1" />
+                <small>{{ controlMessage(campaignForm, 'frequency', 'La frequence') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(campaignForm, 'budgetPrice')">
+                <span>Budget price</span>
+                <input formControlName="budgetPrice" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(campaignForm, 'budgetPrice', 'Le budget') }}</small>
+              </label>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'customerChurn'">
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'channel')">
+                <span>Primary channel</span>
+                <select formControlName="channel">
+                  <option *ngFor="let channel of channels" [value]="channel">{{ channel }}</option>
+                </select>
+                <small>{{ controlMessage(churnForm, 'channel', 'Le canal principal') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'recency')">
+                <span>Recency (days)</span>
+                <input formControlName="recency" type="number" min="0" step="1" />
+                <small>{{ controlMessage(churnForm, 'recency', 'La recency') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'frequency')">
+                <span>Frequency</span>
+                <input formControlName="frequency" type="number" min="1" step="1" />
+                <small>{{ controlMessage(churnForm, 'frequency', 'La frequence') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'monetaryTotal')">
+                <span>Monetary total</span>
+                <input formControlName="monetaryTotal" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(churnForm, 'monetaryTotal', 'Le montant total') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'monetaryMean')">
+                <span>Average basket</span>
+                <input formControlName="monetaryMean" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(churnForm, 'monetaryMean', 'Le panier moyen') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'quantityTotal')">
+                <span>Total quantity</span>
+                <input formControlName="quantityTotal" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(churnForm, 'quantityTotal', 'La quantite totale') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'productDiversity')">
+                <span>Product diversity</span>
+                <input formControlName="productDiversity" type="number" min="1" step="1" />
+                <small>{{ controlMessage(churnForm, 'productDiversity', 'La diversite produit') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'avgPrice')">
+                <span>Average price</span>
+                <input formControlName="avgPrice" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(churnForm, 'avgPrice', 'Le prix moyen') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'customerLifetimeDays')">
+                <span>Customer lifetime (days)</span>
+                <input formControlName="customerLifetimeDays" type="number" min="0" step="1" />
+                <small>{{ controlMessage(churnForm, 'customerLifetimeDays', 'La duree de vie client') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(churnForm, 'monetaryStd')">
+                <span>Monetary std</span>
+                <input formControlName="monetaryStd" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(churnForm, 'monetaryStd', 'L ecart type monetaire') }}</small>
+              </label>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'bestTimeToSell'">
+              <label class="field" [class.invalid]="showInvalid(sellForm, 'channel')">
+                <span>Sales channel</span>
+                <select formControlName="channel">
+                  <option *ngFor="let channel of channels" [value]="channel">{{ channel }}</option>
+                </select>
+                <small>{{ controlMessage(sellForm, 'channel', 'Le canal') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(sellForm, 'targetYear')">
+                <span>Target year</span>
+                <select formControlName="targetYear">
+                  <option *ngFor="let year of targetYears" [value]="year">{{ year }}</option>
+                </select>
+                <small>{{ controlMessage(sellForm, 'targetYear', 'L annee cible') }}</small>
+              </label>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'bestTimeToPromote'">
+              <label class="field" [class.invalid]="showInvalid(promoteForm, 'channel')">
+                <span>Sales channel</span>
+                <select formControlName="channel">
+                  <option *ngFor="let channel of channels" [value]="channel">{{ channel }}</option>
+                </select>
+                <small>{{ controlMessage(promoteForm, 'channel', 'Le canal') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(promoteForm, 'targetYear')">
+                <span>Target year</span>
+                <select formControlName="targetYear">
+                  <option *ngFor="let year of targetYears" [value]="year">{{ year }}</option>
+                </select>
+                <small>{{ controlMessage(promoteForm, 'targetYear', 'L annee cible') }}</small>
+              </label>
+
+              <label class="field full" [class.invalid]="showInvalid(promoteForm, 'objective')">
+                <span>Promotion objective</span>
+                <select formControlName="objective">
+                  <option *ngFor="let objective of promotionObjectives" [value]="objective.value">
+                    {{ objective.label }}
+                  </option>
+                </select>
+                <small>{{ controlMessage(promoteForm, 'objective', 'L objectif') }}</small>
+              </label>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'supplierClassification'">
+              <label class="field" [class.invalid]="showInvalid(supplierForm, 'governorate')">
+                <span>Governorate</span>
+                <select formControlName="governorate">
+                  <option *ngFor="let governorate of governorates" [value]="governorate">
+                    {{ governorate }}
+                  </option>
+                </select>
+                <small>{{ controlMessage(supplierForm, 'governorate', 'Le gouvernorat') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(supplierForm, 'city')">
+                <span>City</span>
+                <select formControlName="city">
+                  <option *ngFor="let city of citiesForGovernorate" [value]="city">{{ city }}</option>
+                </select>
+                <small>{{ controlMessage(supplierForm, 'city', 'La ville') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(supplierForm, 'totalQuantity')">
+                <span>Total quantity</span>
+                <input formControlName="totalQuantity" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(supplierForm, 'totalQuantity', 'La quantite totale') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(supplierForm, 'totalSpend')">
+                <span>Total spend</span>
+                <input formControlName="totalSpend" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(supplierForm, 'totalSpend', 'Le spend total') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(supplierForm, 'purchaseCount')">
+                <span>Purchase count</span>
+                <input formControlName="purchaseCount" type="number" min="0" step="1" />
+                <small>{{ controlMessage(supplierForm, 'purchaseCount', 'Le nombre d achats') }}</small>
+              </label>
+
+              <label class="field" [class.invalid]="showInvalid(supplierForm, 'averageUnitPrice')">
+                <span>Average unit price</span>
+                <input formControlName="averageUnitPrice" type="number" min="0" step="0.01" />
+                <small>{{ controlMessage(supplierForm, 'averageUnitPrice', 'Le prix unitaire moyen') }}</small>
+              </label>
+
+              <label class="field full" [class.invalid]="showInvalid(supplierForm, 'activeProducts')">
+                <span>Active products</span>
+                <input formControlName="activeProducts" type="number" min="0" step="1" />
+                <small>{{ controlMessage(supplierForm, 'activeProducts', 'Les produits actifs') }}</small>
+              </label>
+            </ng-container>
+          </div>
+
+          <div class="submit-row">
+            <p class="inline-error" *ngIf="workflowErrors[activeWorkflowId]">
+              {{ workflowErrors[activeWorkflowId] }}
+            </p>
+
+            <button class="submit-button" type="submit" [disabled]="isBusy(activeWorkflowId)">
+              <span *ngIf="!isBusy(activeWorkflowId)">{{ activeWorkflow.buttonLabel }}</span>
+              <span *ngIf="isBusy(activeWorkflowId)" class="button-loader">Processing prediction...</span>
+            </button>
+          </div>
+        </form>
+
+        <section class="context-panel" *ngIf="activeWorkflowId === 'customerChurn'">
+          <div class="context-head">
+            <div>
+              <span class="stage-label">Churn analytics</span>
+              <h3>Le churn prediction vit maintenant dans ML Consoles</h3>
+              <p>
+                Toute la lecture retention, le scoring interactif et la priorisation client sont
+                regroupes ici avec le reste des modeles machine learning.
+              </p>
+            </div>
+
+            <div class="stage-badge context" *ngIf="!loadingChurnSummary && churnSummary as currentChurnSummary">
+              <span>{{ currentChurnSummary.modelPerformance.best_model }}</span>
+              <small>best model</small>
+            </div>
+          </div>
+
+          <section class="overview-state inline" *ngIf="loadingChurnSummary">
+            <div class="state-loader">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <p>Chargement du contexte churn et de la watchlist retention...</p>
+          </section>
+
+          <section class="overview-state error inline" *ngIf="!loadingChurnSummary && churnSummaryError">
+            <strong>Le contexte churn ne peut pas etre charge.</strong>
+            <p>{{ churnSummaryError }}</p>
+          </section>
+
+          <ng-container *ngIf="!loadingChurnSummary && churnSummary as currentChurnSummary">
+            <div class="churn-metrics">
+              <article class="highlight-card" *ngFor="let metric of currentChurnSummary.metrics | slice:0:4">
+                <span>{{ metric.label }}</span>
+                <strong>{{ metric.value }}</strong>
+              </article>
+            </div>
+
+            <div class="churn-context-grid">
+              <article class="context-card">
+                <span class="result-label">Risk distribution</span>
+
+                <div class="risk-list">
+                  <article class="risk-item" *ngFor="let risk of currentChurnSummary.riskDistribution">
+                    <div class="risk-meta">
+                      <strong>{{ risk.risk_band }}</strong>
+                      <small>{{ risk.customers }} clients</small>
+                    </div>
+                    <div class="confidence-track compact">
+                      <span [style.width]="riskShareWidth(risk.share)"></span>
+                    </div>
+                  </article>
+                </div>
+              </article>
+
+              <article class="context-card">
+                <span class="result-label">Priority watchlist</span>
+
+                <div class="watchlist">
+                  <article class="watch-item" *ngFor="let customer of topRiskCustomers; trackBy: trackByCustomer">
+                    <div>
+                      <strong>{{ customer.customerName }}</strong>
+                      <small>{{ customer.channel }} · {{ customer.segment }}</small>
+                    </div>
+
+                    <div class="watch-score">
+                      <strong>{{ (customer.churnProbability * 100) | number: '1.0-0' }}%</strong>
+                      <small>{{ customer.recommendedAction }}</small>
+                    </div>
+                  </article>
+                </div>
+              </article>
+            </div>
+
+            <div class="insight-list context">
+              <article class="insight-item" *ngFor="let insight of currentChurnSummary.insights | slice:0:3">
+                <span></span>
+                <p>{{ insight }}</p>
+              </article>
+            </div>
+          </ng-container>
+        </section>
+
+        <div class="loader-layer" *ngIf="isBusy(activeWorkflowId)">
+          <div class="loader-orbit"></div>
+          <div>
+            <h3>Model inference in progress</h3>
+            <p>We are preparing the result card, confidence signal and recommendations.</p>
+          </div>
+        </div>
+
+        <section class="result-panel" *ngIf="resultFor(activeWorkflowId) as result">
+          <div class="result-top">
+            <div class="result-copy">
+              <span class="result-label">Prediction result</span>
+              <h3>{{ result.headline }}</h3>
+              <p>{{ result.summary }}</p>
+            </div>
+
+            <div class="confidence-card">
+              <strong>{{ (result.confidence * 100) | number: '1.0-0' }}%</strong>
+              <small>confidence</small>
+            </div>
+          </div>
+
+          <div class="confidence-track">
+            <span [style.width]="confidenceWidth(result)"></span>
+          </div>
+
+          <div class="result-metrics">
+            <article class="result-metric" *ngFor="let metric of result.metrics" [class.success]="metric.tone === 'success'">
+              <span>{{ metric.label }}</span>
+              <strong>{{ metric.value }}</strong>
+            </article>
+          </div>
+
+          <div class="highlight-grid">
+            <article class="highlight-card" *ngFor="let item of resultHighlights(result)">
+              <span>{{ item.label }}</span>
+              <strong>{{ item.value }}</strong>
+            </article>
+          </div>
+
+          <div class="insight-list">
+            <article class="insight-item" *ngFor="let insight of result.insights">
+              <span></span>
+              <p>{{ insight }}</p>
+            </article>
+          </div>
+
+          <div class="supplementary-grid" *ngIf="supplementaryCards(result).length">
+            <article class="supplementary-card" *ngFor="let item of supplementaryCards(result)">
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.value }}</span>
+              <small>{{ item.caption }}</small>
+            </article>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+</div>

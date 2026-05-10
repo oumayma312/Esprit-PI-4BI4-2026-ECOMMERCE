@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pandas
+numpy
+psycopg
+scikit-learn
+opencv-python
+python-dotenv
+requests
+pillow
+beautifulsoup4
+papermill

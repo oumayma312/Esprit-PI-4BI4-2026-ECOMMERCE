@@ -1,0 +1,409 @@
+<section
+  class="landing-page"
+  [class.light-theme]="currentTheme === 'light'"
+  [style.--hero-rotate-x]="heroRotateX"
+  [style.--hero-rotate-y]="heroRotateY"
+  [style.--hero-shift-x]="heroShiftX"
+  [style.--hero-shift-y]="heroShiftY"
+  [style.--hero-glow-x]="heroGlowX"
+  [style.--hero-glow-y]="heroGlowY"
+  [style.--hero-scroll-shift]="heroScrollShift"
+>
+  <div class="page-grid" aria-hidden="true"></div>
+
+  <header class="site-nav" [class.scrolled]="navElevated">
+    <div class="site-nav__inner">
+      <a class="brand" href="#home" (click)="closeMobileNav()">
+        <span class="brand-mark">
+          <img src="/logo.png" alt="Project Story" />
+        </span>
+        <span class="brand-copy">
+          <strong>Project Story</strong>
+          <small>Immersive analytics platform</small>
+        </span>
+      </a>
+
+      <nav class="nav-links" [class.open]="mobileNavOpen">
+        <a href="#home" (click)="closeMobileNav()">Home</a>
+        <a href="#about" (click)="closeMobileNav()">About</a>
+        <a href="#features" (click)="closeMobileNav()">Features</a>
+        <a href="#contact" (click)="closeMobileNav()">Contact</a>
+        <a class="nav-login mobile-only" routerLink="/login" (click)="closeMobileNav()">Sign in</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button
+          type="button"
+          class="theme-toggle"
+          (click)="toggleTheme()"
+          [attr.aria-label]="currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+          [attr.aria-pressed]="currentTheme === 'light'"
+          [attr.title]="currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        >
+          <svg class="theme-toggle__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 3.75v1.5M12 18.75v1.5M5.64 5.64l1.06 1.06M17.3 17.3l1.06 1.06M3.75 12h1.5M18.75 12h1.5M5.64 18.36l1.06-1.06M17.3 6.7l1.06-1.06M15.75 12a3.75 3.75 0 1 1-7.5 0a3.75 3.75 0 0 1 7.5 0Z"
+            />
+          </svg>
+          <span class="theme-toggle__thumb" aria-hidden="true"></span>
+          <svg class="theme-toggle__icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M21 14.25A8.25 8.25 0 0 1 9.75 3a8.25 8.25 0 1 0 11.25 11.25Z"
+            />
+          </svg>
+        </button>
+        <a class="nav-login desktop-only" routerLink="/login">Sign in</a>
+        <button
+          type="button"
+          class="menu-toggle"
+          [class.active]="mobileNavOpen"
+          (click)="toggleMobileNav()"
+          aria-label="Open menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="landing-main">
+    <section class="hero-section section-shell" id="home">
+      <div class="hero-grid">
+        <div class="hero-copy reveal-block is-visible">
+          <span class="section-kicker">Immersive SaaS landing</span>
+          <h1>A premium landing page that makes the value of your product obvious before the first sign-in.</h1>
+          <p>
+            Project Story brings together dashboards, machine learning, an analytics copilot and biometric security
+            inside a visual experience that feels more ambitious, modern and memorable.
+          </p>
+
+          <div class="hero-proof">
+            <span *ngFor="let signal of heroSignals">{{ signal }}</span>
+          </div>
+
+          <div class="hero-actions">
+            <a class="primary-cta" routerLink="/login">Get Started</a>
+            <a class="secondary-cta" href="#features">Explore the Platform</a>
+          </div>
+
+          <div class="hero-stats">
+            <article class="stat-card" *ngFor="let stat of heroStats">
+              <strong>{{ stat.value }}</strong>
+              <span>{{ stat.label }}</span>
+              <small>{{ stat.detail }}</small>
+            </article>
+          </div>
+        </div>
+
+        <div
+          class="hero-visual reveal-block is-visible"
+          [class.motion-ready]="motionReady"
+          (mousemove)="onHeroPointerMove($event)"
+          (mouseleave)="resetHeroPointer()"
+        >
+          <div class="visual-halo" aria-hidden="true"></div>
+          <div class="orb orb-one" aria-hidden="true"></div>
+          <div class="orb orb-two" aria-hidden="true"></div>
+          <div class="orb orb-three" aria-hidden="true"></div>
+
+          <div class="scene-shell">
+            <div class="scene-floor" aria-hidden="true"></div>
+
+            <article class="hero-dashboard">
+              <div class="dashboard-top">
+                <div>
+                  <small>Command surface</small>
+                  <strong>Project Story Control Deck</strong>
+                </div>
+                <span class="live-pill">Live orchestration</span>
+              </div>
+
+              <div class="dashboard-metrics">
+                <article class="metric-card" *ngFor="let metric of sceneMetrics">
+                  <span>{{ metric.label }}</span>
+                  <strong>{{ metric.value }}</strong>
+                  <small>{{ metric.trend }}</small>
+                </article>
+              </div>
+
+              <div class="dashboard-board">
+                <section class="board-panel panel-chart">
+                  <div class="panel-heading">
+                    <span>Prediction confidence</span>
+                    <strong>Model pulse</strong>
+                  </div>
+
+                  <div class="chart-bars" aria-hidden="true">
+                    <span class="bar" *ngFor="let height of chartHeights" [style.height.%]="height"></span>
+                  </div>
+
+                  <div class="panel-footer">
+                    <span>Signals aligned</span>
+                    <strong>Decision windows ready</strong>
+                  </div>
+                </section>
+
+                <section class="board-panel panel-flow">
+                  <div class="panel-heading">
+                    <span>Workflow layers</span>
+                    <strong>Data to action</strong>
+                  </div>
+
+                  <div class="flow-nodes">
+                    <article *ngFor="let node of workflowNodes; let i = index">
+                      <span>0{{ i + 1 }}</span>
+                      <strong>{{ node }}</strong>
+                    </article>
+                  </div>
+                </section>
+              </div>
+
+              <div class="command-strip">
+                <span>CEO view</span>
+                <span>Sales momentum</span>
+                <span>Finance radar</span>
+                <span>AI assistant</span>
+              </div>
+            </article>
+
+            <article class="floating-panel floating-panel--top">
+              <span class="floating-label">Parallax scene</span>
+              <strong>Depth, glow and calm motion</strong>
+              <p>A product staging that feels more mature, more alive and more premium at first glance.</p>
+            </article>
+
+            <article class="floating-panel floating-panel--bottom">
+              <span class="floating-label">Secure access</span>
+              <strong>Password plus Face ID</strong>
+              <p>A reassuring entry flow for sensitive modules, business users and live product demos.</p>
+            </article>
+
+            <div class="orbit-ring" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-strip section-shell">
+      <div class="trust-marquee reveal-block" #revealTarget>
+        <div class="trust-track">
+          <span *ngFor="let signal of trustSignals">{{ signal }}</span>
+          <span *ngFor="let signal of trustSignals" aria-hidden="true">{{ signal }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section section-shell" id="about">
+      <div class="section-heading reveal-block" #revealTarget>
+        <span class="section-kicker">Premium experience</span>
+        <h2>The landing page no longer lists modules only, it now tells the story of a credible and desirable product.</h2>
+        <p>
+          This visual direction turns the first impression into a proof of maturity with depth, rhythm, refined contrast
+          and value cues across the entire journey.
+        </p>
+      </div>
+
+      <div class="about-grid">
+        <article class="about-story reveal-block" #revealTarget>
+          <div class="story-header">
+            <span>Product storyline</span>
+            <strong>Why this experience attracts more attention</strong>
+          </div>
+
+          <p>
+            Instead of a purely informative page, visitors step into a universe that already feels like a real data
+            startup product: more depth, more motion and more coherence between message and form.
+          </p>
+
+          <ul class="story-points">
+            <li *ngFor="let point of storyPoints">{{ point }}</li>
+          </ul>
+
+          <div class="story-surface">
+            <span>Glassmorphism</span>
+            <span>Scroll reveals</span>
+            <span>3D hover layers</span>
+          </div>
+        </article>
+
+        <div class="benefit-stack">
+          <article
+            class="benefit-card reveal-block"
+            #revealTarget
+            *ngFor="let benefit of benefits"
+            [style.--reveal-delay]="benefit.delay"
+          >
+            <div class="benefit-eyebrow">
+              <span>{{ benefit.signal }}</span>
+              <strong>{{ benefit.value }}</strong>
+            </div>
+            <h3>{{ benefit.title }}</h3>
+            <p>{{ benefit.description }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="features-section section-shell" id="features">
+      <div class="section-heading reveal-block" #revealTarget>
+        <span class="section-kicker">Features</span>
+        <h2>Each product capability is presented like a premium module, readable, polished and ready to act on.</h2>
+        <p>
+          The new presentation gives more weight to use cases, business value and the technical sophistication of the
+          platform.
+        </p>
+      </div>
+
+      <div class="feature-grid">
+        <article
+          class="feature-tile reveal-block"
+          #revealTarget
+          *ngFor="let feature of features"
+          [style.--reveal-delay]="feature.delay"
+        >
+          <div class="feature-top">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true" [ngSwitch]="feature.icon">
+                <ng-container *ngSwitchCase="'dashboard'">
+                  <path d="M4 5h16v4H4z" />
+                  <path d="M4 11h7v8H4z" />
+                  <path d="M13 11h7v3h-7z" />
+                  <path d="M13 16h7v3h-7z" />
+                </ng-container>
+                <ng-container *ngSwitchCase="'ml'">
+                  <path d="M6 18V8" />
+                  <path d="M12 21V3" />
+                  <path d="M18 16V10" />
+                  <path d="M4 13h4" />
+                  <path d="M10 8h4" />
+                  <path d="M16 13h4" />
+                </ng-container>
+                <ng-container *ngSwitchCase="'chat'">
+                  <path d="M5 6h14v9H9l-4 3z" />
+                  <path d="M8 10h8" />
+                  <path d="M8 13h5" />
+                </ng-container>
+                <ng-container *ngSwitchCase="'face'">
+                  <path d="M8 9V7a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <path d="M8 15v2a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2" />
+                  <path d="M7 10h10v4H7z" />
+                  <path d="M10 12h4" />
+                </ng-container>
+                <ng-container *ngSwitchCase="'flow'">
+                  <path d="M5 7h6l2 3-2 3H5z" />
+                  <path d="M13 7h6v6h-6" />
+                  <path d="M13 13h6v4h-6" />
+                </ng-container>
+                <ng-container *ngSwitchCase="'security'">
+                  <path d="M12 3l7 3v5c0 4.5-2.8 8.6-7 10-4.2-1.4-7-5.5-7-10V6z" />
+                  <path d="M9.5 11.5l1.8 1.8 3.2-3.2" />
+                </ng-container>
+              </svg>
+            </div>
+
+            <span class="feature-eyebrow">{{ feature.eyebrow }}</span>
+          </div>
+
+          <strong>{{ feature.title }}</strong>
+          <p>{{ feature.description }}</p>
+          <span class="feature-link">View module</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="journey-section section-shell">
+      <div class="journey-panel reveal-block" #revealTarget>
+        <div class="journey-copy">
+          <span class="section-kicker">Smooth conversion</span>
+          <h2>The journey guides attention from first curiosity to sign-in or demo request without breaking immersion.</h2>
+          <p>
+            The hero attracts, the following sections structure the value, and the CTAs close the loop naturally without
+            disrupting the premium feel.
+          </p>
+
+          <div class="journey-preview">
+            <small>Live product framing</small>
+            <strong>A landing page designed to sell the idea as much as the technology behind it.</strong>
+          </div>
+        </div>
+
+        <div class="journey-steps">
+          <article *ngFor="let step of journeySteps">
+            <span>{{ step.step }}</span>
+            <strong>{{ step.title }}</strong>
+            <p>{{ step.description }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-section section-shell" id="contact">
+      <div class="section-heading reveal-block" #revealTarget>
+        <span class="section-kicker">Contact</span>
+        <h2>Turn this showcase into a presentation, a product demo or a real deployment conversation.</h2>
+        <p>
+          Use the form to frame your needs, request a guided walkthrough or prepare a project rollout conversation.
+        </p>
+      </div>
+
+      <div class="contact-grid">
+        <div class="contact-cards">
+          <article class="contact-card reveal-block" #revealTarget *ngFor="let card of contactCards">
+            <strong>{{ card.title }}</strong>
+            <p>{{ card.subtitle }}</p>
+            <a [href]="card.value.includes('@') ? 'mailto:' + card.value : 'tel:' + card.value">{{ card.value }}</a>
+          </article>
+        </div>
+
+        <form class="contact-form reveal-block" #revealTarget (ngSubmit)="submitContact()">
+          <div class="contact-form__intro">
+            <span>Launch brief</span>
+            <strong>Tell us about your use case, your context or the product demo you want to prepare.</strong>
+          </div>
+
+          <div class="contact-form__grid">
+            <label class="contact-field">
+              <span>Name</span>
+              <input [(ngModel)]="visitorName" name="visitorName" type="text" placeholder="Your name" />
+            </label>
+
+            <label class="contact-field">
+              <span>Email</span>
+              <input [(ngModel)]="visitorEmail" name="visitorEmail" type="email" placeholder="you@company.com" />
+            </label>
+
+            <label class="contact-field full">
+              <span>Company</span>
+              <input [(ngModel)]="visitorCompany" name="visitorCompany" type="text" placeholder="Your company name" />
+            </label>
+
+            <label class="contact-field full">
+              <span>Message</span>
+              <textarea
+                [(ngModel)]="visitorMessage"
+                name="visitorMessage"
+                rows="5"
+                placeholder="Describe your needs, your context or the product staging you would like to discuss."
+              ></textarea>
+            </label>
+          </div>
+
+          <div class="contact-actions">
+            <button type="submit" class="primary-cta">Send Request</button>
+            <a class="secondary-cta" routerLink="/login">Go to Sign In</a>
+          </div>
+
+          <p class="contact-feedback" [class.warning]="contactFeedbackTone === 'warning'" *ngIf="contactFeedback">
+            {{ contactFeedback }}
+          </p>
+        </form>
+      </div>
+    </section>
+  </main>
+</section>

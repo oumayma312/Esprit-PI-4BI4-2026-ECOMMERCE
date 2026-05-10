@@ -1,0 +1,132 @@
+<div class="ai-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="ai-shell">
+    <section class="ai-hero">
+      <div class="hero-copy">
+        <div class="hero-chips">
+          <span class="hero-chip">Image similarity</span>
+          <span class="hero-chip muted">Auto compare</span>
+          <span class="hero-chip muted" *ngIf="currentUser">Session {{ currentUser.role | uppercase }}</span>
+        </div>
+
+        <h1>Image similarity search</h1>
+        <p>
+          Upload a product image and the app automatically compares it with the local catalog to
+          show the closest visual matches.
+        </p>
+      </div>
+    </section>
+
+
+    <section class="workspace-panel upload-panel">
+      <div class="panel-head">
+        <div>
+          <p class="panel-kicker">Visual intake</p>
+          <h2>Upload an image</h2>
+          <p class="panel-description">
+            Add a local visual and similarity with catalog products starts automatically after the
+            upload.
+          </p>
+        </div>
+
+        <label class="upload-button">
+          <input type="file" accept="image/*" multiple (change)="onLocalImagesSelected($event)" />
+          <span>Upload image</span>
+        </label>
+      </div>
+
+      <p class="inline-message" *ngIf="uploadMessage">{{ uploadMessage }}</p>
+
+      <div class="upload-grid" *ngIf="uploadedAssets.length; else emptyUploads">
+        <article
+          class="upload-card"
+          *ngFor="let asset of uploadedAssets; trackBy: trackByAsset"
+          [class.active]="selectedUploadedAssetId === asset.id"
+          (click)="compareUploadedAsset(asset)"
+        >
+          <img [src]="asset.previewUrl" [alt]="asset.name" title="{{ asset.name }}" />
+          <div class="upload-copy">
+            <strong>{{ asset.name }}</strong>
+            <small>{{ asset.sizeLabel }} · uploaded at {{ asset.createdAtLabel }}</small>
+            <small>Click to run the analysis again.</small>
+          </div>
+          <div class="upload-actions">
+            <button type="button" class="text-button remove-button" (click)="removeUploadedAsset(asset.id, $event)">
+              Remove image
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #emptyUploads>
+        <div class="empty-state">
+          <strong>No images uploaded yet.</strong>
+          <p>Upload an image to start similarity search immediately.</p>
+        </div>
+      </ng-template>
+    </section>
+
+    <section class="result-panel" *ngIf="matcherCompareLoading || matcherCompareResult">
+      <div class="comparison-placeholder" *ngIf="matcherCompareLoading">
+        <div class="loader-orbit"></div>
+        <h3>Smart analysis in progress</h3>
+        <p>The system is comparing the uploaded visual with catalog products.</p>
+      </div>
+
+      <ng-container *ngIf="!matcherCompareLoading && matcherCompareResult as compare">
+        <div class="result-head">
+          <div class="query-card">
+            <img [src]="queryImageUrl(compare)" [alt]="queryLabel(compare)" title="{{ queryLabel(compare) }}" />
+            <div>
+              <span>{{ queryContextLabel() }}</span>
+              <strong>{{ queryLabel(compare) }}</strong>
+              <small>Uploaded image</small>
+            </div>
+          </div>
+
+          <div class="mini-metrics">
+            <article class="mini-metric" *ngFor="let metric of compare.metrics">
+              <span>{{ metric.label }}</span>
+              <strong>{{ metric.value }}</strong>
+            </article>
+          </div>
+        </div>
+
+        <div class="category-row passive">
+          <span class="category-pill passive" *ngFor="let category of compare.predictedCategories">
+            {{ category.name }} · {{ category.matches }}
+          </span>
+        </div>
+
+        <div class="match-grid">
+          <article class="match-card" *ngFor="let match of compare.matches; trackBy: trackByProduct">
+            <img [src]="match.imageUrl" [alt]="match.productName" title="{{ match.productName }}" />
+            <div class="match-copy">
+              <span>{{ match.mainCategory }}</span>
+              <strong>{{ match.productName }}</strong>
+              <small>{{ match.subcategory }}</small>
+            </div>
+
+            <div class="match-metrics">
+              <div>
+                <span>Similarity</span>
+                <strong>{{ ((match.similarityScore || 0) * 100) | number: '1.0-0' }}%</strong>
+              </div>
+              <div>
+                <span>Visual</span>
+                <strong>{{ ((match.visualScore || 0) * 100) | number: '1.0-0' }}%</strong>
+              </div>
+              <div>
+                <span>Text</span>
+                <strong>{{ ((match.textScore || 0) * 100) | number: '1.0-0' }}%</strong>
+              </div>
+            </div>
+
+            <a [href]="match.productUrl" target="_blank" rel="noreferrer">View product page</a>
+          </article>
+        </div>
+      </ng-container>
+    </section>
+  </main>
+</div>

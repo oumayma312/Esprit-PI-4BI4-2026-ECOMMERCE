@@ -1,0 +1,95 @@
+<div class="chatbot-shell" [class.open]="isOpen">
+  <section class="chat-panel" [class.open]="isOpen" aria-label="Story AI chat panel">
+    <header class="chat-header">
+      <div class="chat-brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32">
+            <path d="M9 9.5h14a4.5 4.5 0 0 1 4.5 4.5v6A4.5 4.5 0 0 1 23 24.5H16l-5.5 4v-4H9A4.5 4.5 0 0 1 4.5 20v-6A4.5 4.5 0 0 1 9 9.5Z"></path>
+            <path d="M12 16h8"></path>
+            <path d="M12 19.5h5"></path>
+            <path d="M21.5 6.5v3"></path>
+            <path d="M20 8h3"></path>
+          </svg>
+        </span>
+        <div>
+          <strong>Story AI</strong>
+          <p>Ai assistant</p>
+        </div>
+      </div>
+
+      <button type="button" class="icon-btn" (click)="close()" aria-label="Close chatbot">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 6l12 12"></path>
+          <path d="M18 6 6 18"></path>
+        </svg>
+      </button>
+    </header>
+
+    <div class="chat-intro">
+      Ask about dashboards, products, campaigns, or any CSV table in the warehouse.
+    </div>
+
+    <div class="message-list" #messageList>
+      <article
+        *ngFor="let message of messages; trackBy: trackMessage"
+        class="message"
+        [class.user]="message.role === 'user'"
+        [class.pending]="message.pending"
+      >
+        <div class="bubble">
+          <p>{{ message.content }}</p>
+          <div class="typing-dots" *ngIf="message.pending" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="message-meta" *ngIf="message.meta || (message.sources?.length ?? 0)">
+          <span *ngIf="message.meta">{{ message.meta }}</span>
+          <span *ngIf="message.sources?.length">Sources: {{ message.sources?.slice(0, 3)?.join(', ') }}</span>
+        </div>
+      </article>
+    </div>
+
+    <form class="composer" (ngSubmit)="sendMessage()">
+      <textarea
+        [(ngModel)]="draft"
+        name="chatDraft"
+        rows="2"
+        placeholder="Ask Story AI a question..."
+        [disabled]="isSending"
+        (keydown)="handleComposerKeydown($event)"
+      ></textarea>
+
+      <button type="submit" [disabled]="isSending || !draft.trim()">
+        <span>{{ isSending ? 'Sending...' : 'Send' }}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h12"></path>
+          <path d="m13 6 6 6-6 6"></path>
+        </svg>
+      </button>
+    </form>
+  </section>
+
+  <button
+    type="button"
+    class="launcher"
+    [class.open]="isOpen"
+    (click)="toggleOpen()"
+    [attr.aria-expanded]="isOpen"
+    aria-label="Open Story AI chatbot"
+  >
+    <span class="launcher-ring"></span>
+    <span class="launcher-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 32">
+        <path d="M9 9.5h14a4.5 4.5 0 0 1 4.5 4.5v6A4.5 4.5 0 0 1 23 24.5H16l-5.5 4v-4H9A4.5 4.5 0 0 1 4.5 20v-6A4.5 4.5 0 0 1 9 9.5Z"></path>
+        <path d="M12 16h8"></path>
+        <path d="M12 19.5h5"></path>
+        <path d="M21.5 6.5v3"></path>
+        <path d="M20 8h3"></path>
+      </svg>
+    </span>
+    <span class="launcher-label">{{ isOpen ? 'Close' : 'Ask AI' }}</span>
+  </button>
+</div>

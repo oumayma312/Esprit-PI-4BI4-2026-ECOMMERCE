@@ -1,0 +1,6 @@
+.app-main {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}

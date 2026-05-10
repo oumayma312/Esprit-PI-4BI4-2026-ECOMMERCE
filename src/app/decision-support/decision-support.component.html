@@ -1,0 +1,124 @@
+<div class="decision-layout">
+  <app-sidebar></app-sidebar>
+
+  <main class="decision-shell" *ngIf="profile as activeProfile">
+    <section class="decision-hero">
+      <div class="hero-copy">
+        <div class="hero-chips">
+          <span class="hero-chip">Decision support</span>
+          <span class="hero-chip muted">{{ activeProfile.role }} session</span>
+        </div>
+        <h1>{{ activeProfile.title }}</h1>
+        <p>{{ activeProfile.subtitle }}</p>
+      </div>
+
+      <div class="hero-panel">
+        <div class="stat-card">
+          <span>Total actions</span>
+          <strong>{{ decisions.length }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>High priority</span>
+          <strong>{{ priorityCount('HAUTE') }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>Pending review</span>
+          <strong>{{ pendingCount }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>Unread only</span>
+          <strong>{{ unreadOnly ? 'On' : 'Off' }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="decision-toolbar">
+      <label class="toggle">
+        <input type="checkbox" [checked]="unreadOnly" (change)="toggleUnreadOnly($event)" />
+        <span>Show unread decisions only</span>
+      </label>
+
+      <div class="toolbar-actions">
+        <button class="ghost" type="button" (click)="refresh()" [disabled]="loading">Refresh</button>
+        <button class="ghost" type="button" (click)="logout()">Sign out</button>
+      </div>
+    </section>
+
+    <section class="decision-meta">
+      <span>{{ authLabel }}</span>
+      <span>{{ lastUpdatedLabel }}</span>
+    </section>
+
+    <section class="decision-intro">
+      <p class="eyebrow">Action queue</p>
+      <h2>{{ activeProfile.description }}</h2>
+      <p class="intro-text">
+        These are the latest decisions returned for {{ activeProfile.role }}. Use each card to review the
+        recommended action and mark it as read once it is acknowledged.
+      </p>
+    </section>
+
+    <section class="error-panel" *ngIf="error">
+      {{ error }}
+    </section>
+
+    <section class="loading-panel" *ngIf="loading">
+      Loading decisions...
+    </section>
+
+    <section class="empty-state" *ngIf="!loading && !error && decisions.length === 0">
+      No decisions found for this role.
+    </section>
+
+    <section class="decision-list" *ngIf="!loading && decisions.length > 0">
+      <article class="decision-card" *ngFor="let decision of paginatedDecisions; trackBy: trackByDecisionId">
+        <div class="decision-top">
+          <div>
+            <p class="decision-id">Decision #{{ decision.id }}</p>
+            <h3>{{ decision.titre }}</h3>
+          </div>
+          <span class="urgency" [attr.data-level]="decision.urgence">{{ urgencyLabel(decision.urgence) }}</span>
+        </div>
+
+        <div class="decision-meta-row">
+          <span>Generated {{ decision.date_generated }}</span>
+          <span>Status: {{ statusLabel(decision.statut) }}</span>
+          <span>Created {{ decision.created_at | date : 'medium' }}</span>
+        </div>
+
+        <div class="source-row" *ngIf="decision.sources?.length; else noSources">
+          <span class="source-chip" *ngFor="let source of decision.sources">{{ source }}</span>
+        </div>
+        <ng-template #noSources>
+          <p class="no-sources">No source metadata provided.</p>
+        </ng-template>
+
+        <div class="decision-actions">
+          <button
+            type="button"
+            class="mark-read"
+            [disabled]="decision.statut === 'lu' || isReading(decision.id)"
+            (click)="markRead(decision)"
+          >
+            {{ decision.statut === 'lu' ? 'Already read' : isReading(decision.id) ? 'Updating...' : 'Mark as read' }}
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <section class="pagination" *ngIf="!loading && decisions.length > pageSize">
+      <button type="button" class="ghost" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+        Previous
+      </button>
+      <span>Page {{ currentPage }} / {{ totalPages }} ({{ decisions.length }} decisions)</span>
+      <button
+        type="button"
+        class="ghost"
+        (click)="goToPage(currentPage + 1)"
+        [disabled]="currentPage === totalPages"
+      >
+        Next
+      </button>
+    </section>
+  </main>
+</div>

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from sqlalchemy import create_engine
 import psycopg2
 
@@ -20,7 +21,7 @@ def get_connection():
     return psycopg2.connect(**DB_CONFIG)
 
 def create_decisions_table():
-    """Crée la table decisions_log si elle n'existe pas encore"""
+    """Create the decisions_log table if it does not yet exist."""
     conn = get_connection()
     cur  = conn.cursor()
     cur.execute("""
@@ -41,4 +42,4 @@ def create_decisions_table():
     conn.commit()
     cur.close()
     conn.close()
-    print("Table decisions_log prête.")
+    print("Table decisions_log ready.")

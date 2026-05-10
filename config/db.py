@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 from sqlalchemy import create_engine
-import psycopg2
+
+# Prefer psycopg (psycopg3) when available; fall back to psycopg2.
+try:
+    import psycopg as _psycopg3  # type: ignore
+    _DRIVER = "psycopg"
+except Exception:
+    import psycopg2 as _psycopg2  # type: ignore
+    _DRIVER = "psycopg2"
 
 DB_CONFIG = {
     "host":     "localhost",
@@ -18,7 +25,31 @@ def get_engine():
     return create_engine(url)
 
 def get_connection():
-    return psycopg2.connect(**DB_CONFIG)
+    """Return a DB connection using preferred driver.
+
+    This tries psycopg (psycopg3) first, then psycopg2. If psycopg2
+    raises a UnicodeDecodeError, re-raise with additional context.
+    """
+    if _DRIVER == "psycopg":
+        return _psycopg3.connect(
+            dbname=DB_CONFIG.get("database"),
+            user=DB_CONFIG.get("user"),
+            password=DB_CONFIG.get("password"),
+            host=DB_CONFIG.get("host"),
+            port=DB_CONFIG.get("port"),
+        )
+
+    try:
+        return _psycopg2.connect(**DB_CONFIG)
+    except UnicodeDecodeError as exc:
+        keys = ",".join(sorted(DB_CONFIG.keys()))
+        raise UnicodeDecodeError(
+            exc.encoding or "utf-8",
+            exc.object,
+            exc.start,
+            exc.end,
+            f"UnicodeDecodeError connecting with psycopg2. DB_CONFIG keys: {keys}"
+        )
 
 def create_decisions_table():
     """Create the decisions_log table if it does not yet exist."""
